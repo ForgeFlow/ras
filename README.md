@@ -1,4 +1,4 @@
-###################### How to install and configure Raspbian on a RPi Zero W (for the RFID attendance project) ######################
+## How to install and configure Raspbian on a RPi Zero W (for the RFID attendance project) ##
 
 ## General configuration ##
 
@@ -19,8 +19,11 @@
 8. Add the following lines to the end (substituting the contents into the ):
 
    network={
+   
      ssid="my network name"
+     
      psk="my network password"
+     
    }
 
    *For other possible network configurations, see https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
@@ -59,11 +62,9 @@
 
           > ssh pi@raspberrypi.local
       
-          If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to 
-          step 17 now.
+    If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
-          *If you have another RPi connected or you had in the past, it may not work. Use $ssh-keygen -R raspberrypi.local first to clear any previous reference to 
-          raspberry.local.
+    *If you have another RPi connected or you had in the past, it may not work. Use $ssh-keygen -R raspberrypi.local first to clear any previous reference to raspberry.local.
 
     16.2. If the previous method didn't worked, we need to find the RPi IP adress. To do that, there are two possibilities:
     
