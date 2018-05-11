@@ -11,11 +11,13 @@ except:
 
 import binascii
 import random, time
+import pygame
 
 from demo_opts import get_device
 from luma.core.render import canvas
 from PIL import ImageFont
 from PIL import Image
+
 
 def have_internet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
@@ -27,20 +29,39 @@ def have_internet():
         conn.close()
         return False
 
-def screen_drawing(device,card,msg,elapsed_time):
+
+def four_msg(device,msg1,msg2,msg3,msg4,elapsed_time):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 20)
+    font2 = ImageFont.truetype(font_path, 18)
 
     with canvas(device) as draw:
-        draw.text((0, 0), "Test Program", font=font2, fill="white")
-        if device.height >= 32:
-            draw.text((0, 14), card, font=font2, fill="white")
-
-        if device.height >= 64:
-            draw.text((0, 26), msg, font=font2, fill="white")
-            draw.text((0, 38), str(elapsed_time), font=font2, fill="white")
+        draw.rectangle(device.bounding_box, outline="white")
+        if elapsed_time <= 15.0:
+            draw.rectangle((3, 3, 124, 17), outline="white", fill="white")
+            draw.text((5, 0), msg1, font=font2, fill="black")
+            draw.text((5, 15), msg2, font=font2, fill="white")
+            draw.text((5, 30), msg3, font=font2, fill="white")
+            draw.text((5, 45), msg4, font=font2, fill="white")
+        elif elapsed_time <= 25.0:
+            draw.rectangle((3, 17, 124, 31), outline="white", fill="white")
+            draw.text((5, 0), msg1, font=font2, fill="white")
+            draw.text((5, 15), msg2, font=font2, fill="black")
+            draw.text((5, 30), msg3, font=font2, fill="white")
+            draw.text((5, 45), msg4, font=font2, fill="white")
+        elif elapsed_time <= 35.0:
+            draw.rectangle((3, 31, 124, 47), outline="white", fill="white")
+            draw.text((5, 0), msg1, font=font2, fill="white")
+            draw.text((5, 15), msg2, font=font2, fill="white")
+            draw.text((5, 30), msg3, font=font2, fill="black")
+            draw.text((5, 45), msg4, font=font2, fill="white")
+        else:
+            draw.rectangle((3, 47, 124, 60), outline="white", fill="white")
+            draw.text((5, 0), msg1, font=font2, fill="white")
+            draw.text((5, 15), msg2, font=font2, fill="white")
+            draw.text((5, 30), msg3, font=font2, fill="white")
+            draw.text((5, 45), msg4, font=font2, fill="black")
     print elapsed_time
 
 def simple_msg(msg):
@@ -87,9 +108,9 @@ def main():
         elapsed_time = 0.0
         time.sleep(5)
 
-        while elapsed_time < 20.0:
+        while elapsed_time < 45.0:
             elapsed_time = time.time() - start_time
-            screen_drawing(device,card,msg,elapsed_time)
+            four_msg(device,"Main program","RFID reader","Reset settings","Back",elapsed_time)
 
     else:
 
