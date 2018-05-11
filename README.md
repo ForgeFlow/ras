@@ -1,5 +1,7 @@
 ## How to install and configure Raspbian on a RPi Zero W (for the RFID attendance project) ##
 
+Some different libraries and codes from other repositories are employed to be able to run our program. Thanks to them from here for these great programs, and all the recognitions for them for the use of their code.
+
 ## General configuration ##
 
 1. Download the Raspbian Lite image from https://www.raspberrypi.org/downloads/raspbian/ as a ZIP.
@@ -241,13 +243,11 @@
 
    Go to the "create_parser(description)" method, and change the following line:
 
-    " general_group.add_argument('--display', '-d', type=str, default=display_choices[0], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join 
-      (display_choices)), choices=display_choices, metavar='') "
+        " general_group.add_argument('--display', '-d', type=str, default=display_choices[0], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join(display_choices)), choices=display_choices, metavar='') "
    
    By:
 
-    " general_group.add_argument('--display', '-d', type=str, default=display_choices[6], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join
-      (display_choices)), choices=display_choices, metavar='') "
+       " general_group.add_argument('--display', '-d', type=str, default=display_choices[6], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join(display_choices)), choices=display_choices, metavar='') "
 
    So that the default field is loaded with the 6th element of the display_choices list (SH1106) instead of the 0th (SSD1306).
 
