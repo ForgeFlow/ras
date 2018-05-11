@@ -1,4 +1,6 @@
-###################### How to install and configure Raspbian on a RPi Zero W (for the RFID attendance project) ######################
+## How to install and configure Raspbian on a RPi Zero W (for the RFID attendance project) ##
+
+Some different libraries and codes from other repositories are employed to be able to run our program. Thanks to them from here for these great programs, and all the recognitions for them for the use of their code.
 
 ## General configuration ##
 
@@ -18,34 +20,33 @@
 
 8. Add the following lines to the end (substituting the contents into the ):
 
-   network={
-     ssid="my network name"
-     psk="my network password"
-   }
+       network={
+         ssid="my network name"
+         psk="my network password"
+       }
 
    *For other possible network configurations, see https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
 9. Add the country code too (to choose the correct frequency bands), as follows:
 
-   country=ES
+       country=ES
 
 10. Go to etc/network/ and open the "interfaces" file.
 
 11. Find this block in the file (if it is not present, go to the next step):
 
-    allow-hotplug wlan0
-    iface wlan0 inet manual
-        wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+        allow-hotplug wlan0
+        iface wlan0 inet manual
+            wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
 12. Substitute the block with (if it is not present, just add the next block to the end of the file):
 
-    auto wlan0
-    allow-hotplug wlan0
-    iface wlan0 inet dhcp
-        wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+        auto wlan0
+        allow-hotplug wlan0
+        iface wlan0 inet dhcp
+            wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
-    *There is the possibility of fixing the IP (static) so it is easier to find. See at https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d 
-     for more details.
+    *There is the possibility of fixing the IP (static) so it is easier to find. See at https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
 
 13. Unmount the partitions and extract the SD card.
 
@@ -57,35 +58,28 @@
 
     16.1. Try the next command:
 
-          > ssh pi@raspberrypi.local
+       > ssh pi@raspberrypi.local
       
-          If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to 
-          step 17 now.
+    If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
-          *If you have another RPi connected or you had in the past, it may not work. Use $ssh-keygen -R raspberrypi.local first to clear any previous reference to 
-          raspberry.local.
+    *If you have another RPi connected or you had in the past, it may not work. Use $ssh-keygen -R raspberrypi.local first to clear any previous reference to raspberry.local.
 
     16.2. If the previous method didn't worked, we need to find the RPi IP adress. To do that, there are two possibilities:
     
-          16.2.1. Use nmap:
+       16.2.1. Use nmap:
           
-                  > sudo apt-get install nmap
-                  > nmap -sn 192.168.1.0/24
+       > sudo apt-get install nmap
+       > nmap -sn 192.168.1.0/24
                   
-                  It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need 
-                  to try until you find them, or use 
-                  the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
+       It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need to try until you find them, or use the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
           
-          16.2.2. Download a smartphone app called Fing. Once it is installed, when you initializa it, it will look for the connected devices to the same network than 
-                  it, and it will tell you the device 
-                  description. Look for "Raspberry Pi". 
+       16.2.2. Download a smartphone app called Fing. Once it is installed, when you initializa it, it will look for the connected devices to the same network than it, and it will tell you the device description. Look for "Raspberry Pi". 
      
     16.3. Once we know the RPi IP adress, use the next command with the proper IP:
 
-          > ssh pi@192.168.1.XX
+       > ssh pi@192.168.1.XX
 
-          If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to 
-          step 17 now.
+    If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
 17. Now, let's configure the RPi for our use. Introduce the following command to opne the congiguration page:
 
@@ -249,13 +243,11 @@
 
    Go to the "create_parser(description)" method, and change the following line:
 
-    " general_group.add_argument('--display', '-d', type=str, default=display_choices[0], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join 
-      (display_choices)), choices=display_choices, metavar='') "
+        " general_group.add_argument('--display', '-d', type=str, default=display_choices[0], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join(display_choices)), choices=display_choices, metavar='') "
    
    By:
 
-    " general_group.add_argument('--display', '-d', type=str, default=display_choices[6], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join
-      (display_choices)), choices=display_choices, metavar='') "
+       " general_group.add_argument('--display', '-d', type=str, default=display_choices[6], help='Display type, supports real devices or emulators. Allowed values are: {0}'.format(', '.join(display_choices)), choices=display_choices, metavar='') "
 
    So that the default field is loaded with the 6th element of the display_choices list (SH1106) instead of the 0th (SSD1306).
 
@@ -294,8 +286,8 @@
 
 To test that everything is properly configured, use the following commands:
 
-    > cd
-    > python RaspiWiFi/Reset\ Device/manual_reset.py
+   > cd
+   > python RaspiWiFi/Reset\ Device/manual_reset.py
 
 So that the Raspberry is rebooted, as well as the WiFi parameters are erased.
 In this way, you must see that first, the screen tells you to enter to the WiFi network, and that once you configure the WiFi, the program is executed properly.
@@ -305,10 +297,10 @@ In this way, you must see that first, the screen tells you to enter to the WiFi 
 
 (*1) To save energy and speed up the device:
 
-     - Boot up into multi-user mode (disabling the GUI on boot):
+   - Boot up into multi-user mode (disabling the GUI on boot):
 
-       > sudo systemctl set-default multi-user.target
+     > sudo systemctl set-default multi-user.target
      
-     - To disable the HDMI, edit "/etc/rc.local" and add (above "exit 0"): "/usr/bin/tvservice -o"
+   - To disable the HDMI, edit "/etc/rc.local" and add (above "exit 0"): "/usr/bin/tvservice -o"
 
 
