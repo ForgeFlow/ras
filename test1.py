@@ -31,6 +31,7 @@ port = "8069"
 user_name = "admin"
 user_password = "admin"
 dbname = "esp8266"
+timeout = 100.0
 
 # Welcome message
 print "Welcome to the MFRC522 data read example"
@@ -132,6 +133,7 @@ def main():
     global host
     global port
     global msg
+    global timeout
 
     object_facade = None
 
@@ -153,7 +155,7 @@ def main():
         elapsed_time = 0.0
         time.sleep(5)
 
-        while elapsed_time < 300.0:
+        while elapsed_time < timeout:
             elapsed_time = time.time() - start_time
             screen_drawing(device,card,msg,elapsed_time)
             # Scan for cards
