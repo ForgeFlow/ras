@@ -26,11 +26,14 @@ from datetime import datetime
 elapsed_time=0.0
 pos = 0
 enter = False
+
+dic = {" ": [" ",0,1,0], 'check_in': ['CHECKED IN',14,1,0], 'check_out': ['CHECKED OUT',6,1,0], 'FALSE': ['NOT AUTHORIZED',47,2,14], 'Bye!': ['BYE!',45,1,0]}
+
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
-msg = ""
-card = ""
+msg = " "
+card = " "
 host = "192.168.1.34"
 port = "8069"
 user_name = "admin"
@@ -141,21 +144,25 @@ def connection(host, port, user, user_pw, database):
 
 
 
-def screen_drawing(device,info):
+def screen_drawing(device,info,card):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
     font2 = ImageFont.truetype(font_path, 24)
 
+   # print "DIC: " + dic[info][0] + str(dic[info][1])
+
     with canvas(device) as draw:
-        if info == "check_in":
-            draw.text((20, 22), info, font=font2, fill="white")
-        elif info == "check_out":
-            draw.text((14, 22), info, font=font2, fill="white")
-        elif info == "FALSE" or info == "Bye!":
-            draw.text((35, 22), info, font=font2, fill="white")
-        else:
-            draw.text((18, 22), info, font=font2, fill="white")
+        draw.rectangle(device.bounding_box, outline="white")
+        try:
+            if dic[info][2] == 1:
+                draw.text((dic[info][1], 20), dic[info][0], font=font2, fill="white")
+            else:
+                a, b = dic[info][0].split(" ")
+                draw.text((dic[info][1], 7), a, font=font2, fill="white")
+                draw.text((dic[info][3], 33), b, font=font2, fill="white")
+        except:
+            draw.text((20, 20), info, font=font2, fill="white")
 
 
 def menu(device,msg1,msg2,msg3,msg4,loc):
@@ -258,11 +265,11 @@ def key_pressed(loc):
 
 def rfid_hr_attendance():
 
-    screen_drawing(device,msg)
+    screen_drawing(device,msg,False)
     scan_card(MIFAREReader,True)
 
 def rfid_reader():
-    screen_drawing(device,card)
+    screen_drawing(device,card,True)
     scan_card(MIFAREReader,False)
 
 def reset_settings():
@@ -330,7 +337,7 @@ if __name__ == "__main__":
     try:
         device = get_device()
         main()
-        screen_drawing(device,"Bye!")
+        screen_drawing(device,"Bye!",False)
         time.sleep(3)
         GPIO.cleanup()
     except KeyboardInterrupt:
