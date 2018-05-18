@@ -22,23 +22,45 @@ from luma.core.render import canvas
 from PIL import ImageFont
 from PIL import Image
 from datetime import datetime
+from goto import with_goto
 
+import reset_lib
+import json
+
+turn_off = False
+adm = True
 elapsed_time=0.0
 pos = 0
 enter = False
+reset = False
 
-dic = {" ": [" ",0,1,0], 'check_in': ['CHECKED IN',14,1,0], 'check_out': ['CHECKED OUT',6,1,0], 'FALSE': ['NOT AUTHORIZED',47,2,14], 'Bye!': ['BYE!',45,1,0]}
+dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37]}
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
 msg = " "
 card = " "
-host = "192.168.1.34"
-port = "8069"
-user_name = "admin"
-user_password = "admin"
-dbname = "esp8266"
+#host = "192.168.1.34"
+#port = "8069"
+#user_name = "admin"
+#user_password = "admin"
+#dbname = "esp8266"
+
+json_file = open('/home/pi/Raspberry_Code/data.json')
+#json_str = json_file.read()
+json_data = json.load(json_file)
+host = json_data["odoo_host"][0]
+port = json_data["odoo_port"][0]
+user_name = json_data["user_name"][0]
+user_password = json_data["user_password"][0]
+dbname = json_data["db"][0]
+if "update" not in json_data:
+    update = False
+else:
+    update = True
+print update
+
 
 if os.name != 'posix':
     sys.exit('{} platform not supported'.format(os.name))
@@ -65,6 +87,7 @@ def scan_card(MIFAREReader,odoo):
     global host
     global port
     global msg
+    global adm
 
     # Scan for cards
     (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -84,7 +107,8 @@ def scan_card(MIFAREReader,odoo):
         card = hex(int(uid[0])).split('x')[-1] + hex(int(uid[1])).split('x')[-1] + hex(int(uid[2])).split('x')[-1] + hex(int(uid[3])).split('x')[-1] 
 
         print card
-
+        if card == "1a25ad79":
+            adm = True
         # This is the default key for authentication
         key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 
@@ -144,7 +168,7 @@ def connection(host, port, user, user_pw, database):
 
 
 
-def screen_drawing(device,info,card):
+def screen_drawing(device,info):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
@@ -157,10 +181,15 @@ def screen_drawing(device,info,card):
         try:
             if dic[info][2] == 1:
                 draw.text((dic[info][1], 20), dic[info][0], font=font2, fill="white")
-            else:
+            elif dic[info][2] == 2:
                 a, b = dic[info][0].split(" ")
                 draw.text((dic[info][1], 7), a, font=font2, fill="white")
                 draw.text((dic[info][3], 33), b, font=font2, fill="white")
+            else:
+                a, b, c = dic[info][0].split(" ")
+                draw.text((dic[info][1], 2), a, font=font2, fill="white")
+                draw.text((dic[info][3], 20), b, font=font2, fill="white")
+                draw.text((dic[info][4], 37), c, font=font2, fill="white")
         except:
             draw.text((20, 20), info, font=font2, fill="white")
 
@@ -221,7 +250,7 @@ def triple_msg(device,msg1,msg2,msg3,size):
         draw.rectangle(device.bounding_box, outline="white")
         draw.text((15, 7), msg1, font=font2, fill="white")
         draw.text((50, 25), msg2, font=font2, fill="white")
-        draw.text((0, 40), msg3, font=font2, fill="white")
+        draw.text((5, 40), msg3, font=font2, fill="white")
 
     time.sleep(2)
 
@@ -265,25 +294,30 @@ def key_pressed(loc):
 
 def rfid_hr_attendance():
 
-    screen_drawing(device,msg,False)
+    screen_drawing(device,msg)
     scan_card(MIFAREReader,True)
 
 def rfid_reader():
-    screen_drawing(device,card,True)
+    screen_drawing(device,card)
     scan_card(MIFAREReader,False)
 
 def reset_settings():
+    global reset
     print "Reset Settings selected"
+    reset = True
 
 def back():
+    global turn_off
     print "Back selected"
-
+    turn_off = True
 
 def main():
     global Image
     global pos
-    global enter
+    global enter, turn_off
     global elapsed_time
+    global adm
+    global msg, card
     start_time = time.time()
     ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
 
@@ -303,43 +337,52 @@ def main():
 
         time.sleep(5)
 
-        triple_msg(device,"Welcome to the","RFID"," Attendance system",17)
+        triple_msg(device,"Welcome to the","RFID","Attendance system",17)
         time.sleep(4)
-
-        while enter == False and elapsed_time < 300.0:
-            elapsed_time = time.time() - start_time
-            menu(device,"Main program","RFID reader","Reset settings","Back",pos)
-            try:
-                pos = key_pressed(pos)
-                print pos
-            except KeyboardInterrupt:
-                break
-
-        if enter == True:
-            while elapsed_time < 300.0:
+        while adm == True:
+            msg = " "
+            card = " "
+            adm = False
+            while enter == False and elapsed_time < 300.0 and turn_off == False:
+                elapsed_time = time.time() - start_time
+                menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
                 try:
-                    elapsed_time = time.time() - start_time
-                    ops[str(pos)]()
+                    pos = key_pressed(pos)
+                    print pos
                 except KeyboardInterrupt:
                     break
+
+            if enter == True:
+                enter = False
+                while elapsed_time < 300.0 and reset == False and adm == False and turn_off == False:
+                    try:
+                        elapsed_time = time.time() - start_time
+                        ops[str(pos)]()
+                        if adm == True:
+                            print str(adm)
+                    except KeyboardInterrupt:
+                        break
 
 
     else:
 
-        simple_msg("WiFi Setting")
+        screen_drawing(device,"Wifi1")
         time.sleep(3)
-        double_msg("Connect to","10.0.0.1:9191")
+        screen_drawing(device,"Wifi2")
         time.sleep(3)
-        double_msg("using","RaspiWifi Setup")
+        screen_drawing(device,"Wifi3")
         time.sleep(2)
 
 if __name__ == "__main__":
     try:
         device = get_device()
         main()
-        screen_drawing(device,"Bye!",False)
+        screen_drawing(device,"Bye!")
         time.sleep(3)
         GPIO.cleanup()
+        if reset == True:
+            screen_drawing(device,"")
+            reset_lib.reset_to_host_mode()
     except KeyboardInterrupt:
         GPIO.cleanup()
         pass
