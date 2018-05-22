@@ -1,6 +1,18 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
-import os, json
+import os, json, socket
 app = Flask(__name__)
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 @app.route('/')
 def student():
@@ -33,4 +45,4 @@ def do_admin_login():
 
 if __name__ == '__main__':
    app.secret_key = os.urandom(12)
-   app.run(host='192.168.1.47', port = 80, debug = False)
+   app.run(host=str(get_ip()), port = 80, debug = False)

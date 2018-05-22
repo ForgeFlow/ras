@@ -15,16 +15,15 @@ except:
 
 import binascii
 import random
-import sys, termios, tty, os, time
+import os, sys, time
 
 from demo_opts import get_device
 from luma.core.render import canvas
 from PIL import ImageFont
 from PIL import Image
 from datetime import datetime
-from goto import with_goto
 
-import reset_lib
+#import reset_lib
 import json
 
 turn_off = False
@@ -36,18 +35,19 @@ reset = False
 
 dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37]}
 
+
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
-msg = " "
-card = " "
-host = "192.168.1.34"
-port = "8069"
-user_name = "admin"
-user_password = "admin"
-dbname = "esp8266"
+#msg = " "
+#card = " "
+#host = "192.168.1.34"
+#port = "8069"
+#user_name = "admin"
+#user_password = "admin"
+#dbname = "esp8266"
 
-'''
+
 json_file = open('/home/pi/Raspberry_Code/data.json')
 json_data = json.load(json_file)
 host = json_data["odoo_host"][0]
@@ -60,11 +60,6 @@ if "update" not in json_data:
 else:
     update = True
 print update
-'''
-
-if os.name != 'posix':
-    sys.exit('{} platform not supported'.format(os.name))
-
 
 def have_internet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
@@ -87,7 +82,7 @@ def scan_card(MIFAREReader,odoo):
     global host
     global port
     global msg
-    global adm
+    global adm, turn_off
 
     # Scan for cards
     (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -109,6 +104,7 @@ def scan_card(MIFAREReader,odoo):
         print card
         if card == "1a25ad79":
             adm = True
+            turn_off = True
         # This is the default key for authentication
         key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 
@@ -167,33 +163,6 @@ def connection(host, port, user, user_pw, database):
     print "object_facade: ", object_facade
 
 
-
-def screen_drawing(device,info):
-    # use custom font
-    font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 24)
-
-   # print "DIC: " + dic[info][0] + str(dic[info][1])
-
-    with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
-        try:
-            if dic[info][2] == 1:
-                draw.text((dic[info][1], 20), dic[info][0], font=font2, fill="white")
-            elif dic[info][2] == 2:
-                a, b = dic[info][0].split(" ")
-                draw.text((dic[info][1], 7), a, font=font2, fill="white")
-                draw.text((dic[info][3], 33), b, font=font2, fill="white")
-            else:
-                a, b, c = dic[info][0].split(" ")
-                draw.text((dic[info][1], 2), a, font=font2, fill="white")
-                draw.text((dic[info][3], 20), b, font=font2, fill="white")
-                draw.text((dic[info][4], 37), c, font=font2, fill="white")
-        except:
-            draw.text((20, 20), info, font=font2, fill="white")
-
-
 def menu(device,msg1,msg2,msg3,msg4,loc):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -227,6 +196,32 @@ def menu(device,msg1,msg2,msg3,msg4,loc):
             draw.text((5, 30), msg3, font=font2, fill="white")
             draw.text((5, 45), msg4, font=font2, fill="black")
 
+
+def screen_drawing(device,info):
+    # use custom font
+    font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                'fonts', 'C&C Red Alert [INET].ttf'))
+    font2 = ImageFont.truetype(font_path, 24)
+
+   # print "DIC: " + dic[info][0] + str(dic[info][1])
+
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white")
+        try:
+            if dic[info][2] == 1:
+                draw.text((dic[info][1], 20), dic[info][0], font=font2, fill="white")
+            elif dic[info][2] == 2:
+                a, b = dic[info][0].split(" ")
+                draw.text((dic[info][1], 7), a, font=font2, fill="white")
+                draw.text((dic[info][3], 33), b, font=font2, fill="white")
+            else:
+                a, b, c = dic[info][0].split(" ")
+                draw.text((dic[info][1], 2), a, font=font2, fill="white")
+                draw.text((dic[info][3], 20), b, font=font2, fill="white")
+                draw.text((dic[info][4], 37), c, font=font2, fill="white")
+        except:
+            draw.text((20, 20), info, font=font2, fill="white")
+
 def double_msg(device,msg1,msg2,size):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -254,44 +249,6 @@ def triple_msg(device,msg1,msg2,msg3,size):
 
     time.sleep(2)
 
-def getch():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
-
-
-def key_pressed(loc):
-   global enter
-   char = getch()
-
-   if char == "w":
-       print "Up"
-       loc -= 1
-       if loc == -1:
-           loc = 3
-       print str(loc)
-
-   elif char == "s":
-       print "Down"
-       loc += 1
-       if loc == 4:
-           loc = 0
-       print str(loc)
-
-   elif char == "d":
-       print "Enter"
-       enter = True
-
-   else:
-       print "Wrong key"
-   return loc
-
 def rfid_hr_attendance():
 
     screen_drawing(device,msg)
@@ -311,6 +268,8 @@ def back():
     print "Back selected"
     turn_off = True
 
+ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
+
 def main():
     global Image
     global pos
@@ -319,7 +278,7 @@ def main():
     global adm
     global msg, card
     start_time = time.time()
-    ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
+#    ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
 
     if have_internet():
 
@@ -343,26 +302,34 @@ def main():
             msg = " "
             card = " "
             adm = False
+            print "ENTER: " + str(enter)
+            print str(elapsed_time)
+            print str(turn_off)
             while enter == False and elapsed_time < 300.0 and turn_off == False:
                 elapsed_time = time.time() - start_time
                 menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
-                try:
-                    pos = key_pressed(pos)
-                    print pos
-                except KeyboardInterrupt:
-                    break
+       #         try:
+                if elapsed_time > 15.0 and elapsed_time <= 23.0:
+                    pos = 1  #key_pressed(pos)
+                elif elapsed_time > 23.0 and elapsed_time <= 30.0:
+                    pos = 0
+                elif elapsed_time > 30.0:
+                    enter = True
+                else:
+                    pos = 0
+        #        except KeyboardInterrupt:
+         #           break
 
             if enter == True:
                 enter = False
                 while elapsed_time < 300.0 and reset == False and adm == False and turn_off == False:
                     try:
                         elapsed_time = time.time() - start_time
-                        ops[str(pos)]()
+                        ops[str(pos)]() #rfid_hr_attendance()
                         if adm == True:
                             print str(adm)
                     except KeyboardInterrupt:
                         break
-
 
     else:
 
@@ -383,6 +350,7 @@ if __name__ == "__main__":
         if reset == True:
             screen_drawing(device,"")
             reset_lib.reset_to_host_mode()
+
     except KeyboardInterrupt:
         GPIO.cleanup()
         pass

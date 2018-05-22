@@ -90,6 +90,7 @@ def screen_drawing(device,card,msg,elapsed_time):
     font2 = ImageFont.truetype(font_path, 20)
 
     with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white")
         draw.text((0, 0), "Test Program", font=font2, fill="white")
         if device.height >= 32:
             draw.text((0, 14), card, font=font2, fill="white")
