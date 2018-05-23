@@ -30,7 +30,7 @@ def result():
       print str(dic['user_name'][0])
       #file = open('test.txt','w')
       jsonarray = json.dumps(dic)
-      with open('data.json', 'w') as outfile:
+      with open('/home/pi/Raspberry_Code/data.json', 'w+') as outfile:
           json.dump(dic,outfile)
       print jsonarray
       return render_template("result.html",result = result)

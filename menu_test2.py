@@ -33,7 +33,7 @@ pos = 0
 enter = False
 reset = False
 
-dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37]}
+dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37], 'update': ['Resetting to update',20,3,60,35]}
 
 
 # Create an object of the class MFRC522
@@ -50,6 +50,7 @@ MIFAREReader = MFRC522.MFRC522()
 
 json_file = open('/home/pi/Raspberry_Code/data.json')
 json_data = json.load(json_file)
+json_file.close()
 host = json_data["odoo_host"][0]
 port = json_data["odoo_port"][0]
 user_name = json_data["user_name"][0]
@@ -59,6 +60,9 @@ if "update" not in json_data:
     update = False
 else:
     update = True
+    f = open("/home/pi/Raspberry_Code/update.txt","w+")
+    f.write("Updating repository!")
+    f.close
 print update
 
 def have_internet():
@@ -275,7 +279,7 @@ def main():
     global pos
     global enter, turn_off
     global elapsed_time
-    global adm
+    global adm, update
     global msg, card
     start_time = time.time()
 #    ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
@@ -298,14 +302,14 @@ def main():
 
         triple_msg(device,"Welcome to the","RFID","Attendance system",17)
         time.sleep(4)
-        while adm == True:
+        while adm == True and update == False:
             msg = " "
             card = " "
             adm = False
             print "ENTER: " + str(enter)
             print str(elapsed_time)
             print str(turn_off)
-            while enter == False and elapsed_time < 300.0 and turn_off == False:
+            while enter == False and elapsed_time < 300.0 and turn_off == False and update == False:
                 elapsed_time = time.time() - start_time
                 menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
        #         try:
@@ -322,10 +326,20 @@ def main():
 
             if enter == True:
                 enter = False
-                while elapsed_time < 300.0 and reset == False and adm == False and turn_off == False:
+                while elapsed_time < 300.0 and reset == False and adm == False and turn_off == False and update == False:
                     try:
                         elapsed_time = time.time() - start_time
                         ops[str(pos)]() #rfid_hr_attendance()
+                        json_file = open('/home/pi/Raspberry_Code/data.json')
+                        json_data = json.load(json_file)
+                        json_file.close()
+                        if "update" not in json_data:
+                            update = False
+                        else:
+                            update = True
+                            f = open("/home/pi/Raspberry_Code/update.txt","w+")
+                            f.write("Updating repository!")
+                            f.close
                         if adm == True:
                             print str(adm)
                     except KeyboardInterrupt:
@@ -344,6 +358,10 @@ if __name__ == "__main__":
     try:
         device = get_device()
         main()
+        if update == True:
+            screen_drawing(device,"update")
+            time.sleep(2)
+            os.system('sudo reboot')
         screen_drawing(device,"Bye!")
         time.sleep(3)
         GPIO.cleanup()
