@@ -2,6 +2,8 @@
 
 Some different libraries and codes from other repositories are employed to be able to run our program. Thanks to them from here for these great programs, and all the recognitions for them for the use of their code.
 
+Test 1.
+
 ## General configuration ##
 
 1. Download the Raspbian Lite image from https://www.raspberrypi.org/downloads/raspbian/ as a ZIP.
