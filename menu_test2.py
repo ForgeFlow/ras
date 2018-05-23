@@ -281,6 +281,7 @@ def main():
     global elapsed_time
     global adm, update
     global msg, card
+    global device
     start_time = time.time()
 #    ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
 
@@ -354,21 +355,29 @@ def main():
         screen_drawing(device,"Wifi3")
         time.sleep(2)
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def foo():
+    global device
+    global update
+    global reset
     try:
         device = get_device()
         main()
         if update == True:
             screen_drawing(device,"update")
             time.sleep(2)
-            os.system('sudo reboot')
+            screen_drawing(device,"")
+            GPIO.cleanup()
         screen_drawing(device,"Bye!")
         time.sleep(3)
         GPIO.cleanup()
         if reset == True:
             screen_drawing(device,"")
             reset_lib.reset_to_host_mode()
+        return update
 
     except KeyboardInterrupt:
         GPIO.cleanup()
         pass
+
+#foo()
