@@ -1,4 +1,4 @@
 import os
 print "START"
 os.system('./update_repo.sh')
-print "DONE HELL YEAH"
+print "DONE FINALLY"
