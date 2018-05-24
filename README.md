@@ -261,26 +261,43 @@ Test 13.
 
 
 
-## RFID - OLED - ODOO program configuration ##
+## RFID - OLED - ODOO & Configuration Server program configuration ##
 
-1. Clone the repository and enter the folder:
+1. Clone the repository:
 
     > cd
     > git clone https://github.com/lurobe94/Raspberry_Code.git
+    
+2. Install Flask for the server:
+
+    > pip install Flask
+    
+3. Test the server to create the data.json file, which the main program will read to get the Odoo parameters:
+
     > cd Raspberry_Code
+    > python hello-template.py
+    
+    Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
+    
+    The data.json file must have been generated in the repository. Check the parameters are right.
 
-2. Before any configuration, test the main program by:
+4. Test the main program by:
 
-    > python test1.py
+    > python launcher.py
 
-   The program should work as expected.
+   The program should work as expected. You can use the administrator RFID card to end the program.
 
-3. To configure the RPi to run the program at boot, edit the rc.local file:
+5. To configure the RPi to run the program at boot, edit the rc.local file:
 
     > sudo nano /etc/rc.local 
 
-   Add at the end, but before the "exit 0" line, the following: " python /home/pi/Raspberry_Code/test1.py & " (Maybe part of the path is different for you).
-   Don't forget the " & ", so that the program runs in a separated process and the RPi can initialize itself without problems.
+   Add at the end, but before the "exit 0" line, the following: 
+   
+       python /home/pi/Raspberry_Code/launcher.py & 
+       pyhton /home/pi/Raspberry_Code/hello-template.py &
+   
+   Check he path, it can be different if you structured the folders in another way.
+   Don't forget the " & ", so that the programs runs in separated processes and the RPi can initialize itself without problems.
 
 
 
@@ -288,11 +305,12 @@ Test 13.
 
 To test that everything is properly configured, use the following commands:
 
+   > rm -f data.json
    > cd
-   > python RaspiWiFi/Reset\ Device/manual_reset.py
+   > python Raspberry_Code/manual_reset.py
 
-So that the Raspberry is rebooted, as well as the WiFi parameters are erased.
-In this way, you must see that first, the screen tells you to enter to the WiFi network, and that once you configure the WiFi, the program is executed properly.
+So that the data.json is deleted (and you can test the whole functioning of the device) and the Raspberry is rebooted, as well as the WiFi parameters are erased.
+In this way, you must see first the screen that tells you to enter to the WiFi network, and that once you configure the WiFi, the program asks you to go to the configuration portal, and once you enter the parameters, the main program is executed properly.
 
 
 *****************************************************************************************************************************************************************
