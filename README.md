@@ -306,7 +306,9 @@ Test 13.
 To test that everything is properly configured, use the following commands:
 
    > rm -f data.json
+   
    > cd
+   
    > python Raspberry_Code/manual_reset.py
 
 So that the data.json is deleted (and you can test the whole functioning of the device) and the Raspberry is rebooted, as well as the WiFi parameters are erased.
