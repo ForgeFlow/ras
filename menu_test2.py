@@ -305,9 +305,9 @@ def main():
                             update = False
                         else:
                             update = True
-                            f = open("/home/pi/Raspberry_Code/update.txt","w+")
-                            f.write("Updating repository!")
-                            f.close
+                        #    f = open("/home/pi/Raspberry_Code/update.txt","w+")
+                        #    f.write("Updating repository!")
+                        #    f.close
                         if adm == True:
                             print str(adm)
                     except KeyboardInterrupt:
@@ -365,9 +365,9 @@ def foo():
                 update = False
             else:
                 update = True
-                f = open("/home/pi/Raspberry_Code/update.txt","w+")
-                f.write("Updating repository!")
-                f.close
+               # f = open("/home/pi/Raspberry_Code/update.txt","w+")
+               # f.write("Updating repository!")
+               # f.close
             print "THIS IS UPDATE: " + str(update)
         else:
              raise ValueError("It is not a file!")
