@@ -1,4 +1,3 @@
 #!/bin/bash
 
-git pull
-
+git -C /home/pi/Raspberry_Code/ pull

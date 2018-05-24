@@ -25,6 +25,7 @@ from datetime import datetime
 
 #import reset_lib
 import json
+import os.path
 
 turn_off = False
 adm = True
@@ -33,7 +34,7 @@ pos = 0
 enter = False
 reset = False
 
-dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37], 'update': ['Resetting to update',20,3,60,35]}
+dic = {" ": [" ",0,1,0,0], 'check_in': ['CHECKED IN',14,1,0,0], 'check_out': ['CHECKED OUT',6,1,0,0], 'FALSE': ['NOT AUTHORIZED',47,2,14,0], 'Bye!': ['BYE!',45,1,0,0], 'Wifi1': ['WiFi Setting',45,2,30,0], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8], 'Wifi3': ['using RaspiWifi setup',35,3,20,37], 'update': ['Resetting to update',20,3,60,35], 'config1': ['Connect to 192.168.1.47',25,3,55,8], 'config2': ['for the configuration',53,3,53,5]}
 
 
 # Create an object of the class MFRC522
@@ -46,24 +47,6 @@ MIFAREReader = MFRC522.MFRC522()
 #user_name = "admin"
 #user_password = "admin"
 #dbname = "esp8266"
-
-
-json_file = open('/home/pi/Raspberry_Code/data.json')
-json_data = json.load(json_file)
-json_file.close()
-host = json_data["odoo_host"][0]
-port = json_data["odoo_port"][0]
-user_name = json_data["user_name"][0]
-user_password = json_data["user_password"][0]
-dbname = json_data["db"][0]
-if "update" not in json_data:
-    update = False
-else:
-    update = True
-    f = open("/home/pi/Raspberry_Code/update.txt","w+")
-    f.write("Updating repository!")
-    f.close
-print update
 
 def have_internet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
@@ -274,6 +257,7 @@ def back():
 
 ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
 
+
 def main():
     global Image
     global pos
@@ -283,26 +267,9 @@ def main():
     global msg, card
     global device
     start_time = time.time()
-#    ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': reset_settings, '3': back}
 
     if have_internet():
 
-        img_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-            'images', 'ef4.png'))
-        logo = Image.open(img_path).convert("RGBA")
-        fff = Image.new(logo.mode, logo.size, (0,) * 4)
-
-        background = Image.new("RGBA", device.size, "black")
-        posn = ((device.width - logo.width) // 2, 0)
-
-        img = Image.composite(logo, fff, logo)
-        background.paste(img, posn)
-        device.display(background.convert(device.mode))
-
-        time.sleep(5)
-
-        triple_msg(device,"Welcome to the","RFID","Attendance system",17)
-        time.sleep(4)
         while adm == True and update == False:
             msg = " "
             card = " "
@@ -360,8 +327,50 @@ def foo():
     global device
     global update
     global reset
+    global host, port, user_name, user_password, dbname
     try:
         device = get_device()
+        img_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+            'images', 'ef4.png'))
+        logo = Image.open(img_path).convert("RGBA")
+        fff = Image.new(logo.mode, logo.size, (0,) * 4)
+
+        background = Image.new("RGBA", device.size, "black")
+        posn = ((device.width - logo.width) // 2, 0)
+
+        img = Image.composite(logo, fff, logo)
+        background.paste(img, posn)
+        device.display(background.convert(device.mode))
+
+        time.sleep(5)
+
+        triple_msg(device,"Welcome to the","RFID","Attendance system",17)
+        time.sleep(4)
+
+        while not os.path.isfile("/home/pi/Raspberry_Code/data.json"):
+            screen_drawing(device,"config1")
+            time.sleep(2)
+            screen_drawing(device,"config2")
+            time.sleep(2)
+        if os.path.isfile("/home/pi/Raspberry_Code/data.json"):
+            json_file = open('/home/pi/Raspberry_Code/data.json')
+            json_data = json.load(json_file)
+            json_file.close()
+            host = json_data["odoo_host"][0]
+            port = json_data["odoo_port"][0]
+            user_name = json_data["user_name"][0]
+            user_password = json_data["user_password"][0]
+            dbname = json_data["db"][0]
+            if "update" not in json_data:
+                update = False
+            else:
+                update = True
+                f = open("/home/pi/Raspberry_Code/update.txt","w+")
+                f.write("Updating repository!")
+                f.close
+            print "THIS IS UPDATE: " + str(update)
+        else:
+             raise ValueError("It is not a file!")
         main()
         if update == True:
             screen_drawing(device,"update")
