@@ -71,6 +71,7 @@ Test 13.
        16.2.1. Use nmap:
           
        > sudo apt-get install nmap
+       
        > nmap -sn 192.168.1.0/24
                   
        It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need to try until you find them, or use the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
@@ -100,6 +101,7 @@ Test 13.
 23. Update and upgrade (*1):
 
     > sudo apt-get -y update
+    
     > sudo apt-get -y upgrade
 
 24. Check if the SPI is really enabled using:
@@ -111,6 +113,7 @@ Test 13.
 25. Use the following commands to install some additional packages for the I2C:
 
     > sudo apt-get install -y python-smbus
+    
     > sudo apt-get install -y i2c-tools
 
 26. Check the I2C using:
@@ -120,6 +123,7 @@ Test 13.
 27. Install important programs/packages:
 
     > sudo apt-get install git
+    
     > sudo apt-get install python-dev -y
 
 
@@ -131,7 +135,9 @@ Test 13.
 1. Clone the repository and enter the folder:
 
     > cd
+    
     > git clone https://github.com/jasbur/RaspiWiFi/tree/master
+    
     > cd Raspiwifi
 
 2. Run the next command (the installation will take several minutes):
@@ -164,7 +170,9 @@ Test 13.
 1. Clone the following repository and enter its folder:
 
     > cd
+    
     > git clone https://github.com/lthiery/SPI-Py
+    
     > cd SPI-py
 
 2. Install the SPI module necessary for the MFRC522 library:
@@ -174,7 +182,9 @@ Test 13.
 3. Then, clone the MFRC522 repository and enter its folder:
 
     > cd
+    
     > git clone https://github.com/mxgxw/MFRC522-python
+    
     > cd MFRC522-python
 
 4. Connect the RFID Reader to the RPi Zero GPIO pins. The template for the explanation is: *RPI-GPIO-pin:RFIDReader-pin*
@@ -201,6 +211,7 @@ Test 13.
 1. Install some necessary packages:
 
     > cd
+    
     > sudo apt-get install python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
 
 2. Install the luma.oled (https://luma-oled.readthedocs.io/en/latest/) package (it will take several minutes):
@@ -217,7 +228,9 @@ Test 13.
 4. Execute the following commands to confugire the user rights and install some necessary packages:
   
     > sudo usermod -a -G i2c,spi,gpio pi
+    
     > sudo apt install python-dev python-pip libfreetype6-dev libjpeg-dev build-essential
+    
     > sudo apt install libsdl-dev libportmidi-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libsdl-image1.2-dev
 
 5. Reboot (sudo reboot) and enter again the RPi through SSH.
@@ -225,7 +238,9 @@ Test 13.
 6. Clone the repository and enter its folder:
 
     > cd
+    
     > git clone https://github.com/rm-hull/luma.examples.git
+    
     > cd luma.examples
 
 7. Install the luma libraries using (it will take several minutes):
@@ -235,6 +250,7 @@ Test 13.
 8. To test that everything is properly installed, run one of the examples (they can be found and explained at https://github.com/rm-hull/luma.examples):
 
     > cd examples
+    
     > python pi_logo.py -d sh1106
 
    If the Raspberry Pi logo is displayed at the screen properly, the installation was succesful.
@@ -266,6 +282,7 @@ Test 13.
 1. Clone the repository:
 
     > cd
+    
     > git clone https://github.com/lurobe94/Raspberry_Code.git
     
 2. Install Flask for the server:
@@ -275,6 +292,7 @@ Test 13.
 3. Test the server to create the data.json file, which the main program will read to get the Odoo parameters:
 
     > cd Raspberry_Code
+    
     > python hello-template.py
     
     Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
