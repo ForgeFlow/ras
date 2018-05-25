@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Data Table</title>
+	<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+        <link rel="stylesheet" href="static/table.css?version=8">
+</head>
+
+<body>
+<table class="table-fill">
+<thead>
+<tr>
+<th class="text-left">Parameter</th>
+<th class="text-left">Value</th>
+</tr>
+</thead>
+<tbody class="table-hover">
+
+<tr>
+           <td class="text-left"> Odoo Host </th>
+           <td class="text-left"> {{ result["odoo_host"] }} </td>
+</tr>
+<tr>
+           <td class="text-left"> Odoo Port </th>
+           <td class="text-left"> {{ result["odoo_port"] }} </td>
+</tr>
+<tr>
+           <td class="text-left"> Odoo User </th>
+           <td class="text-left"> {{ result["user_name"] }} </td>
+</tr>
+<tr>
+           <td class="text-left"> Odoo Password </th>
+           <td class="password"> **********  </td>
+</tr>
+<tr>
+           <td class="text-left"> Odoo Databse </th>
+           <td class="text-left"> {{ result["db"] }} </td>
+</tr>
+<tr>
+           <td class="text-left"> Admin ID </th>
+           <td class="text-left"> {{ result["admin_id"] }} </td>
+</tr>
+
+</tbody>
+</table>
+  
+
+</body>

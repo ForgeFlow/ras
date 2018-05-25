@@ -33,7 +33,7 @@ def result():
       with open('/home/pi/Raspberry_Code/data.json', 'w+') as outfile:
           json.dump(dic,outfile)
       print jsonarray
-      return render_template("result.html",result = result)
+      return render_template("result2.html",result = result)
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():

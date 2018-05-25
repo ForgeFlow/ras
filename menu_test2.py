@@ -52,14 +52,6 @@ dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',14,1,0,0,24], 'check_out
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
-#msg = " "
-#card = " "
-#host = "192.168.1.34"
-#port = "8069"
-#user_name = "admin"
-#user_password = "admin"
-#dbname = "esp8266"
-
 def have_internet():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
     try:
@@ -203,8 +195,6 @@ def screen_drawing(device,info):
                                 'fonts', 'C&C Red Alert [INET].ttf'))
     font2 = ImageFont.truetype(font_path, dic[info][5])
 
-   # print "DIC: " + dic[info][0] + str(dic[info][1])
-
     with canvas(device) as draw:
         draw.rectangle(device.bounding_box, outline="white")
         try:
@@ -221,6 +211,20 @@ def screen_drawing(device,info):
                 draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
         except:
             draw.text((20, 20), info, font=font2, fill="white")
+
+def card_drawing(device,id):
+    # use custom font
+    font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                'fonts', 'C&C Red Alert [INET].ttf'))
+    font2 = ImageFont.truetype(font_path, 24)
+
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white")
+        try:
+            draw.text(30, 20, id, font=font2, fill="white")
+        except:
+            draw.text((20, 20), id, font=font2, fill="white")
+
 
 def double_msg(device,msg1,msg2,size):
     # use custom font
@@ -255,7 +259,8 @@ def rfid_hr_attendance():
     scan_card(MIFAREReader,True)
 
 def rfid_reader():
-    screen_drawing(device,card)
+    global card
+    card_drawing(device,card)
     scan_card(MIFAREReader,False)
 
 def reset_settings():
@@ -290,14 +295,14 @@ def main():
             print "ENTER: " + str(enter)
             print str(elapsed_time)
             print str(turn_off)
-            while enter == False and elapsed_time < 300.0 and turn_off == False and update == False:
+            while enter == False and turn_off == False and update == False:
                 elapsed_time = time.time() - start_time
                 menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
        #         try:
                 if elapsed_time > 10.0 and elapsed_time <= 15.0:
-                    pos = 1  #key_pressed(pos)
+                    pos = 0  #key_pressed(pos)
                 elif elapsed_time > 15.0 and elapsed_time <= 20.0:
-                    pos = 0
+                    pos = 1
                 elif elapsed_time > 20.0:
                     enter = True
                 else:
@@ -307,7 +312,7 @@ def main():
 
             if enter == True:
                 enter = False
-                while elapsed_time < 300.0 and reset == False and adm == False and turn_off == False and update == False:
+                while reset == False and adm == False and turn_off == False and update == False:
                     try:
                         elapsed_time = time.time() - start_time
                         ops[str(pos)]() #rfid_hr_attendance()
@@ -335,7 +340,6 @@ def main():
         screen_drawing(device,"Wifi3")
         time.sleep(2)
 
-#if __name__ == "__main__":
 def m_functionality():
     global device
     global update
@@ -360,32 +364,32 @@ def m_functionality():
 
         triple_msg(device,"Welcome to the","RFID","Attendance system",17)
         time.sleep(4)
-
-        while not os.path.isfile("/home/pi/Raspberry_Code/data.json"):
-            screen_drawing(device,"config1")
-            time.sleep(2)
-            screen_drawing(device,"config2")
-            time.sleep(2)
-        if os.path.isfile("/home/pi/Raspberry_Code/data.json"):
-            json_file = open('/home/pi/Raspberry_Code/data.json')
-            json_data = json.load(json_file)
-            json_file.close()
-            host = json_data["odoo_host"][0]
-            port = json_data["odoo_port"][0]
-            user_name = json_data["user_name"][0]
-            user_password = json_data["user_password"][0]
-            dbname = json_data["db"][0]
-            admin_id = json_data["admin_id"][0]
-            if "update" not in json_data:
-                update = False
-            else:
-                update = True
+        if have_internet():
+            while not os.path.isfile("/home/pi/Raspberry_Code/data.json"):
+                screen_drawing(device,"config1")
+                time.sleep(2)
+                screen_drawing(device,"config2")
+                time.sleep(2)
+            if os.path.isfile("/home/pi/Raspberry_Code/data.json"):
+                json_file = open('/home/pi/Raspberry_Code/data.json')
+                json_data = json.load(json_file)
+                json_file.close()
+                host = json_data["odoo_host"][0]
+                port = json_data["odoo_port"][0]
+                user_name = json_data["user_name"][0]
+                user_password = json_data["user_password"][0]
+                dbname = json_data["db"][0]
+                admin_id = json_data["admin_id"][0]
+                if "update" not in json_data:
+                    update = False
+                else:
+                    update = True
                # f = open("/home/pi/Raspberry_Code/update.txt","w+")
                # f.write("Updating repository!")
                # f.close
-            print "THIS IS UPDATE: " + str(update)
-        else:
-             raise ValueError("It is not a file!")
+                print "THIS IS UPDATE: " + str(update)
+            else:
+                raise ValueError("It is not a file!")
         main()
         if update == True:
             screen_drawing(device,"update")
@@ -405,4 +409,4 @@ def m_functionality():
         GPIO.cleanup()
         pass
 
-#foo()
+#m_functionality()
