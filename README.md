@@ -308,13 +308,18 @@ Test 14.
 5. To configure the RPi to run the program at boot, edit the rc.local file:
 
     > sudo nano /etc/rc.local 
-
+    
+   First, add these lines below the line "By default this script does nothing", to generate a log file for debugging errors.
+   
+       exec 2> /tmp/rc.local.log  
+       exec 1>&2                  
+       set -x                     
    Add at the end, but before the "exit 0" line, the following: 
    
        python /home/pi/Raspberry_Code/launcher.py & 
        pyhton /home/pi/Raspberry_Code/hello-template.py &
    
-   Check he path, it can be different if you structured the folders in another way.
+   Check the path, it can be different if you structured the folders in another way.
    Don't forget the " & ", so that the programs runs in separated processes and the RPi can initialize itself without problems.
 
 
