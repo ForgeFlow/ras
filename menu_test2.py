@@ -47,6 +47,7 @@ def get_ip():
     return IP
 
 dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',14,1,0,0,24], 'check_out': ['CHECKED OUT',6,1,0,0,24], 'FALSE': ['NOT AUTHORIZED',47,2,14,0,24], 'Bye!': ['BYE!',45,1,0,0,24], 'Wifi1': ['WiFi Setting',45,2,30,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
+dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,45,5,40,'Check the parameters',3,41,53,13,20], 'error2': [2,'RFID intrigrity failed',3,50,2,37,20,'Pass the card',3,50,60,50,20]}
 
 
 # Create an object of the class MFRC522
@@ -75,6 +76,7 @@ def scan_card(MIFAREReader,odoo):
     global msg
     global adm, turn_off
     global admin_id
+    global error
 
     # Scan for cards
     (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -110,30 +112,45 @@ def scan_card(MIFAREReader,odoo):
         if status == MIFAREReader.MI_OK:
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
+            if odoo == True:
+                print("#################################"
+                      "################################################")
+                print("PARAMETERS: " + str(host) + " / " + str(
+                      port) + " / " + str(user_name) + " / " + str(
+                      user_password) + " / " + str(dbname))
+                print("##################################"
+                      "###############################################")
+                try:
+                    connection(host, port, user_name, user_password, dbname)
+                    res = object_facade.execute(
+                            dbname, user_id, user_password, "hr.employee",
+                            "register_attendance", card)
+                    print res
+                    msg = res["action"]
+                    error = False
+                except:
+                    print "No Odoo connection"
+                    msg = "error1"
+                    error = True
+                time.sleep(1)
+            else:
+                error = False
         else:
             print "Authentication error"
-        if odoo == True:
-            print("#################################"
-                  "################################################")
-            print("PARAMETERS: " + str(host) + " / " + str(
-                  port) + " / " + str(user_name) + " / " + str(
-                  user_password) + " / " + str(dbname))
-            print("##################################"
-                  "###############################################")
-            connection(host, port, user_name, user_password, dbname)
-            res = object_facade.execute(
-                    dbname, user_id, user_password, "hr.employee",
-                    "register_attendance", card)
-            print res
-            msg = res["action"]
-            time.sleep(1)
+            msg = "error2"
+            error = True
+    else:
+        print "HERE"
+        error = False
+
 
 def connection(host, port, user, user_pw, database):
     global user_password
     user_password = user_pw
-    global db_name
+    global db_name, https_on
     dbname = database
-    if port in ['443', '80', '']:
+    print "CONNEC 1"
+    if https_on: #port in ['443', '80', '']:
         url_template = "https://%s/xmlrpc/%s"
         login_facade = xmlrpclib.ServerProxy(url_template % (
         host, 'common'))
@@ -142,9 +159,11 @@ def connection(host, port, user, user_pw, database):
         print "URL: ", url_template % (host, port, 'common')
         login_facade = xmlrpclib.ServerProxy(url_template % (
             host, port, 'common'))
+    print "CONNEC 2"
     global user_id
     user_id = login_facade.login(database, user, user_pw)
     print "USER: ", user_id
+    print "CONNEC 3"
     global object_facade
     if port in ['443', '80', '']:
         object_facade = xmlrpclib.ServerProxy(url_template % (
@@ -153,6 +172,7 @@ def connection(host, port, user, user_pw, database):
          object_facade = xmlrpclib.ServerProxy(url_template % (
             host, port, 'object'))
     print "object_facade: ", object_facade
+    print "CONNEC 4"
 
 
 def menu(device,msg1,msg2,msg3,msg4,loc):
@@ -191,26 +211,66 @@ def menu(device,msg1,msg2,msg3,msg4,loc):
 
 def screen_drawing(device,info):
     # use custom font
+    global error, msg
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, dic[info][5])
+    print "ERROR: " + str(error)
+    print info
+    code = info.replace('error', '')
+    if error == True:
+        font2 = ImageFont.truetype(font_path, dicerror[info][11])
+        fonte = ImageFont.truetype(font_path, 30)
+        with canvas(device) as draw:
+            draw.rectangle(device.bounding_box, outline="white")
+            draw.text((33, 5), "ERROR", font=fonte, fill="white")
+            draw.text((27, 30), "CODE " + code, font=fonte, fill="white")
+        time.sleep(2)
+        print str(dicerror[info][0])
+        for i in range(0,dicerror[info][0]+1):
+            print "FOR: " + str(i)
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white")
+                try:
+                    if dicerror[info][0] != i:
+                        if dicerror[info][2+(i*5)] == 1:
+                            draw.text((dicerror[info][3+(i*5)], 20), dicerror[info][1+(i*5)], font=font2, fill="white")
+                        elif dicerror[info][2+(i*5)] == 2:
+                            a, b = dicerror[info][1+(i*5)].split(" ")
+                            draw.text((dicerror[info][3+(i*5)], 7), a, font=font2, fill="white")
+                            draw.text((dicerror[info][4+(i*5)], 33), b, font=font2, fill="white")
+                        else:
+                            a, b, c = dicerror[info][1+(i*5)].split(" ")
+                            draw.text((dicerror[info][3+(i*5)], 4), a, font=font2, fill="white")
+                            draw.text((dicerror[info][4+(i*5)], 22), b, font=font2, fill="white")
+                            draw.text((dicerror[info][5+(i*5)], 40), c, font=font2, fill="white")
+                    print "1"
+                    time.sleep(2)
+                    print "2"
+                except:
+                    draw.text((20, 20), info, font=font2, fill="white")
+                time.sleep(2)
+        msg = " "
+    else:
+        print "NO ERROR"
+        font2 = ImageFont.truetype(font_path, dic[info][5])
 
-    with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
-        try:
-            if dic[info][2] == 1:
-                draw.text((dic[info][1], 20+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
-            elif dic[info][2] == 2:
-                a, b = dic[info][0].split(" ")
-                draw.text((dic[info][1], 7+(24-dic[info][5])/2), a, font=font2, fill="white")
-                draw.text((dic[info][3], 33+(24-dic[info][5])/2), b, font=font2, fill="white")
-            else:
-                a, b, c = dic[info][0].split(" ")
-                draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
-                draw.text((dic[info][3], 20+(24-dic[info][5])/2), b, font=font2, fill="white")
-                draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
-        except:
-            draw.text((20, 20), info, font=font2, fill="white")
+        with canvas(device) as draw:
+            draw.rectangle(device.bounding_box, outline="white")
+            try:
+                if dic[info][2] == 1:
+                    draw.text((dic[info][1], 20+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
+                elif dic[info][2] == 2:
+                    a, b = dic[info][0].split(" ")
+                    draw.text((dic[info][1], 7+(24-dic[info][5])/2), a, font=font2, fill="white")
+                    draw.text((dic[info][3], 33+(24-dic[info][5])/2), b, font=font2, fill="white")
+                else:
+                    a, b, c = dic[info][0].split(" ")
+                    draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
+                    draw.text((dic[info][3], 20+(24-dic[info][5])/2), b, font=font2, fill="white")
+                    draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
+            except:
+                draw.text((20, 20), info, font=font2, fill="white")
+
 
 def card_drawing(device,id):
     # use custom font
@@ -254,12 +314,12 @@ def triple_msg(device,msg1,msg2,msg3,size):
     time.sleep(2)
 
 def rfid_hr_attendance():
-
+    global error
     screen_drawing(device,msg)
     scan_card(MIFAREReader,True)
 
 def rfid_reader():
-    global card
+    global card, error
     card_drawing(device,card)
     scan_card(MIFAREReader,False)
 
@@ -282,7 +342,7 @@ def main():
     global enter, turn_off
     global elapsed_time
     global adm, update
-    global msg, card
+    global msg, card, error
     global device
     start_time = time.time()
 
@@ -291,6 +351,7 @@ def main():
         while adm == True and update == False:
             msg = " "
             card = " "
+            error = False
             adm = False
             print "ENTER: " + str(enter)
             print str(elapsed_time)
@@ -299,11 +360,11 @@ def main():
                 elapsed_time = time.time() - start_time
                 menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
        #         try:
-                if elapsed_time > 10.0 and elapsed_time <= 15.0:
+                if elapsed_time > 2.0 and elapsed_time <= 5.0:
                     pos = 0  #key_pressed(pos)
-                elif elapsed_time > 15.0 and elapsed_time <= 20.0:
-                    pos = 1
-                elif elapsed_time > 20.0:
+                elif elapsed_time > 5.0 and elapsed_time <= 7.0:
+                    pos = 0
+                elif elapsed_time > 7.0:
                     enter = True
                 else:
                     pos = 0
@@ -345,7 +406,7 @@ def m_functionality():
     global update
     global reset
     global host, port, user_name, user_password, dbname
-    global admin_id
+    global admin_id, https_on
     try:
         device = get_device()
         img_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -380,6 +441,11 @@ def m_functionality():
                 user_password = json_data["user_password"][0]
                 dbname = json_data["db"][0]
                 admin_id = json_data["admin_id"][0]
+                if "https" not in json_data:
+                    https_on = False
+                else:
+                    https_on = True
+
                 if "update" not in json_data:
                     update = False
                 else:
