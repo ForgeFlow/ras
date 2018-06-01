@@ -27,12 +27,47 @@ from datetime import datetime
 import json
 import os.path
 
+error = False
+
 turn_off = False
 adm = True
 elapsed_time=0.0
 pos = 0
 enter = False
 reset = False
+on_Down = False
+on_OK = False
+
+GPIO.setmode(GPIO.BOARD)  # Set's GPIO pins to BCM GPIO numbering
+
+INPUT_PIN_DOWN = 31           # Pin for the DOWN button
+GPIO.setup(INPUT_PIN_DOWN, GPIO.IN)  # Set our input pin to be an input
+
+INPUT_PIN_OK = 29           # Pin for the OK button
+GPIO.setup(INPUT_PIN_OK, GPIO.IN)  # Set our input pin to be an input
+
+# Create a function to run when the input is high
+def inputStateDown(channel):
+    global on_Down
+    if on_Down == False:
+        print('3.3');
+        on_Down = True
+    else:
+        print '0'
+        on_Down = False
+
+def inputStateOK(channel):
+    global on_OK
+    if on_OK == False:
+        print('3.3');
+        on_OK = True
+    else:
+        print '0'
+        on_OK = False
+
+GPIO.add_event_detect(INPUT_PIN_DOWN, GPIO.BOTH, callback=inputStateDown, bouncetime=200)
+GPIO.add_event_detect(INPUT_PIN_OK, GPIO.BOTH, callback=inputStateOK, bouncetime=200)
+
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -98,7 +133,7 @@ def scan_card(MIFAREReader,odoo):
         print card
         if card == admin_id:
             adm = True
-            turn_off = True
+            #turn_off = True
         # This is the default key for authentication
         key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
 
@@ -214,10 +249,10 @@ def screen_drawing(device,info):
     global error, msg
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'C&C Red Alert [INET].ttf'))
-    print "ERROR: " + str(error)
-    print info
-    code = info.replace('error', '')
     if error == True:
+        print "ERROR: " + str(error)
+        print info
+        code = info.replace('error', '')
         font2 = ImageFont.truetype(font_path, dicerror[info][11])
         fonte = ImageFont.truetype(font_path, 30)
         with canvas(device) as draw:
@@ -344,9 +379,14 @@ def main():
     global adm, update
     global msg, card, error
     global device
+    global error
+    global on_Down, on_OK
     start_time = time.time()
 
     if have_internet():
+
+        on_Down_old = False
+        on_OK_old = False
 
         while adm == True and update == False:
             msg = " "
@@ -356,21 +396,26 @@ def main():
             print "ENTER: " + str(enter)
             print str(elapsed_time)
             print str(turn_off)
+            # MENU
             while enter == False and turn_off == False and update == False:
                 elapsed_time = time.time() - start_time
                 menu(device,"Main program","RFID reader","Reset settings","Halt",pos)
-       #         try:
-                if elapsed_time > 2.0 and elapsed_time <= 5.0:
-                    pos = 0  #key_pressed(pos)
-                elif elapsed_time > 5.0 and elapsed_time <= 7.0:
-                    pos = 0
-                elif elapsed_time > 7.0:
-                    enter = True
-                else:
-                    pos = 0
-        #        except KeyboardInterrupt:
-         #           break
-
+                try:
+                    # Check if the OK button is pressed
+                    if on_OK != on_OK_old:
+                        enter = True
+                        on_OK_old = on_OK
+                    else:
+                        enter = False
+                    # Check if the DOWN button is pressed
+                    if on_Down != on_Down_old:
+                        pos = pos + 1
+                        if pos > 3:
+                            pos = 0
+                        on_Down_old = on_Down
+                except KeyboardInterrupt:
+                    break
+            # CHOSEN FUNCTIONALITY
             if enter == True:
                 enter = False
                 while reset == False and adm == False and turn_off == False and update == False:
@@ -384,13 +429,13 @@ def main():
                             update = False
                         else:
                             update = True
-                        #    f = open("/home/pi/Raspberry_Code/update.txt","w+")
-                        #    f.write("Updating repository!")
-                        #    f.close
                         if adm == True:
                             print str(adm)
                     except KeyboardInterrupt:
                         break
+                pos = 0
+                print "on_OK_old: " + str(on_OK_old)
+                print "on_OK: " + str(on_OK)
 
     else:
 
@@ -450,9 +495,6 @@ def m_functionality():
                     update = False
                 else:
                     update = True
-               # f = open("/home/pi/Raspberry_Code/update.txt","w+")
-               # f.write("Updating repository!")
-               # f.close
                 print "THIS IS UPDATE: " + str(update)
             else:
                 raise ValueError("It is not a file!")

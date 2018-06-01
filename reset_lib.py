@@ -1,7 +1,7 @@
 import os
 
 def reset_to_host_mode():
-    os.system('aplay /home/pi/RaspiWiFi/Reset\ Device/button_chime.wav')
+#    os.system('aplay /home/pi/RaspiWiFi/Reset\ Device/button_chime.wav')
     os.system('sudo rm -f /etc/wpa_supplicant/wpa_supplicant.conf')
     os.system('sudo rm -f /home/pi/Projects/RaspiWifi/tmp/*')
     os.system('sudo cp -r /home/pi/RaspiWiFi/Reset\ Device/static_files/dhcpd.conf /etc/dhcp/')
