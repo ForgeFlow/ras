@@ -37,19 +37,23 @@ def result():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-#    if request.form['submit'] == 'Reset credentials':
-#        print "RESET PASS"
-#        return render_template('change.html')
-#    elif request.form['submit'] == 'Log in':
-#        print "LOGIN"
-    if request.form['password'] == 'pass' and request.form['username'] == 'admin':
-        session['logged_in'] = True
+    if request.form.get('Reset credentials') == 'Reset credentials':
+        print "RESET PASS"
+        return render_template('change.html')
+    elif request.form.get('Log in') == 'Log in':
+        print "LOGIN"
+        json_file = open('/home/pi/Raspberry_Code/credentials.json')
+        json_data = json.load(json_file)
+        json_file.close()
+        print json_data['new password'][0]
+        if request.form['password'] == json_data['new password'][0] and request.form['username'] == json_data['username'][0]:
+            session['logged_in'] = True
+        else:
+            flash('wrong password!')
+        return student()
     else:
-        flash('wrong password!')
-    return student()
-#    else:
-#        print "ELSE"
-#        pass
+        print "ELSE"
+        return student()
 
 @app.route('/change', methods=['POST', 'GET'])
 def change_credentials():
@@ -59,9 +63,18 @@ def change_credentials():
       print dic
       #file = open('test.txt','w')
       jsonarray = json.dumps(dic)
-      with open('/home/pi/Raspberry_Code/credentials.json', 'w+') as outfile:
-          json.dump(dic,outfile)
-      print jsonarray
+      json_file = open('/home/pi/Raspberry_Code/credentials.json')
+      json_data = json.load(json_file)
+      json_file.close()
+      print json_data['new password'][0]
+      if str(dic['old password'][0]) == json_data['new password'][0] and str(dic['username'][0]) == json_data['username'][0]:
+          with open('/home/pi/Raspberry_Code/credentials.json', 'w+') as outfile:
+              json.dump(dic,outfile)
+          print jsonarray
+      else:
+          flash('wrong password!')
+
+      #print jsonarray['new password'][0]
       return student()
 
 
