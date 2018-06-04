@@ -37,11 +37,33 @@ def result():
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
+#    if request.form['submit'] == 'Reset credentials':
+#        print "RESET PASS"
+#        return render_template('change.html')
+#    elif request.form['submit'] == 'Log in':
+#        print "LOGIN"
     if request.form['password'] == 'pass' and request.form['username'] == 'admin':
         session['logged_in'] = True
     else:
         flash('wrong password!')
     return student()
+#    else:
+#        print "ELSE"
+#        pass
+
+@app.route('/change', methods=['POST', 'GET'])
+def change_credentials():
+    if request.method == 'POST':
+      result = request.form
+      dic = result.to_dict(flat=False)
+      print dic
+      #file = open('test.txt','w')
+      jsonarray = json.dumps(dic)
+      with open('/home/pi/Raspberry_Code/credentials.json', 'w+') as outfile:
+          json.dump(dic,outfile)
+      print jsonarray
+      return student()
+
 
 if __name__ == '__main__':
    app.secret_key = os.urandom(12)

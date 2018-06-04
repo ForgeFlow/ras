@@ -63,7 +63,7 @@ box-shadow: none;
   transition: 0.25s;
   display: block;
   width: 250px;
-  margin: 0 auto;
+  margin: 5 auto;
 }
  
 .btn:hover {
