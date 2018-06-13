@@ -171,7 +171,7 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/lthiery/SPI-Py
+    > git clone https://github.com/lthiery/SPI-Py.git
     
     > cd SPI-py
 
@@ -183,7 +183,7 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/mxgxw/MFRC522-python
+    > git clone https://github.com/mxgxw/MFRC522-python.git
     
     > cd MFRC522-python
 
