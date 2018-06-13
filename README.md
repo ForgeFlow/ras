@@ -6,9 +6,9 @@ Test 17.
 
 ## General configuration in Ubuntu 16.04 ##
 
-1. Download the Raspbian Lite image from https://www.raspberrypi.org/downloads/raspbian/ as a ZIP.
+1. Download the Raspbian Lite image from [The Raspberry official site](https://www.raspberrypi.org/downloads/raspbian/) as a ZIP.
 
-2. Download Etcher (https://etcher.io/) to flash the SD card.
+2. Download [Etcher](https://etcher.io/) to flash the SD card.
 
 3. Insert the SD card in the PC.
 
@@ -50,7 +50,7 @@ Test 17.
 
     *There is the possibility of fixing the IP (static) so it is easier to find. See at https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
 
-13. Unmount the partitions and extract the SD card.
+13. Unmount the partitions and eject the SD card.
 
 14. Introduce it in the RPi Zero, and plug the cable to give it power.
 
@@ -76,7 +76,7 @@ Test 17.
                   
        It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need to try until you find them, or use the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
           
-       16.2.2. Download a smartphone app called Fing. Once it is installed, when you initializa it, it will look for the connected devices to the same network than it, and it will tell you the device description. Look for "Raspberry Pi". 
+       16.2.2. Download a smartphone app called Fing. Once it is installed, when you initialize it, it will look for the connected devices to the same network than it, and it will tell you the device description. Look for "Raspberry Pi". 
      
     16.3. Once we know the RPi IP adress, use the next command with the proper IP:
 
@@ -84,7 +84,7 @@ Test 17.
 
     If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
-17. Now, let's configure the RPi for our use. Introduce the following command to opne the congiguration page:
+17. Now, let's configure the RPi for our use. Introduce the following command to opne the configuration page:
 
     > sudo raspi-config
 
@@ -136,7 +136,7 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/jasbur/RaspiWiFi/tree/master
+    > git clone https://github.com/jasbur/RaspiWiFi.git
     
     > cd Raspiwifi
 
