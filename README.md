@@ -4,7 +4,7 @@ Some different libraries and codes from other repositories are employed to be ab
 
 Test 17.
 
-## General configuration ##
+## General configuration in Ubuntu 16.04 ##
 
 1. Download the Raspbian Lite image from https://www.raspberrypi.org/downloads/raspbian/ as a ZIP.
 
