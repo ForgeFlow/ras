@@ -18,7 +18,7 @@ Test 17.
 
 6. To enable the ssh (we will use it to connect to the RPi), create a blank file called "ssh" (no extension needed) at the boot partition (not the boot folder of the rootfs partition).
 
-7. Go to the rootfs parition and open the file etc/wpa_supplicant/wpa_supplicant.conf (beware and be sure you are not at your computer folders, you have to modify the SD ones!).
+7. Go to the rootfs partition and open the file etc/wpa_supplicant/wpa_supplicant.conf (beware and be sure you are not at your computer folders, you have to modify the SD ones!).
 
 8. Add the following lines to the end (substituting the contents into the ):
 
@@ -29,9 +29,9 @@ Test 17.
 
    *For other possible network configurations, see https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
-9. Add the country code too (to choose the correct frequency bands), as follows:
+9. Add the country code too (to choose the correct frequency bands), as follows (you can find yours at [Country Codes List](http://www.nationsonline.org/oneworld/country_code_list.htm) - ISO ALPHA-2 Code):
 
-       country=ES
+       country=XX
 
 10. Go to etc/network/ and open the "interfaces" file.
 
@@ -48,7 +48,7 @@ Test 17.
         iface wlan0 inet dhcp
             wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
-    *There is the possibility of fixing the IP (static) so it is easier to find. See at https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
+    *There is the possibility of fixing the IP (static) so it is easier to find. See https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
 
 13. Unmount the partitions and eject the SD card.
 
@@ -187,8 +187,8 @@ Test 17.
     
     > cd MFRC522-python
 
-4. Connect the RFID Reader to the RPi Zero GPIO pins. The template for the explanation is: *RPI-GPIO-pin:RFIDReader-pin*
-   Concretely (I will refer here to the physical position of the GPIO pins, it can be found at https://es.pinout.xyz/pinout/pin3_gpio2#):
+4. Connect the RFID Reader to the RPi Zero GPIO pins. The template for the explanation is: *RPI-GPIO-pin:RFIDReader-pin*.
+   Concretely (I will refer here to the physical position of the GPIO pins, it can be found at https://pinout.xyz/pinout/io_pi_zero#):
 
     - GPIO_17(3.3V_Power_Supply):3.3V
     - GPIO_19(MOSI):MOSI
@@ -293,7 +293,7 @@ Test 17.
 
     > cd Raspberry_Code
     
-    > python hello-template.py
+    > sudo python hello-template.py
     
     Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
     
