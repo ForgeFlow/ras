@@ -293,7 +293,7 @@ Test 17.
 
     > cd Raspberry_Code
     
-    > sudo python hello-template.py
+    > sudo python config-server.py
     
     Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
     
