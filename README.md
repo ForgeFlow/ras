@@ -72,7 +72,7 @@ Test 17.
           
        > sudo apt-get install nmap
        
-       > nmap -sn 192.168.1.0/24
+       > nmap -sn 192.168.X.0/24
                   
        It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need to try until you find them, or use the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
           
@@ -80,7 +80,7 @@ Test 17.
      
     16.3. Once we know the RPi IP adress, use the next command with the proper IP:
 
-       > ssh pi@192.168.1.XX
+       > ssh pi@192.168.X.XX
 
     If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
