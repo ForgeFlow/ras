@@ -81,8 +81,8 @@ def get_ip():
         s.close()
     return IP
 
-dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',14,1,0,0,24], 'check_out': ['CHECKED OUT',6,1,0,0,24], 'FALSE': ['NOT AUTHORIZED',47,2,14,0,24], 'Bye!': ['BYE!',45,1,0,0,24], 'Wifi1': ['WiFi Setting',45,2,30,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',25,3,55,8,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
-dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,45,5,40,'Check the parameters',3,41,53,13,20], 'error2': [2,'RFID intrigrity failed',3,50,2,37,20,'Pass the card',3,50,60,50,20]}
+dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',6,1,0,0,22], 'check_out': ['CHECKED OUT',18,2,45,0,22], 'FALSE': ['NOT AUTHORIZED',45,2,8,0,20], 'Bye!': ['BYE!',40,1,0,0,24], 'Wifi1': ['WiFi Setting',35,2,20,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',20,3,50,1,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
+dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,41,5,40,'Check the parameters',3,41,53,20,19], 'error2': [2,'RFID intrigrity failed',3,50,2,37,'Pass the card',3,50,60,50,20]}
 
 
 # Create an object of the class MFRC522
@@ -213,11 +213,11 @@ def connection(host, port, user, user_pw, database):
 def menu(device,msg1,msg2,msg3,msg4,loc):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 18)
+                                'fonts','Orkney.ttf')) #'C&C Red Alert [INET].ttf'))
+    font2 = ImageFont.truetype(font_path, 16)
 
     with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
+        #draw.rectangle(device.bounding_box, outline="white")
         if loc == 0:
             draw.rectangle((3, 3, 124, 17), outline="white", fill="white")
             draw.text((5, 0), msg1, font=font2, fill="black")
@@ -248,23 +248,23 @@ def screen_drawing(device,info):
     # use custom font
     global error, msg
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
+                                'fonts', 'Orkney.ttf'))
     if error == True:
         print "ERROR: " + str(error)
         print info
         code = info.replace('error', '')
-        font2 = ImageFont.truetype(font_path, dicerror[info][11])
-        fonte = ImageFont.truetype(font_path, 30)
+        font2 = ImageFont.truetype(font_path, dicerror[info][11]-3)
+        fonte = ImageFont.truetype(font_path, 28)
         with canvas(device) as draw:
-            draw.rectangle(device.bounding_box, outline="white")
-            draw.text((33, 5), "ERROR", font=fonte, fill="white")
-            draw.text((27, 30), "CODE " + code, font=fonte, fill="white")
+            #draw.rectangle(device.bounding_box, outline="white")
+            draw.text((17, 5), "ERROR", font=fonte, fill="white")
+            draw.text((14, 37), "CODE " + code, font=fonte, fill="white")
         time.sleep(2)
         print str(dicerror[info][0])
         for i in range(0,dicerror[info][0]+1):
             print "FOR: " + str(i)
             with canvas(device) as draw:
-                draw.rectangle(device.bounding_box, outline="white")
+                #draw.rectangle(device.bounding_box, outline="white")
                 try:
                     if dicerror[info][0] != i:
                         if dicerror[info][2+(i*5)] == 1:
@@ -276,7 +276,7 @@ def screen_drawing(device,info):
                         else:
                             a, b, c = dicerror[info][1+(i*5)].split(" ")
                             draw.text((dicerror[info][3+(i*5)], 4), a, font=font2, fill="white")
-                            draw.text((dicerror[info][4+(i*5)], 22), b, font=font2, fill="white")
+                            draw.text((dicerror[info][4+(i*5)], 23), b, font=font2, fill="white")
                             draw.text((dicerror[info][5+(i*5)], 40), c, font=font2, fill="white")
                     print "1"
                     time.sleep(2)
@@ -287,21 +287,21 @@ def screen_drawing(device,info):
         msg = " "
     else:
         print "NO ERROR"
-        font2 = ImageFont.truetype(font_path, dic[info][5])
+        font2 = ImageFont.truetype(font_path, dic[info][5]-2)
 
         with canvas(device) as draw:
-            draw.rectangle(device.bounding_box, outline="white")
+            #draw.rectangle(device.bounding_box, outline="white")
             try:
                 if dic[info][2] == 1:
-                    draw.text((dic[info][1], 20+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
+                    draw.text((dic[info][1], 22+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
                 elif dic[info][2] == 2:
                     a, b = dic[info][0].split(" ")
-                    draw.text((dic[info][1], 7+(24-dic[info][5])/2), a, font=font2, fill="white")
-                    draw.text((dic[info][3], 33+(24-dic[info][5])/2), b, font=font2, fill="white")
+                    draw.text((dic[info][1], 10+(24-dic[info][5])/2), a, font=font2, fill="white")
+                    draw.text((dic[info][3], 37+(24-dic[info][5])/2), b, font=font2, fill="white")
                 else:
                     a, b, c = dic[info][0].split(" ")
                     draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
-                    draw.text((dic[info][3], 20+(24-dic[info][5])/2), b, font=font2, fill="white")
+                    draw.text((dic[info][3], 22+(24-dic[info][5])/2), b, font=font2, fill="white")
                     draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
             except:
                 draw.text((20, 20), info, font=font2, fill="white")
@@ -310,13 +310,13 @@ def screen_drawing(device,info):
 def card_drawing(device,id):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, 24)
+                                'fonts', 'Orkney.ttf'))
+    font2 = ImageFont.truetype(font_path, 22)
 
     with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
+        #draw.rectangle(device.bounding_box, outline="white")
         try:
-            draw.text(30, 20, id, font=font2, fill="white")
+            draw.text(15, 20, id, font=font2, fill="white")
         except:
             draw.text((20, 20), id, font=font2, fill="white")
 
@@ -324,11 +324,11 @@ def card_drawing(device,id):
 def double_msg(device,msg1,msg2,size):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, size)
+                                'fonts', 'Orkney.ttf'))
+    font2 = ImageFont.truetype(font_path, size-2)
 
     with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
+        #draw.rectangle(device.bounding_box, outline="white")
         draw.text((10, 18), msg1, font=font2, fill="white")
         draw.text((10, 30), msg2, font=font2, fill="white")
 
@@ -337,14 +337,14 @@ def double_msg(device,msg1,msg2,size):
 def triple_msg(device,msg1,msg2,msg3,size):
     # use custom font
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                'fonts', 'C&C Red Alert [INET].ttf'))
-    font2 = ImageFont.truetype(font_path, size)
+                                'fonts', 'Orkney.ttf'))
+    font2 = ImageFont.truetype(font_path, size-3)
 
     with canvas(device) as draw:
-        draw.rectangle(device.bounding_box, outline="white")
-        draw.text((15, 7), msg1, font=font2, fill="white")
-        draw.text((50, 25), msg2, font=font2, fill="white")
-        draw.text((5, 40), msg3, font=font2, fill="white")
+        #draw.rectangle(device.bounding_box, outline="white")
+        draw.text((15, 10), msg1, font=font2, fill="white")
+        draw.text((50, 28), msg2, font=font2, fill="white")
+        draw.text((1, 43), msg3, font=font2, fill="white")
 
     time.sleep(2)
 
