@@ -4,11 +4,11 @@ Some different libraries and codes from other repositories are employed to be ab
 
 Test 17.
 
-## General configuration ##
+## General configuration in Ubuntu 16.04 ##
 
-1. Download the Raspbian Lite image from https://www.raspberrypi.org/downloads/raspbian/ as a ZIP.
+1. Download the Raspbian Lite image from [The Raspberry official site](https://www.raspberrypi.org/downloads/raspbian/) as a ZIP.
 
-2. Download Etcher (https://etcher.io/) to flash the SD card.
+2. Download [Etcher](https://etcher.io/) to flash the SD card.
 
 3. Insert the SD card in the PC.
 
@@ -18,7 +18,7 @@ Test 17.
 
 6. To enable the ssh (we will use it to connect to the RPi), create a blank file called "ssh" (no extension needed) at the boot partition (not the boot folder of the rootfs partition).
 
-7. Go to the rootfs parition and open the file etc/wpa_supplicant/wpa_supplicant.conf (beware and be sure you are not at your computer folders, you have to modify the SD ones!).
+7. Go to the rootfs partition and open the file etc/wpa_supplicant/wpa_supplicant.conf (beware and be sure you are not at your computer folders, you have to modify the SD ones!).
 
 8. Add the following lines to the end (substituting the contents into the ):
 
@@ -29,9 +29,9 @@ Test 17.
 
    *For other possible network configurations, see https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
-9. Add the country code too (to choose the correct frequency bands), as follows:
+9. Add the country code too (to choose the correct frequency bands), as follows (you can find yours at [Country Codes List](http://www.nationsonline.org/oneworld/country_code_list.htm) - ISO ALPHA-2 Code):
 
-       country=ES
+       country=XX
 
 10. Go to etc/network/ and open the "interfaces" file.
 
@@ -48,9 +48,9 @@ Test 17.
         iface wlan0 inet dhcp
             wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
-    *There is the possibility of fixing the IP (static) so it is easier to find. See at https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
+    *There is the possibility of fixing the IP (static) so it is easier to find. See https://medium.com/@DavidMaitland/raspberry-pi-zero-headless-setup-92fb72daf88d for more details.
 
-13. Unmount the partitions and extract the SD card.
+13. Unmount the partitions and eject the SD card.
 
 14. Introduce it in the RPi Zero, and plug the cable to give it power.
 
@@ -72,19 +72,19 @@ Test 17.
           
        > sudo apt-get install nmap
        
-       > nmap -sn 192.168.1.0/24
+       > nmap -sn 192.168.X.0/24
                   
        It will show all the connected devices to the WiFi network by their IPs. The problem is that you won't know which one matches your RPi. You will need to try until you find them, or use the command before connecting the RPi, so that the IP that appears when it is connected would be the right one.
           
-       16.2.2. Download a smartphone app called Fing. Once it is installed, when you initializa it, it will look for the connected devices to the same network than it, and it will tell you the device description. Look for "Raspberry Pi". 
+       16.2.2. Download a smartphone app called Fing. Once it is installed, when you initialize it, it will look for the connected devices to the same network than it, and it will tell you the device description. Look for "Raspberry Pi". 
      
     16.3. Once we know the RPi IP adress, use the next command with the proper IP:
 
-       > ssh pi@192.168.1.XX
+       > ssh pi@192.168.X.XX
 
     If it worked, it will ask you for a password. Introduce "raspberry" (default password), and you will be able to manage the RPi through terminal by SSH. Go to step 17 now.
 
-17. Now, let's configure the RPi for our use. Introduce the following command to opne the congiguration page:
+17. Now, let's configure the RPi for our use. Introduce the following command to opne the configuration page:
 
     > sudo raspi-config
 
@@ -136,7 +136,7 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/jasbur/RaspiWiFi/tree/master
+    > git clone https://github.com/jasbur/RaspiWiFi.git
     
     > cd Raspiwifi
 
@@ -171,7 +171,7 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/lthiery/SPI-Py
+    > git clone https://github.com/lthiery/SPI-Py.git
     
     > cd SPI-py
 
@@ -183,12 +183,12 @@ Test 17.
 
     > cd
     
-    > git clone https://github.com/mxgxw/MFRC522-python
+    > git clone https://github.com/mxgxw/MFRC522-python.git
     
     > cd MFRC522-python
 
-4. Connect the RFID Reader to the RPi Zero GPIO pins. The template for the explanation is: *RPI-GPIO-pin:RFIDReader-pin*
-   Concretely (I will refer here to the physical position of the GPIO pins, it can be found at https://es.pinout.xyz/pinout/pin3_gpio2#):
+4. Connect the RFID Reader to the RPi Zero GPIO pins. The template for the explanation is: *RPI-GPIO-pin:RFIDReader-pin*.
+   Concretely (I will refer here to the physical position of the GPIO pins, it can be found at https://pinout.xyz/pinout/io_pi_zero#):
 
     - GPIO_17(3.3V_Power_Supply):3.3V
     - GPIO_19(MOSI):MOSI
@@ -293,7 +293,7 @@ Test 17.
 
     > cd Raspberry_Code
     
-    > python hello-template.py
+    > sudo python config-server.py
     
     Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
     
