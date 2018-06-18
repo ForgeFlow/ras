@@ -28,6 +28,9 @@ import json
 import os.path
 
 error = False
+card_found = False
+
+cnt_found = 0
 
 turn_off = False
 adm = True
@@ -82,8 +85,9 @@ def get_ip():
     return IP
 
 dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',6,1,0,0,22], 'check_out': ['CHECKED OUT',18,2,45,0,22], 'FALSE': ['NOT AUTHORIZED',45,2,8,0,20], 'Bye!': ['BYE!',40,1,0,0,24], 'Wifi1': ['WiFi Setting',35,2,20,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',20,3,50,1,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
-dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,41,5,40,'Check the parameters',3,41,53,20,19], 'error2': [2,'RFID intrigrity failed',3,50,2,37,'Pass the card',3,50,60,50,20]}
+dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,41,5,40,'Check the parameters',3,41,53,20,19], 'error2': [2,'RFID intrigrity failed',3,50,20,35,'Pass the card',3,48,45,48,20]}
 
+tz_dic = {'-12:00': "Pacific/Kwajalein",  '-11:00': "Pacific/Samoa",'-10:00': "US/Hawaii",'-09:50': "Pacific/Marquesas",'-09:00': "US/Alaska",'-08:00': "Etc/GMT-8",'-07:00': "Etc/GMT-7",'-06:00': "America/Mexico_City",'-05:00': "America/Lima",'-04:00': "America/La_Paz",'-03:50': "Canada/Newfoundland",'-03:00': "America/Buenos_Aires",'-02:00': "Etc/GMT-2",'-01:00': "Atlantic/Azores",'+00:00': "Europe/London",'+01:00': "Europe/Madrid",'+02:00': "Europe/Kaliningrad",'+03:00': "Asia/Baghdad",'+03:50': "Asia/Tehran",'+04:00': "Asia/Baku",'+04:50': "Asia/Kabul",'+05:00': "Asia/Karachi",'+05:50': "Asia/Calcutta",'+05:75': "Asia/Kathmandu",'+06:00': "Asia/Dhaka",'+06:50': "Asia/Rangoon",'+07:00': "Asia/Bangkok",'+08:00': "Asia/Hong_Kong",'+08:75': "Australia/Eucla",'+09:00': "Asia/Tokyo",'+09:50': "Australia/Adelaide",'+10:00': "Pacific/Guam",'+10:50': "Australia/Lord_Howe",'+11:00': "Asia/Magadan",'+11:50': "Pacific/Norfolk",'+12:00': "Pacific/Auckland",'+12:75': "Pacific/Chatham",'+13:00': "Pacific/Apia",'+14:00': "Pacific/Fakaofo" }
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
@@ -105,6 +109,7 @@ def scan_card(MIFAREReader,odoo):
     global user_password
     global db_name
     global card
+    global card_found
     global user_name
     global host
     global port
@@ -119,6 +124,7 @@ def scan_card(MIFAREReader,odoo):
     # If a card is found
     if status == MIFAREReader.MI_OK:
         print "Card detected"
+        card_found = True
 
     # Get the UID of the card
     (status,uid) = MIFAREReader.MFRC522_Anticoll()
@@ -284,27 +290,33 @@ def screen_drawing(device,info):
                 except:
                     draw.text((20, 20), info, font=font2, fill="white")
                 time.sleep(2)
-        msg = " "
+        msg = "time"
     else:
         print "NO ERROR"
-        font2 = ImageFont.truetype(font_path, dic[info][5]-2)
-
+        if info != "time":
+            font2 = ImageFont.truetype(font_path, dic[info][5]-2)
+        else:
+            font2 = ImageFont.truetype(font_path, 30)
         with canvas(device) as draw:
             #draw.rectangle(device.bounding_box, outline="white")
-            try:
-                if dic[info][2] == 1:
-                    draw.text((dic[info][1], 22+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
-                elif dic[info][2] == 2:
-                    a, b = dic[info][0].split(" ")
-                    draw.text((dic[info][1], 10+(24-dic[info][5])/2), a, font=font2, fill="white")
-                    draw.text((dic[info][3], 37+(24-dic[info][5])/2), b, font=font2, fill="white")
-                else:
-                    a, b, c = dic[info][0].split(" ")
-                    draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
-                    draw.text((dic[info][3], 22+(24-dic[info][5])/2), b, font=font2, fill="white")
-                    draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
-            except:
-                draw.text((20, 20), info, font=font2, fill="white")
+            if info == "time":
+                hour = time.strftime("%H:%M",time.localtime())
+                draw.text((23, 20), hour, font=font2, fill="white")
+            else:
+                try:
+                    if dic[info][2] == 1:
+                        draw.text((dic[info][1], 22+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
+                    elif dic[info][2] == 2:
+                        a, b = dic[info][0].split(" ")
+                        draw.text((dic[info][1], 10+(24-dic[info][5])/2), a, font=font2, fill="white")
+                        draw.text((dic[info][3], 37+(24-dic[info][5])/2), b, font=font2, fill="white")
+                    else:
+                        a, b, c = dic[info][0].split(" ")
+                        draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
+                        draw.text((dic[info][3], 22+(24-dic[info][5])/2), b, font=font2, fill="white")
+                        draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
+                except:
+                    draw.text((20, 20), info, font=font2, fill="white")
 
 
 def card_drawing(device,id):
@@ -349,8 +361,18 @@ def triple_msg(device,msg1,msg2,msg3,size):
     time.sleep(2)
 
 def rfid_hr_attendance():
-    global error
-    screen_drawing(device,msg)
+    global error, cnt_found, card_found
+    #hour = time.strftime("%H:%M")
+    if card_found == True:
+        screen_drawing(device,msg)
+        cnt_found = cnt_found + 1
+        print "CNT_FOUND" + str(cnt_found)
+        if cnt_found >= 5:
+            card_found = False
+    else:
+        cnt_found = 0
+        screen_drawing(device,"time")
+
     scan_card(MIFAREReader,True)
 
 def rfid_reader():
@@ -486,6 +508,10 @@ def m_functionality():
                 user_password = json_data["user_password"][0]
                 dbname = json_data["db"][0]
                 admin_id = json_data["admin_id"][0]
+                timezone = json_data["timezone"][0]
+                os.environ['TZ'] = tz_dic[timezone]
+                time.tzset()
+                print time.strftime('%X %x %Z')
                 if "https" not in json_data:
                     https_on = False
                 else:
