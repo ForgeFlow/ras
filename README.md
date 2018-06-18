@@ -295,7 +295,7 @@ Test 17.
     
     > sudo python config-server.py
     
-    Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in hello-template.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
+    Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in config-server.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
     
     The data.json file must have been generated in the repository. Check the parameters are right.
 
@@ -317,7 +317,7 @@ Test 17.
    Add at the end, but before the "exit 0" line, the following: 
    
        python /home/pi/Raspberry_Code/launcher.py & 
-       pyhton /home/pi/Raspberry_Code/hello-template.py &
+       pyhton /home/pi/Raspberry_Code/config-server.py &
    
    Check the path, it can be different if you structured the folders in another way.
    Don't forget the " & ", so that the programs runs in separated processes and the RPi can initialize itself without problems.
