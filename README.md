@@ -98,29 +98,35 @@ Test 17.
 
 22. When the RPi SSH connections comes back to be possible, log in using your new password.
 
-23. Update and upgrade (*1):
+23. Change the timezone to the one of your country using:
+
+    > sudo dpkg-reconfigure tzdata
+    
+    Follow the instructions.
+
+24. Update and upgrade (*1):
 
     > sudo apt-get -y update
     
     > sudo apt-get -y upgrade
 
-24. Check if the SPI is really enabled using:
+25. Check if the SPI is really enabled using:
 
     > ls -l /dev/spidev*
 
     You must see two devices, one for each SPI bus.
 
-25. Use the following commands to install some additional packages for the I2C:
+26. Use the following commands to install some additional packages for the I2C:
 
     > sudo apt-get install -y python-smbus
     
     > sudo apt-get install -y i2c-tools
 
-26. Check the I2C using:
+27. Check the I2C using:
 
     > ls -l /dev/i2c*
 
-27. Install important programs/packages:
+28. Install important programs/packages:
 
     > sudo apt-get install git
     
