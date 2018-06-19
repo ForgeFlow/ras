@@ -292,6 +292,7 @@ Some different libraries and codes from other repositories are employed to be ab
 2. Install Flask and Babel for the server:
 
     > pip install Flask
+    
     > easy_install Flask-Babel
     
 3. Test the server to create the data.json file, which the main program will read to get the Odoo parameters:
