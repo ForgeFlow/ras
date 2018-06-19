@@ -7,12 +7,12 @@
         <link rel="stylesheet" href="static/main.css?version=1">
     </head>
     <body>
-      <form action="http://192.168.1.47/result" method="post" id="testform">
+      <form action="http://{{ IP }}/result" method="post" id="testform">
         
       <h1>{{ _('Configuration portal') }}</h1>
         <fieldset>
           <legend><span class="number">1</span>{{ _('Odoo Parameters') }}</legend>
-          <label for="name">{{ _('Odoo Host') }}:</label>
+          <label for="name">{{ _('Odoo Host:') }}</label>
           <input type="text" id="odoo_host" name="odoo_host">
           <label for="name">{{ _('Port:') }}</label>
           <input type="text" id="odoo_port" name="odoo_port">

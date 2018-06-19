@@ -206,7 +206,7 @@ def connection(host, port, user, user_pw, database):
     print "USER: ", user_id
     print "CONNEC 3"
     global object_facade
-    if port in ['443', '80', '']:
+    if https_on: #port in ['443', '80', '']:
         object_facade = xmlrpclib.ServerProxy(url_template % (
             host, 'object'))
     else:
@@ -301,7 +301,20 @@ def screen_drawing(device,info):
             #draw.rectangle(device.bounding_box, outline="white")
             if info == "time":
                 hour = time.strftime("%H:%M",time.localtime())
-                draw.text((23, 20), hour, font=font2, fill="white")
+                num_ones = hour.count('1')
+                if num_ones == 0:
+                    draw.text((23, 20), hour, font=font2, fill="white")
+                else:
+                    if num_ones == 1:
+                        draw.text((25, 20), hour, font=font2, fill="white")
+                    else:
+                        if num_ones == 2:
+                            draw.text((28, 20), hour, font=font2, fill="white")
+                        else:
+                            if num_ones == 3:
+                                draw.text((31, 20), hour, font=font2, fill="white")
+                            else:
+                                draw.text((34, 20), hour, font=font2, fill="white")
             else:
                 try:
                     if dic[info][2] == 1:
@@ -330,7 +343,7 @@ def card_drawing(device,id):
         try:
             draw.text(15, 20, id, font=font2, fill="white")
         except:
-            draw.text((20, 20), id, font=font2, fill="white")
+            draw.text((15, 20), id, font=font2, fill="white")
 
 
 def double_msg(device,msg1,msg2,size):
