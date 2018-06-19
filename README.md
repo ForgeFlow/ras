@@ -2,8 +2,6 @@
 
 Some different libraries and codes from other repositories are employed to be able to run our program. Thanks to them from here for these great programs, and all the recognitions for them for the use of their code.
 
-Test 17.
-
 ## General configuration in Ubuntu 16.04 ##
 
 1. Download the Raspbian Lite image from [The Raspberry official site](https://www.raspberrypi.org/downloads/raspbian/) as a ZIP.
@@ -297,7 +295,7 @@ Test 17.
     
 3. Test the server to create the data.json file, which the main program will read to get the Odoo parameters:
 
-    > cd Raspberry_Code
+    > cd Raspberry_Code/Config-Portal/
     
     > sudo python config-server.py
     
@@ -323,7 +321,7 @@ Test 17.
    Add at the end, but before the "exit 0" line, the following: 
    
        python /home/pi/Raspberry_Code/launcher.py & 
-       pyhton /home/pi/Raspberry_Code/config-server.py &
+       pyhton /home/pi/Raspberry_Code/Config-Portal/config-server.py &
    
    Check the path, it can be different if you structured the folders in another way.
    Don't forget the " & ", so that the programs runs in separated processes and the RPi can initialize itself without problems.
