@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: RAS SECOND VERSION\n"
 "Report-Msgid-Bugs-To: luis.romero@eficent.com\n"
-"POT-Creation-Date: 2018-06-19 10:29+0200\n"
+"POT-Creation-Date: 2018-06-20 10:27+0200\n"
 "PO-Revision-Date: 2018-06-19 09:16+0200\n"
 "Last-Translator: LUIS ROMERO <luis.romero@eficent.com>\n"
 "Language: es\n"
@@ -42,7 +42,7 @@ msgstr "Registrar cambios"
 msgid "Reset"
 msgstr "Resetear campos"
 
-#: templates/login.html:12 templates/login.html:26
+#: templates/login.html:12 templates/login.html:34
 msgid "Log in"
 msgstr "Iniciar sesión"
 
@@ -51,8 +51,24 @@ msgid "password"
 msgstr "contraseña"
 
 #: templates/login.html:27
+msgid "Language:"
+msgstr "Idioma:"
+
+#: templates/login.html:29
+msgid "English"
+msgstr "Inglés"
+
+#: templates/login.html:30
+msgid "Spanish"
+msgstr "Español"
+
+#: templates/login.html:35
 msgid "Reset Credentials"
 msgstr "Resetear credenciales"
+
+#: templates/login.html:36
+msgid "Change language"
+msgstr "Cambiar idioma"
 
 #: templates/result2.html:4
 msgid "Data Table"

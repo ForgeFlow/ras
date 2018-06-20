@@ -84,8 +84,14 @@ def get_ip():
         s.close()
     return IP
 
-dic = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',6,1,0,0,22], 'check_out': ['CHECKED OUT',18,2,45,0,22], 'FALSE': ['NOT AUTHORIZED',45,2,8,0,20], 'Bye!': ['BYE!',40,1,0,0,24], 'Wifi1': ['WiFi Setting',35,2,20,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',20,3,50,1,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
-dicerror = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,41,5,40,'Check the parameters',3,41,53,20,19], 'error2': [2,'RFID intrigrity failed',3,50,20,35,'Pass the card',3,48,45,48,20]}
+dic_en = {' ': [" ",0,1,0,0,24], 'check_in': ['CHECKED IN',6,1,0,0,22], 'check_out': ['CHECKED OUT',18,2,45,0,22], 'FALSE': ['NOT AUTHORIZED',45,2,8,0,20], 'Bye!': ['BYE!',40,1,0,0,24], 'Wifi1': ['WiFi Setting',35,2,20,0,24], 'Wifi2': ['Connect to 10.0.0.1:9191',20,3,50,1,24], 'Wifi3': ['using RaspiWifi setup',35,3,20,37,24], 'update': ['Resetting to update',20,3,55,35,24], 'config1': ['Connect to ' + get_ip(),25,3,55,15,20], 'config2': ['for device configuration',53,3,35,7,20]}
+dicerror_en = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Odoo communication failed',3,41,5,40,'Check the parameters',3,41,53,20,19], 'error2': [2,'RFID intrigrity failed',3,50,20,35,'Pass the card',3,48,45,48,20]}
+
+dic_es = {' ': [" ",0,1,0,0,24], 'check_in': ['ENTRADA REGISTRADA',20,2,3,0,22], 'check_out': ['SALIDA REGISTRADA',30,2,3,0,22], 'FALSE': ['NO AUTORIZADO',53,2,5,0,20], 'Bye!': ['HASTA LUEGO',25,2,25,0,24], 'Wifi1': ['Configuracion WiFi',7,2,35,0,24], 'Wifi2': ['Entra en 10.0.0.1:9191',30,3,50,1,24], 'Wifi3': ['usando RaspiWifi setup',35,3,20,37,24], 'update': ['Reseteando para actualizar',13,3,55,20,24], 'config1': ['Entra en ' + get_ip(),18,3,55,15,20], 'config2': ['para la configuracion',50,3,55,7,20]}
+dicerror_es = {' ': [1," ",1,0,0,0,24], 'error1': [2,'Error de comunicacion',3,47,54,15,'Chequea los parametros',3,28,50,20,19], 'error2': [2,'Integridad RFID fallida',3,20,50,35,'Pasa la tarjeta',3,44,55,34,20]}
+
+dic = {'es': dic_es, 'en': dic_en}
+dicerror = {'es': dicerror_es, 'en': dicerror_en}
 
 tz_dic = {'-12:00': "Pacific/Kwajalein",  '-11:00': "Pacific/Samoa",'-10:00': "US/Hawaii",'-09:50': "Pacific/Marquesas",'-09:00': "US/Alaska",'-08:00': "Etc/GMT-8",'-07:00': "Etc/GMT-7",'-06:00': "America/Mexico_City",'-05:00': "America/Lima",'-04:00': "America/La_Paz",'-03:50': "Canada/Newfoundland",'-03:00': "America/Buenos_Aires",'-02:00': "Etc/GMT-2",'-01:00': "Atlantic/Azores",'+00:00': "Europe/London",'+01:00': "Europe/Madrid",'+02:00': "Europe/Kaliningrad",'+03:00': "Asia/Baghdad",'+03:50': "Asia/Tehran",'+04:00': "Asia/Baku",'+04:50': "Asia/Kabul",'+05:00': "Asia/Karachi",'+05:50': "Asia/Calcutta",'+05:75': "Asia/Kathmandu",'+06:00': "Asia/Dhaka",'+06:50': "Asia/Rangoon",'+07:00': "Asia/Bangkok",'+08:00': "Asia/Hong_Kong",'+08:75': "Australia/Eucla",'+09:00': "Asia/Tokyo",'+09:50': "Australia/Adelaide",'+10:00': "Pacific/Guam",'+10:50': "Australia/Lord_Howe",'+11:00': "Asia/Magadan",'+11:50': "Pacific/Norfolk",'+12:00': "Pacific/Auckland",'+12:75': "Pacific/Chatham",'+13:00': "Pacific/Apia",'+14:00': "Pacific/Fakaofo" }
 
@@ -252,38 +258,38 @@ def menu(device,msg1,msg2,msg3,msg4,loc):
 
 def screen_drawing(device,info):
     # use custom font
-    global error, msg
+    global error, msg, lang
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                 'fonts', 'Orkney.ttf'))
     if error == True:
         print "ERROR: " + str(error)
         print info
         code = info.replace('error', '')
-        font2 = ImageFont.truetype(font_path, dicerror[info][11]-3)
+        font2 = ImageFont.truetype(font_path, dicerror[lang][info][11]-3)
         fonte = ImageFont.truetype(font_path, 28)
         with canvas(device) as draw:
             #draw.rectangle(device.bounding_box, outline="white")
             draw.text((17, 5), "ERROR", font=fonte, fill="white")
             draw.text((14, 37), "CODE " + code, font=fonte, fill="white")
         time.sleep(2)
-        print str(dicerror[info][0])
-        for i in range(0,dicerror[info][0]+1):
+        print str(dicerror[lang][info][0])
+        for i in range(0,dicerror[lang][info][0]+1):
             print "FOR: " + str(i)
             with canvas(device) as draw:
                 #draw.rectangle(device.bounding_box, outline="white")
                 try:
-                    if dicerror[info][0] != i:
-                        if dicerror[info][2+(i*5)] == 1:
-                            draw.text((dicerror[info][3+(i*5)], 20), dicerror[info][1+(i*5)], font=font2, fill="white")
-                        elif dicerror[info][2+(i*5)] == 2:
-                            a, b = dicerror[info][1+(i*5)].split(" ")
-                            draw.text((dicerror[info][3+(i*5)], 7), a, font=font2, fill="white")
-                            draw.text((dicerror[info][4+(i*5)], 33), b, font=font2, fill="white")
+                    if dicerror[lang][info][0] != i:
+                        if dicerror[lang][info][2+(i*5)] == 1:
+                            draw.text((dicerror[lang][info][3+(i*5)], 20), dicerror[lang][info][1+(i*5)], font=font2, fill="white")
+                        elif dicerror[lang][info][2+(i*5)] == 2:
+                            a, b = dicerror[lang][info][1+(i*5)].split(" ")
+                            draw.text((dicerror[lang][info][3+(i*5)], 10), a, font=font2, fill="white")
+                            draw.text((dicerror[lang][info][4+(i*5)], 45), b, font=font2, fill="white")
                         else:
-                            a, b, c = dicerror[info][1+(i*5)].split(" ")
-                            draw.text((dicerror[info][3+(i*5)], 4), a, font=font2, fill="white")
-                            draw.text((dicerror[info][4+(i*5)], 23), b, font=font2, fill="white")
-                            draw.text((dicerror[info][5+(i*5)], 40), c, font=font2, fill="white")
+                            a, b, c = dicerror[lang][info][1+(i*5)].split(" ")
+                            draw.text((dicerror[lang][info][3+(i*5)], 4), a, font=font2, fill="white")
+                            draw.text((dicerror[lang][info][4+(i*5)], 23), b, font=font2, fill="white")
+                            draw.text((dicerror[lang][info][5+(i*5)], 40), c, font=font2, fill="white")
                     print "1"
                     time.sleep(2)
                     print "2"
@@ -293,8 +299,9 @@ def screen_drawing(device,info):
         msg = "time"
     else:
         print "NO ERROR"
+        print lang
         if info != "time":
-            font2 = ImageFont.truetype(font_path, dic[info][5]-2)
+            font2 = ImageFont.truetype(font_path, dic[lang][info][5]-2)
         else:
             font2 = ImageFont.truetype(font_path, 30)
         with canvas(device) as draw:
@@ -317,17 +324,17 @@ def screen_drawing(device,info):
                                 draw.text((34, 20), hour, font=font2, fill="white")
             else:
                 try:
-                    if dic[info][2] == 1:
-                        draw.text((dic[info][1], 22+(24-dic[info][5])/2), dic[info][0], font=font2, fill="white")
-                    elif dic[info][2] == 2:
-                        a, b = dic[info][0].split(" ")
-                        draw.text((dic[info][1], 10+(24-dic[info][5])/2), a, font=font2, fill="white")
-                        draw.text((dic[info][3], 37+(24-dic[info][5])/2), b, font=font2, fill="white")
+                    if dic[lang][info][2] == 1:
+                        draw.text((dic[lang][info][1], 22+(24-dic[lang][info][5])/2), dic[lang][info][0], font=font2, fill="white")
+                    elif dic[lang][info][2] == 2:
+                        a, b = dic[lang][info][0].split(" ")
+                        draw.text((dic[lang][info][1], 10+(24-dic[lang][info][5])/2), a, font=font2, fill="white")
+                        draw.text((dic[lang][info][3], 37+(24-dic[lang][info][5])/2), b, font=font2, fill="white")
                     else:
-                        a, b, c = dic[info][0].split(" ")
-                        draw.text((dic[info][1], 2+(24-dic[info][5])/2), a, font=font2, fill="white")
-                        draw.text((dic[info][3], 22+(24-dic[info][5])/2), b, font=font2, fill="white")
-                        draw.text((dic[info][4], 37+(24-dic[info][5])/2), c, font=font2, fill="white")
+                        a, b, c = dic[lang][info][0].split(" ")
+                        draw.text((dic[lang][info][1], 2+(24-dic[lang][info][5])/2), a, font=font2, fill="white")
+                        draw.text((dic[lang][info][3], 22+(24-dic[lang][info][5])/2), b, font=font2, fill="white")
+                        draw.text((dic[lang][info][4], 37+(24-dic[lang][info][5])/2), c, font=font2, fill="white")
                 except:
                     draw.text((20, 20), info, font=font2, fill="white")
 
@@ -414,7 +421,7 @@ def main():
     global adm, update
     global msg, card, error
     global device
-    global error
+    global error, lang
     global on_Down, on_OK
     start_time = time.time()
 
@@ -466,6 +473,11 @@ def main():
                             update = True
                         if adm == True:
                             print str(adm)
+                        json_file = open('/home/pi/Raspberry_Code/idiom.json')
+                        json_data = json.load(json_file)
+                        json_file.close()
+                        lang = json_data["language"][0]
+
                     except KeyboardInterrupt:
                         break
                 pos = 0
@@ -482,7 +494,7 @@ def main():
         time.sleep(2)
 
 def m_functionality():
-    global device
+    global device, lang
     global update
     global reset
     global host, port, user_name, user_password, dbname
@@ -535,6 +547,10 @@ def m_functionality():
                 else:
                     update = True
                 print "THIS IS UPDATE: " + str(update)
+                json_file = open('/home/pi/Raspberry_Code/idiom.json')
+                json_data = json.load(json_file)
+                json_file.close()
+                lang = json_data["language"][0]
             else:
                 raise ValueError("It is not a file!")
         main()

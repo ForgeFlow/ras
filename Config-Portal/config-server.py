@@ -15,8 +15,12 @@ def get_locale():
     # header the browser transmits.  We support de/fr/en in this
     # example.  The best match wins.
 
+    json_file = open('/home/pi/Raspberry_Code/idiom.json')
+    json_data = json.load(json_file)
+    json_file.close()
+
     #return request.accept_languages.best_match(['es','en'])
-    return 'es'
+    return json_data['language'][0]
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -66,6 +70,17 @@ def do_admin_login():
             session['logged_in'] = True
         else:
             flash('wrong password!')
+        return student()
+    elif request.form.get('Change language') == 'Change language':
+        print "CHANGE LANGUAGE"
+        result = request.form
+        dic = result.to_dict(flat=False)
+        json_file = open('/home/pi/Raspberry_Code/idiom.json')
+        json_data = json.load(json_file)
+        json_file.close()
+        print json_data['language'][0]
+        with open('/home/pi/Raspberry_Code/idiom.json', 'w+') as outfile:
+              json.dump(dic,outfile)
         return student()
     else:
         print "ELSE"

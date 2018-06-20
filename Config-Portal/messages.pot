@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-06-19 10:29+0200\n"
+"POT-Creation-Date: 2018-06-20 10:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: templates/login.html:12 templates/login.html:26
+#: templates/login.html:12 templates/login.html:34
 msgid "Log in"
 msgstr ""
 
@@ -50,7 +50,23 @@ msgid "password"
 msgstr ""
 
 #: templates/login.html:27
+msgid "Language:"
+msgstr ""
+
+#: templates/login.html:29
+msgid "English"
+msgstr ""
+
+#: templates/login.html:30
+msgid "Spanish"
+msgstr ""
+
+#: templates/login.html:35
 msgid "Reset Credentials"
+msgstr ""
+
+#: templates/login.html:36
+msgid "Change language"
 msgstr ""
 
 #: templates/result2.html:4

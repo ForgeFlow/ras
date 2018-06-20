@@ -5,7 +5,7 @@
 {% else %}
  
  
-<form action="/login" method="POST" id="loginform">
+<form action="/login" method="POST">
 	<div class="login">
 		<div class="login-screen">
 			<div class="app-title">
@@ -25,12 +25,13 @@
 
 				<div class="control-group">
                                   <label for="language">{{ _('Language:') }}</label>
-                                  <select name="language" form="loginform">
+                                  <select name="language" form="testform">
                                     <option value="en">{{ _('English') }}</option>
                                     <option value="es">{{ _('Spanish') }}</option>
                                   </select>
+				<button type="submit" name="Change language" value="Change language"  class="btn btn-primary btn-large btn-block">{{ _('Change language') }}</button>
                                 </div>
-                <button type="submit" name="Change language" value="Change language"  class="btn btn-primary btn-large btn-block">{{ _('Change language') }}</button> 
+ 
                 <button type="submit" name="Log in" value="Log in" class="btn btn-primary btn-large btn-block">{{ _('Log in') }}</button>
                 <button type="submit" name="Reset credentials" value="Reset credentials"  class="btn btn-primary btn-large btn-block">{{ _('Reset Credentials') }}</button>
 			</div>
