@@ -20,7 +20,10 @@ def get_locale():
     json_file.close()
 
     #return request.accept_languages.best_match(['es','en'])
-    return json_data['language'][0]
+    if json_data['language'][0] == "e":
+        return json_data['language']
+    else:
+        return json_data['language'][0]
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
