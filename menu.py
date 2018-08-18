@@ -541,7 +541,7 @@ def main():
                                 time.sleep(2)
                                 screen_drawing(device,"config2")
                                 time.sleep(2)
-                            if os.path.isfile(/data.json"):
+                            if os.path.isfile(os.getcwd()+"/data.json"):
                                 json_file = open(os.getcwd()+'/data.json')
                                 json_data = json.load(json_file)
                                 json_file.close()
