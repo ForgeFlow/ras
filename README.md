@@ -4,8 +4,6 @@ Some different libraries and codes from other repositories are employed to be ab
 
 ## General configuration in Ubuntu 16.04 ##
 
-0. 
-
 1. Download the Raspbian Lite image from [The Raspberry official site](https://www.raspberrypi.org/downloads/raspbian/) as a ZIP.
 
 2. Download [Etcher](https://etcher.io/) to flash the SD card.
