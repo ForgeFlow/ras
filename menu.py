@@ -470,9 +470,9 @@ def main():
                 elapsed_time = time.time() - start_time
                 if menu_sel == 1:
                     if lang == "es":
-                        menu(device,"RFID - Odoo","Lector RFID","Ajustes","Apagar",pos)
+                        menu(device,"RFID - Odoo","Lector RFID","Ajustes","Salir",pos)
                     else:
-                        menu(device,"RFID - Odoo","RFID reader","Settings","Halt",pos)
+                        menu(device,"RFID - Odoo","RFID reader","Settings","Exit",pos)
                     try:
                         # Check if the OK button is pressed
                         if on_OK != on_OK_old:
