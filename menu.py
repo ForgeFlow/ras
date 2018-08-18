@@ -68,8 +68,8 @@ def inputStateOK(channel):
         print '0'
         on_OK = False
 
-GPIO.add_event_detect(INPUT_PIN_DOWN, GPIO.BOTH, callback=inputStateDown, bouncetime=200)
-GPIO.add_event_detect(INPUT_PIN_OK, GPIO.BOTH, callback=inputStateOK, bouncetime=200)
+GPIO.add_event_detect(INPUT_PIN_DOWN, GPIO.FALLING, callback=inputStateDown, bouncetime=200)
+GPIO.add_event_detect(INPUT_PIN_OK, GPIO.FALLING, callback=inputStateOK, bouncetime=200)
 
 
 def get_ip():
