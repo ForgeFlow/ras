@@ -424,7 +424,7 @@ def change_language():
         idiom = {'language' : 'en'}
     else:
         idiom = {'language' : 'es'}
-    with open('/home/pi/RASv2/idiom.json', 'w') as file:
+    with open(os.getcwd()+'/idiom.json', 'w') as file:
         json.dump(idiom, file)
 
 def settings():
@@ -513,7 +513,7 @@ def main():
                             on_Down_old = on_Down
                     except KeyboardInterrupt:
                         break
-                json_file = open(os.getcwd()+'idiom.json')
+                json_file = open(os.getcwd()+'/idiom.json')
                 json_data = json.load(json_file)
                 json_file.close()
                 lang = json_data["language"][0]
@@ -536,13 +536,13 @@ def main():
                         elapsed_time = time.time() - start_time
 
                         if pos == 0:
-                            while not os.path.isfile("/home/pi/RASv2/data.json"):
+                            while not os.path.isfile(os.getcwd()+"/data.json"):
                                 screen_drawing(device,"config1")
                                 time.sleep(2)
                                 screen_drawing(device,"config2")
                                 time.sleep(2)
-                            if os.path.isfile("/home/pi/RASv2/data.json"):
-                                json_file = open('/home/pi/RASv2/data.json')
+                            if os.path.isfile(/data.json"):
+                                json_file = open(os.getcwd()+'/data.json')
                                 json_data = json.load(json_file)
                                 json_file.close()
                                 print "HEREEEE"
@@ -576,8 +576,8 @@ def main():
                             ops[str(pos2+4)]()
                             if pos2 == 1:
                                 adm = True
-                        if os.path.isfile("/home/pi/RASv2/data.json"):
-                            json_file = open('/home/pi/RASv2/data.json')
+                        if os.path.isfile(os.getcwd()+"/data.json"):
+                            json_file = open(os.getcwd()+'/data.json')
                             json_data = json.load(json_file)
                             json_file.close()
                             admin_id = json_data["admin_id"][0]
@@ -587,7 +587,7 @@ def main():
                                 update = True
                         if adm == True:
                             print str(adm)
-                        json_file = open('/home/pi/RASv2/idiom.json')
+                        json_file = open(os.getcwd()+'/idiom.json')
                         json_data = json.load(json_file)
                         json_file.close()
                         lang = json_data["language"][0]
@@ -632,7 +632,7 @@ def m_functionality():
         background.paste(img, posn)
         device.display(background.convert(device.mode))
 
-        json_file = open('/home/pi/RASv2/idiom.json')
+        json_file = open(os.getcwd()+'/idiom.json')
         json_data = json.load(json_file)
         json_file.close()
         lang = json_data["language"][0]
