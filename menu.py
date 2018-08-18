@@ -513,7 +513,7 @@ def main():
                             on_Down_old = on_Down
                     except KeyboardInterrupt:
                         break
-                json_file = open('/home/pi/RASv2/idiom.json')
+                json_file = open(os.getcwd()+'idiom.json')
                 json_data = json.load(json_file)
                 json_file.close()
                 lang = json_data["language"][0]
