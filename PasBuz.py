@@ -17,51 +17,60 @@ import sys
 
 class PasBuz:
 
-  def __init__(self):
-    self.PinBuz = 13   #defines which Pin sends the signal to the Passive Buzzer
+  def __init__(self, Pin):
+    self.PinBuz = Pin   #defines which Pin sends the signal to the Passive Buzzer
 
-  def CheckIn(self):
+  def CheckOut(self): #Going Down a Major Third
     self.InitBuz()
+    Pitch = 554 #Pitch in Hz corresponds to the musical note C#5
+    Duration = 0.05
 
-    self.PlayBuz(95,700,0.1)
-    self.PlayBuz(95,589,0.15)
+    self.PlayBuz(95,1.26*Pitch,Duration) # Factor 1.26 represents a Major third above Pitch
+    self.PlayBuz(95,Pitch,Duration*1.5)
+    self.PlayBuz(0,Pitch,Duration)
 
     self.ResetBuz()
     return True
 
-  def CheckOut(self):
+  def CheckIn(self): #Going Up a Major Third
     self.InitBuz()
+    Pitch = 554 #Pitch in Hz corresponds to the musical note c#5
+    Duration = 0.05
 
-    self.PlayBuz(95,525,0.2)
-    self.PlayBuz(0,525,0.1)
-    self.PlayBuz(95,525,0.12)
-    self.PlayBuz(99,715,0.3)
+    self.PlayBuz(90,Pitch,Duration*2)
+    self.PlayBuz(0,Pitch,Duration*3)
+    self.PlayBuz(95,Pitch,Duration*2)
+    self.PlayBuz(80,Pitch*1.28,Duration*4)
+    self.PlayBuz(0,Pitch*1.27,Duration)
 
     self.ResetBuz()
     return True
 
   def BuzError(self):
     self.InitBuz()
+    Pitch = 1109 # Pitch in Hz corresponds to the musical note c#6
+    Duration = 0.05
 
-    self.PlayBuz(95,990,0.15)
-    self.PlayBuz(0,990,0.15)
-    self.PlayBuz(95,990,0.15)
-    self.PlayBuz(0,990,0.15)
-    self.PlayBuz(95,1020,0.3)
+    self.PlayBuz(99,Pitch,Duration)
+    self.PlayBuz(0,Pitch,Duration)
+    self.PlayBuz(95,Pitch,Duration)
+    self.PlayBuz(0,Pitch,Duration)
+    self.PlayBuz(95,Pitch,Duration)
+    self.PlayBuz(0,Pitch,Duration)
 
     self.ResetBuz()
     return True
 
   def PlayBuz(self, Duty, Freq, Duration):
-    self.Buzz.ChangeDutyCycle(Duty)
-    self.Buzz.ChangeFrequency(Freq)
-    time.sleep(Duration)
+    self.Buzz.ChangeDutyCycle(Duty) # Duty goes from 0 to 99(% of PWM) - similar to volume
+    self.Buzz.ChangeFrequency(Freq) # Frequency of the note you want to play - 440Hz is A4 for example
+    time.sleep(Duration) # Duration of the note you want to play in seconds
 
   def InitBuz(self):
     GPIO.setmode(GPIO.BOARD)     # Numbers GPIOs by physical location
-    GPIO.setup(self.PinBuz, GPIO.OUT) # Set pins' mode is output               $
-    self.Buzz = GPIO.PWM(self.PinBuz, 880) # 440 is initial frequency.
-    self.Buzz.start(1)                # Start Buzzer pin with 50% duty rate
+    GPIO.setup(self.PinBuz, GPIO.OUT) # pins mode is output               $
+    self.Buzz = GPIO.PWM(self.PinBuz, 880) # 880 is initial frequency.
+    self.Buzz.start(1)                # Start Buzzer pin with 1% duty rate
 
   def ResetBuz(self):
     self.Buzz.stop()                     # Stop the buzzer

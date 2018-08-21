@@ -1,8 +1,9 @@
 import PasBuz
 import time
-
-P=PasBuz.PasBuz()
-#P.CheckIn()
-# time.sleep(2)
+Pin = 13
+P=PasBuz.PasBuz(Pin)
+P.CheckIn()
+time.sleep(1)
 P.CheckOut()
-#P.BuzError()
+time.sleep(1)
+P.BuzError()
