@@ -23,10 +23,10 @@ class PasBuz:
   def CheckOut(self): #Going Down a Major Third
     self.InitBuz()
     Pitch = 554 #Pitch in Hz corresponds to the musical note C#5
-    Duration = 0.05
+    Duration = 0.1
 
     self.PlayBuz(95,1.26*Pitch,Duration) # Factor 1.26 represents a Major third above Pitch
-    self.PlayBuz(95,Pitch,Duration*1.5)
+    self.PlayBuz(95,Pitch,Duration)
     self.PlayBuz(0,Pitch,Duration)
 
     self.ResetBuz()
@@ -75,5 +75,5 @@ class PasBuz:
   def ResetBuz(self):
     self.Buzz.stop()                     # Stop the buzzer
     GPIO.output(self.PinBuz, 1)          # Set Buzzer pin to High
-    GPIO.cleanup()                  # Release resource
+   # GPIO.cleanup()                  # Release resource
 
