@@ -74,6 +74,6 @@ class PasBuz:
 
   def ResetBuz(self):
     self.Buzz.stop()                     # Stop the buzzer
-    GPIO.output(self.PinBuz, 1)          # Set Buzzer pin to High
-   # GPIO.cleanup()                  # Release resource
+    GPIO.output(self.PinBuz, 0)          # Set Buzzer pin to Low
+    #GPIO.cleanup()                  # Release resource
 

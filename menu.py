@@ -25,6 +25,7 @@ from datetime import datetime
 
 #import reset_lib
 import json
+import PasBuz
 
 error = False
 card_found = False
@@ -40,6 +41,11 @@ reset = False
 on_Down = False
 on_OK = False
 update = False
+
+global PBuzzer
+PinBuzzer = 13    # Pin for the Buzzer
+
+PBuzzer = PasBuz.PasBuz(PinBuzzer)
 
 GPIO.setmode(GPIO.BOARD)  # Set's GPIO pins to BCM GPIO numbering
 
@@ -174,6 +180,13 @@ def scan_card(MIFAREReader,odoo):
                             "register_attendance", card)
                     print res
                     msg = res["action"]
+                    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+msg
+                    if res["action"] == "check_in":
+                        PBuzzer.CheckIn()   # Acoustic Melody for Check In
+                    if res["action"] == "check_out":
+                        PBuzzer.CheckOut()   # Acoustic Melody for Check Out
+                    if res["action"] == "FALSE":
+                        PBuzzer.BuzError()  #Acoustic Melody for Error - RFID Card is not in Database
                     error = False
                 except:
                     print "No Odoo connection"
@@ -263,6 +276,7 @@ def screen_drawing(device,info):
                                 'fonts', 'Orkney.ttf'))
     if error == True:
         print "ERROR: " + str(error)
+        PBuzzer.BuzError()        # Passive Buzzer gives Error Signal
         print info
         code = info.replace('error', '')
         font2 = ImageFont.truetype(font_path, dicerror[lang][info][11]-3)
