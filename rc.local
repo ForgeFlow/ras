@@ -1,0 +1,48 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+exec 2> /tmp/rc.local.log
+exec 1>&2
+set -x
+
+#!/bin/bash
+
+FLAG="/var/log/firstboot.log"
+if [ ! -f $FLAG ]; then
+   #Put here your initialization sentences
+   echo "This is the first boot"
+   systemctl stop dhcpcd
+   systemctl disable dhcpcd
+  #  apt-get install -y network-manager
+  #  apt-get clean
+   systemctl enable NetworkManager
+   systemctl start NetworkManager
+
+   #the next line creates an empty file so it won't run the next boot
+   touch $FLAG
+else
+   echo "Do nothing"
+fi
+
+python3 /home/pi/ras/web/config-server.py &
+python3 /home/pi/ras/launcher.py -d sh1106 &
+
+/usr/bin/tvservice -o
+
+exit 0

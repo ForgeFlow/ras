@@ -1,1 +1,5 @@
+.vscode
 *.pyc
+__pycache__
+dicts/credentials.json
+dicts/data.json

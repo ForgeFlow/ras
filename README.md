@@ -295,7 +295,7 @@ Some different libraries and codes from other repositories are employed to be ab
     
     > easy_install Flask-Babel
     
-3. Test the server to create the data.json file, which the main program will read to get the Odoo parameters:
+3. Test the server to create the home/pi/ras/dicts/data.json file, which the main program will read to get the Odoo parameters:
 
     > cd Raspberry_Code/Config-Portal/
     
@@ -303,7 +303,7 @@ Some different libraries and codes from other repositories are employed to be ab
     
     Enter using any web browser to the Raspberry IP address (192.168.1.XX), and the login portal will appear. Enter the credentials (they can be changed in config-server.py) and the configuration portal will appear. Enter then the Odoo parameters, a RFID card ID for the administrator, and do not select the update option, as you just clone it.
     
-    The data.json file must have been generated in the repository. Check the parameters are right.
+    The /home/pi/ras/dicts/data.json file must have been generated in the repository. Check the parameters are right.
 
 4. Test the main program by:
 
@@ -334,13 +334,13 @@ Some different libraries and codes from other repositories are employed to be ab
 
 To test that everything is properly configured, use the following commands:
 
-   > rm -f data.json
+   > rm -f /home/pi/ras/dicts/data.json
    
    > cd
    
    > python Raspberry_Code/manual_reset.py
 
-So that the data.json is deleted (and you can test the whole functioning of the device) and the Raspberry is rebooted, as well as the WiFi parameters are erased.
+So that the /home/pi/ras/dicts/data.json is deleted (and you can test the whole functioning of the device) and the Raspberry is rebooted, as well as the WiFi parameters are erased.
 In this way, you must see first the screen that tells you to enter to the WiFi network, and that once you configure the WiFi, the program asks you to go to the configuration portal, and once you enter the parameters, the main program is executed properly.
 
 
