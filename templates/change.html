@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+
+
+<form action="/change" method="POST">
+        <div class="login">
+                <div class="login-screen">
+                        <div class="app-title">
+                                <h1>{{ _('Change credentials') }}</h1>
+                        </div>
+
+                        <div class="login-form">
+                                <div class="control-group">
+                                        <input type="text" class="login-field" value="" placeholder="{{ _('username') }}"
+                                                name="username">
+                                        <label class="login-field-icon fui-user" for="login-name"></label>
+                                </div>
+
+                                <div class="control-group">
+                                        <input type="password" class="login-field" value="" placeholder="{{ _('old password') }}"
+                                                name="old password">
+                                        <label class="login-field-icon fui-lock" for="login-pass"></label>
+                                </div>
+
+                                <div class="control-group">
+                                        <input type="password" class="login-field" value="" placeholder="{{ _('new password') }}"
+                                                name="new password">
+                                        <label class="login-field-icon fui-lock" for="login-pass"></label>
+                                </div>
+
+                                <input type="submit" value="{{ _('Submit changes') }}" class="btn btn-primary btn-large btn-block">
+                                <input type="reset" value="{{ _('Reset') }}" class="btn btn-primary btn-large btn-block">
+                                <br>
+                        </div>
+                </div>
+        </div>
+</form>

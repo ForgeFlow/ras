@@ -1,0 +1,8 @@
+.vscode
+.idea
+*.pyc
+__pycache__
+dicts/credentials.json
+dicts/data.json
+tests
+run_tests.sh
