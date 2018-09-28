@@ -17,7 +17,6 @@ WORK_DIR = '/home/pi/ras/'
 card_found = False
 
 cnt_found = 0
-admin_id = "FFFFFFFF"
 turn_off = False
 on_menu = True
 pos = 0
@@ -66,6 +65,18 @@ GPIO.setup(INPUT_PIN_OK, GPIO.IN)  # Set our input pin to be an input
 
 OLED1106 = display_drawing.DisplayDrawning()
 
+def get_admin_id():
+    if os.path.isfile(os.path.abspath(
+            os.path.join(WORK_DIR, 'dicts/data.json'))):
+        json_file = open(os.path.abspath(
+            os.path.join(WORK_DIR, 'dicts/data.json')))
+        json_data = json.load(json_file)
+        json_file.close()
+        return json_data["admin_id"][0]
+    else:
+        return 'FFFFFFFF'
+
+admin_id = get_admin_id()
 
 def instance_connection():
     global admin_id

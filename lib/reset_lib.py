@@ -41,6 +41,7 @@ def get_ip():
 
 def reset_to_host_mode():
     os.system('sudo wifi-connect --portal-ssid "RFID Attendance System"')
+    os.system('sudo systemctl restart ras-portal.service')
 
 
 def update_repo():

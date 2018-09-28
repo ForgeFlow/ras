@@ -2,7 +2,7 @@
 
 <head>
         <meta charset="utf-8" />
-        <title>{{ _('Data Table') }}</title>
+        <title>Data Table</title>
         <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
         <link rel="stylesheet" href="static/table.css?version=8">
 </head>
@@ -11,30 +11,30 @@
         <table class="table-fill">
                 <thead>
                         <tr>
-                                <th class="text-left">{{ _('Parameter') }}</th>
-                                <th class="text-left">{{ _('Value') }}</th>
+                                <th class="text-left">Parameter</th>
+                                <th class="text-left">Value</th>
                         </tr>
                 </thead>
                 <tbody class="table-hover">
 
                         <tr>
-                                <td class="text-left"> {{ _('Odoo Host') }} </th>
+                                <td class="text-left"> Odoo Host </th>
                                 <td class="text-left"> {{ result["odoo_host"] }} </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Odoo Port') }} </th>
+                                <td class="text-left"> Odoo Port </th>
                                 <td class="text-left"> {{ result["odoo_port"] }} </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Odoo User') }} </th>
+                                <td class="text-left"> Odoo User </th>
                                 <td class="text-left"> {{ result["user_name"] }} </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Odoo Password') }} </th>
+                                <td class="text-left"> Odoo Password </th>
                                 <td class="password"> ********** </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Odoo Database') }} </th>
+                                <td class="text-left"> Odoo Database </th>
                                 <td class="text-left"> {{ result["db"] }} </td>
                         </tr>
                         <tr>
@@ -42,15 +42,15 @@
                                 <td class="text-left"> {{ result["admin_id"] }} </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Timezone') }} </th>
+                                <td class="text-left"> Timezone </th>
                                 <td class="text-left"> {{ result["timezone"] }} </td>
                         </tr>
                         <tr>
-                                <td class="text-left"> {{ _('Current Version') }} </th>
+                                <td class="text-left"> Current Version </th>
                                 <td class="text-left"> {{ result["version"] }} </td>
                         </tr>
-                        <!-- <button type="submit" name="Log in" value="Log in" class="btn btn-primary btn-large btn-block">{{ _('Log in') }}</button>
-                        <button type="submit" name="Reset credentials" value="Reset credentials" class="btn btn-primary btn-large btn-block">{{_('Reset Credentials') }}</button> -->
+                        <!-- <button type="submit" name="Log in" value="Log in" class="btn btn-primary btn-large btn-block">Log in</button>
+                        <button type="submit" name="Reset credentials" value="Reset credentials" class="btn btn-primary btn-large btn-block">Reset Credentials</button> -->
                 </tbody>
         </table>
 
