@@ -43,6 +43,10 @@ def reset_to_host_mode():
     os.system('sudo wifi-connect --portal-ssid "RFID Attendance System"')
     os.system('sudo systemctl restart ras-portal.service')
 
+def reset_params():
+    global on_menu
+    os.system('sudo rm /home/pi/ras/dicts/data.json')
+    on_menu = True
 
 def update_repo():
     os.chdir('/home/pi/ras')

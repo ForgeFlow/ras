@@ -27,11 +27,12 @@ dic = {
     'update': ['Updating;Firmware', 20, 2, 20, 0, 24],
     'comERR1': ['Odoo;communication;failed', 41, 3, 5, 40, 19],
     'comERR2': ['Check;connection;parameters', 41, 3, 20, 20, 19],
+    'configured': ['Odoo;connection;ready', 40, 3, 20, 40, 19],
 }
 
 menus = {
-    'Main': ["RFID - Odoo", "RFID reader", "Settings", "Turn off"],
-    'Settings': ["WiFi Reset", "Update RAS", "Reboot", "Back"],
+    'Main': ["RFID - Odoo", "RFID reader", "Settings", "Reboot"],
+    'Settings': ["WiFi Reset", "Update RAS", "Reset Data", "Back"],
 }
 
 
