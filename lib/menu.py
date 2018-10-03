@@ -339,7 +339,7 @@ def main():
     global msg, card
     global odoo
 
-    if have_internet():
+    if is_wifi_active():
 
         menu_sel = 1
         pos = 0
