@@ -17,7 +17,6 @@ WORK_DIR = '/home/pi/ras/'
 
 card_found = False
 
-cnt_found = 0
 turn_off = False
 on_menu = True
 pos = 0
@@ -63,6 +62,7 @@ GPIO.setup(INPUT_PIN_OK, GPIO.IN)  # Set our input pin to be an input
 
 OLED1106 = display_drawing.DisplayDrawning()
 
+
 def get_admin_id():
     if os.path.isfile(os.path.abspath(
             os.path.join(WORK_DIR, 'dicts/data.json'))):
@@ -74,7 +74,9 @@ def get_admin_id():
     else:
         return 'FFFFFFFF'
 
+
 admin_id = get_admin_id()
+
 
 def instance_connection():
     global admin_id
@@ -119,7 +121,6 @@ def inputStateOK(channel):
     on_OK = True
 
 
-
 GPIO.add_event_detect(INPUT_PIN_DOWN, GPIO.FALLING, callback=inputStateDown,
                       bouncetime=400)
 GPIO.add_event_detect(INPUT_PIN_OK, GPIO.FALLING, callback=inputStateOK,
@@ -158,22 +159,16 @@ def configure_ap_mode():
     while ap_mode:
         pass
     _logger.debug("Leaving configure_ap_mode")
-    on_menu  = True
+    on_menu = True
 
 
 def scan_card(MIFAREReader, odoo):
-    global card
-    global card_found
-    global msg
-    global on_menu, turn_off
+    global on_menu
 
+    card = False
+    msg = ' '
     # Scan for cards
     (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
-
-    # If a card is found
-    if status == MIFAREReader.MI_OK:
-        _logger.debug("Card detected")
-        card_found = True
 
     # Get the UID of the card
     (status, uid) = MIFAREReader.MFRC522_Anticoll()
@@ -184,15 +179,13 @@ def scan_card(MIFAREReader, odoo):
         # _logger.debug(UID)
         _logger.debug(
             "Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3]))
-        card = hex(int(uid[0])).split('x')[-1] + hex(int(uid[1])).split('x')[
-            -1] + hex(int(uid[2])).split('x')[-1] + hex(int(uid[3])).split('x')[
-            -1]
+        card = hex(int(uid[0])).split('x')[-1] + hex(int(uid[1])).split('x')[-1] + \
+            hex(int(uid[2])).split('x')[-1] + hex(int(uid[3])).split('x')[-1]
 
         _logger.debug(card)
         if card == admin_id:
             on_menu = True
             return
-            # turn_off = True
         # This is the default key for authentication
         key = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
 
@@ -202,6 +195,7 @@ def scan_card(MIFAREReader, odoo):
         # Authenticate
         status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key,
                                            uid)
+        _logger.debug("%s of card %s", status, card)
 
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
@@ -218,27 +212,23 @@ def scan_card(MIFAREReader, odoo):
                         PBuzzer.CheckOut()  # Acoustic Melody for Check Out
                     if res["action"] == "FALSE":
                         PBuzzer.BuzError()  # Acoustic Melody for Error - RFID Card is not in Database
+    return card, msg
 
 
 def rfid_hr_attendance():
-    global cnt_found, card_found
-    if card_found:
+    card, msg = scan_card(MIFAREReader, odoo)
+    if card:
         OLED1106.screen_drawing(msg)
-        cnt_found = cnt_found + 1
-        _logger.debug("CNT_FOUND" + str(cnt_found))
-        if cnt_found >= 5:
-            card_found = False
+        time.sleep(5)
     else:
-        cnt_found = 0
         OLED1106.screen_drawing("time")
-
-    scan_card(MIFAREReader, odoo)
 
 
 def rfid_reader():
-    global card
-    OLED1106.card_drawing(card)
-    scan_card(MIFAREReader, False)
+    card, msg = scan_card(MIFAREReader, False)
+    if card:
+        _logger.debug("%s RFID Card read", card)
+        OLED1106.card_drawing(card)
 
 
 def reset_settings():
@@ -252,13 +242,16 @@ def shutdown():
     _logger.debug("Back selected")
     turn_off = True
 
+
 def reboot_system():
     OLED1106.screen_drawing("shut_down")
     time.sleep(1)
     reboot()
 
+
 def settings():
     _logger.debug("Other settings selected")
+
 
 def reset_parameters():
     global on_menu
@@ -267,6 +260,7 @@ def reset_parameters():
             os.path.join(WORK_DIR, 'dicts/data.json'))):
         reset_params()
     on_menu = True
+
 
 def updating_repo():
     global updating
@@ -302,15 +296,14 @@ def update_firmware():
         reboot_system()
 
 
-ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': settings, '3': reboot_system,
+ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': settings,
+       '3': reboot_system,
        '4': reset_settings, '5': update_firmware, '6': reset_parameters}
 
 
 def select_menu(menu_sel, pos):
-
     global on_OK
     global on_Down
-    _logger.debug("select_menu("+str(menu_sel)+', '+str(pos)+": on_Down="+str(on_Down)+' and on_OK='+str(on_OK))
     enter = False
     if menu_sel == 1:
         OLED1106.display_menu('Main', pos)
@@ -336,15 +329,12 @@ def select_menu(menu_sel, pos):
 def main():
     global enter, turn_off
     global on_menu
-    global msg, card
     global odoo
 
     if is_wifi_active():
 
         menu_sel = 1
         pos = 0
-        msg = " "
-        card = " "
 
         while not turn_off:
             while enter is False and on_menu:
@@ -362,14 +352,14 @@ def main():
                 elif menu_sel == 2 and pos == 3:
                     menu_sel = 1
                     pos = 2
-                    on_menu = True         
+                    on_menu = True
             if menu_sel == 1 and pos == 0:
                 while not odoo:
                     _logger.debug("No Odoo connection available")
                     while not os.path.isfile(
-                        os.path.abspath(
-                            os.path.join(
-                                WORK_DIR, 'dicts/data.json'))):
+                            os.path.abspath(
+                                os.path.join(
+                                    WORK_DIR, 'dicts/data.json'))):
                         _logger.debug("No data.json available")
                         OLED1106._display_ip()
                         time.sleep(2)
@@ -404,7 +394,6 @@ def main():
     else:
         if not is_wifi_active():
             configure_ap_mode()
-            display_drawing.dic.update
             main()
 
 
