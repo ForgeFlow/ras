@@ -232,8 +232,6 @@ def rfid_reader():
         OLED1106.card_drawing(card)
 
 
-
-
 def reset_settings():
     _logger.debug("Reset Settings selected")
     configure_ap_mode()
