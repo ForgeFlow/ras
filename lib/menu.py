@@ -185,7 +185,8 @@ def scan_card(MIFAREReader, odoo):
         _logger.debug(card)
         if card == admin_id:
             on_menu = True
-            return
+            card = False
+            return card, msg
         # This is the default key for authentication
         key = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
 
@@ -219,7 +220,7 @@ def rfid_hr_attendance():
     card, msg = scan_card(MIFAREReader, odoo)
     if card:
         OLED1106.screen_drawing(msg)
-        time.sleep(5)
+        time.sleep(2)
     else:
         OLED1106.screen_drawing("time")
 
