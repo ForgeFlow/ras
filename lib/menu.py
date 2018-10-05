@@ -232,6 +232,8 @@ def rfid_reader():
         OLED1106.card_drawing(card)
 
 
+
+
 def reset_settings():
     _logger.debug("Reset Settings selected")
     configure_ap_mode()
@@ -354,6 +356,8 @@ def main():
                     menu_sel = 1
                     pos = 2
                     on_menu = True
+                elif menu_sel == 1 and pos == 1:
+                    OLED1106.screen_drawing(' ')
             if menu_sel == 1 and pos == 0:
                 while not odoo:
                     _logger.debug("No Odoo connection available")
