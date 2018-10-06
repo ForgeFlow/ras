@@ -367,7 +367,7 @@ def main():
                                     WORK_DIR, 'dicts/data.json'))):
                         _logger.debug("No data.json available")
                         OLED1106._display_ip()
-                        time.sleep(2)
+                        rfid_reader()
                         on_menu = True
                     odoo = instance_connection()
                     if odoo.uid and on_menu:
