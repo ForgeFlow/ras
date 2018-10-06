@@ -1,6 +1,7 @@
 from flask import Flask, flash, render_template, request, session
 import os, json
 from lib.reset_lib import get_ip
+from lib.menu import tz_dic
 
 app = Flask(__name__)
 
@@ -19,10 +20,10 @@ def form():
             json_data = json.load(json_file)
             json_file.close()
             return render_template('form.html', IP=str(get_ip()), port=3000,
-                                   data=json_data)
+                                   data=json_data, tz_dic=tz_dic)
         else:
             return render_template('form.html', IP=str(get_ip()), port=3000,
-                                   data=False)
+                                   data=False, tz_dic=tz_dic)
 
 
 @app.route('/result', methods=['POST', 'GET'])

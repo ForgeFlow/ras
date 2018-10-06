@@ -27,25 +27,47 @@ ap_mode = False
 
 odoo = False
 
-tz_dic = {'-12:00': "Pacific/Kwajalein", '-11:00': "Pacific/Samoa",
-          '-10:00': "US/Hawaii", '-09:50': "Pacific/Marquesas",
-          '-09:00': "US/Alaska", '-08:00': "Etc/GMT-8", '-07:00': "Etc/GMT-7",
-          '-06:00': "America/Mexico_City", '-05:00': "America/Lima",
-          '-04:00': "America/La_Paz", '-03:50': "Canada/Newfoundland",
-          '-03:00': "America/Buenos_Aires", '-02:00': "Etc/GMT-2",
-          '-01:00': "Atlantic/Azores", '+00:00': "Europe/London",
-          '+01:00': "Europe/Madrid", '+02:00': "Europe/Kaliningrad",
-          '+03:00': "Asia/Baghdad", '+03:50': "Asia/Tehran",
-          '+04:00': "Asia/Baku", '+04:50': "Asia/Kabul",
-          '+05:00': "Asia/Karachi", '+05:50': "Asia/Calcutta",
-          '+05:75': "Asia/Kathmandu", '+06:00': "Asia/Dhaka",
-          '+06:50': "Asia/Rangoon", '+07:00': "Asia/Bangkok",
-          '+08:00': "Asia/Hong_Kong", '+08:75': "Australia/Eucla",
-          '+09:00': "Asia/Tokyo", '+09:50': "Australia/Adelaide",
-          '+10:00': "Pacific/Guam", '+10:50': "Australia/Lord_Howe",
-          '+11:00': "Asia/Magadan", '+11:50': "Pacific/Norfolk",
-          '+12:00': "Pacific/Auckland", '+12:75': "Pacific/Chatham",
-          '+13:00': "Pacific/Apia", '+14:00': "Pacific/Fakaofo"}
+tz_dic = {
+    '-12:00': {'value': '-12:00', 'timezone': "Pacific/Kwajalein"},
+    '-11:00': {'value': '-11:00', 'timezone': "Pacific/Samoa"},
+    '-10:00': {'value': '-10:00', 'timezone': "US/Hawaii"},
+    '-09:50': {'value': '-09:50', 'timezone': "Pacific/Marquesas"},
+    '-09:00': {'value': '-09:00', 'timezone': "US/Alaska"},
+    '-08:00': {'value': '-08:00', 'timezone': "Etc/GMT-8"},
+    '-07:00': {'value': '-07:00', 'timezone': "Etc/GMT-7"},
+    '-06:00': {'value': '-06:00', 'timezone': "America/Mexico_City"},
+    '-05:00': {'value': '-05:00', 'timezone': "America/Lima"},
+    '-04:00': {'value': '-04:00', 'timezone': "America/La_Paz"},
+    '-03:50': {'value': '-03:50', 'timezone': "Canada/Newfoundland"},
+    '-03:00': {'value': '-03:00', 'timezone': "America/Buenos_Aires"},
+    '-02:00': {'value': '-02:00', 'timezone': "Etc/GMT-2"},
+    '-01:00': {'value': '-01:00', 'timezone': "Atlantic/Azores"},
+    '+00:00': {'value': '+00:00', 'timezone': "Europe/London"},
+    '+01:00': {'value': '+01:00', 'timezone': "Europe/Madrid"},
+    '+02:00': {'value': '+02:00', 'timezone': "Europe/Kaliningrad"},
+    '+03:00': {'value': '+03:00', 'timezone': "Asia/Baghdad"},
+    '+03:50': {'value': '+03:50', 'timezone': "Asia/Tehran"},
+    '+04:00': {'value': '+04:00', 'timezone': "Asia/Baku"},
+    '+04:50': {'value': '+04:50', 'timezone': "Asia/Kabul"},
+    '+05:00': {'value': '+05:00', 'timezone': "Asia/Karachi"},
+    '+05:50': {'value': '+05:50', 'timezone': "Asia/Calcutta"},
+    '+05:75': {'value': '+05:75', 'timezone': "Asia/Kathmandu"},
+    '+06:00': {'value': '+06:00', 'timezone': "Asia/Dhaka"},
+    '+06:50': {'value': '+06:50', 'timezone': "Asia/Rangoon"},
+    '+07:00': {'value': '+07:00', 'timezone': "Asia/Bangkok"},
+    '+08:00': {'value': '+08:00', 'timezone': "Asia/Hong_Kong"},
+    '+08:75': {'value': '+08:75', 'timezone': "Australia/Eucla"},
+    '+09:00': {'value': '+09:00', 'timezone': "Asia/Tokyo"},
+    '+09:50': {'value': '+09:50', 'timezone': "Australia/Adelaide"},
+    '+10:00': {'value': '+10:00', 'timezone': "Pacific/Guam"},
+    '+10:50': {'value': '+10:50', 'timezone': "Australia/Lord_Howe"},
+    '+11:00': {'value': '+11:00', 'timezone': "Asia/Magadan"},
+    '+11:50': {'value': '+11:50', 'timezone': "Pacific/Norfolk"},
+    '+12:00': {'value': '+12:00', 'timezone': "Pacific/Auckland"},
+    '+12:75': {'value': '+12:75', 'timezone': "Pacific/Chatham"},
+    '+13:00': {'value': '+13:00', 'timezone': "Pacific/Apia"},
+    '+14:00': {'value': '+14:00', 'timezone': "Pacific/Fakaofo"}
+}
 
 global PBuzzer
 PinSignalBuzzer = 13  # Pin to feed the Signal to the Buzzer - Signal Pin
@@ -93,7 +115,7 @@ def instance_connection():
         dbname = json_data["db"][0]
         admin_id = json_data["admin_id"][0]
         timezone = json_data["timezone"][0]
-        os.environ['TZ'] = tz_dic[timezone]
+        os.environ['TZ'] = tz_dic[timezone]['timezone']
         time.tzset()
         if "https" not in json_data:
             https_on = False
@@ -230,6 +252,7 @@ def rfid_reader():
     if card:
         _logger.debug("%s RFID Card read", card)
         OLED1106.card_drawing(card)
+        time.sleep(3)
 
 
 def reset_settings():
@@ -260,14 +283,14 @@ def reset_parameters():
     if os.path.isfile(os.path.abspath(
             os.path.join(WORK_DIR, 'dicts/data.json'))):
         reset_params()
-    on_menu = True
+    on_menu=True
 
 
 def updating_repo():
     global updating
     update_repo()
     _logger.debug("Update finished")
-    updating = False
+    updating=False
 
 
 def print_update_repo():
@@ -282,10 +305,10 @@ def update_firmware():
     if have_internet():
         global updating
         _logger.debug("Updating repository")
-        updating = True
+        updating=True
         try:
-            thread3 = threading.Thread(target=print_update_repo)
-            thread4 = threading.Thread(target=updating_repo)
+            thread3=threading.Thread(target=print_update_repo)
+            thread4=threading.Thread(target=updating_repo)
         except:
             print("Error: unable to start thread")
         finally:
@@ -297,7 +320,7 @@ def update_firmware():
         reboot_system()
 
 
-ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': settings,
+ops={'0': rfid_hr_attendance, '1': rfid_reader, '2': settings,
        '3': reboot_system,
        '4': reset_settings, '5': update_firmware, '6': reset_parameters}
 
@@ -305,7 +328,7 @@ ops = {'0': rfid_hr_attendance, '1': rfid_reader, '2': settings,
 def select_menu(menu_sel, pos):
     global on_OK
     global on_Down
-    enter = False
+    enter=False
     if menu_sel == 1:
         OLED1106.display_menu('Main', pos)
     elif menu_sel == 2:
@@ -313,14 +336,14 @@ def select_menu(menu_sel, pos):
     try:
         # Check if the OK button is pressed
         if on_OK:
-            enter = True
-            on_OK = False
+            enter=True
+            on_OK=False
         # Check if the DOWN button is pressed
         if on_Down:
-            pos = pos + 1
+            pos=pos + 1
             if pos > 3:
-                pos = 0
-            on_Down = False
+                pos=0
+            on_Down=False
     except KeyboardInterrupt:
         _logger.debug("KeyboardInterrupt")
         raise KeyboardInterrupt
@@ -334,26 +357,26 @@ def main():
 
     if is_wifi_active():
 
-        menu_sel = 1
-        pos = 0
+        menu_sel=1
+        pos=0
 
         while not turn_off:
             while enter is False and on_menu:
-                enter, pos = select_menu(menu_sel, pos)
+                enter, pos=select_menu(menu_sel, pos)
             # CHOSEN FUNCTIONALITY
             if enter:
-                enter = False
-                on_menu = False
+                enter=False
+                on_menu=False
                 # GO TO SETTINGS
                 if menu_sel == 1 and pos == 2:
-                    menu_sel = 2
-                    pos = 0
-                    on_menu = True
+                    menu_sel=2
+                    pos=0
+                    on_menu=True
                 # BACK FROM SETTINGS
                 elif menu_sel == 2 and pos == 3:
-                    menu_sel = 1
-                    pos = 2
-                    on_menu = True
+                    menu_sel=1
+                    pos=2
+                    on_menu=True
                 elif menu_sel == 1 and pos == 1:
                     OLED1106.screen_drawing(' ')
             if menu_sel == 1 and pos == 0:
@@ -366,22 +389,24 @@ def main():
                         _logger.debug("No data.json available")
                         OLED1106._display_ip()
                         rfid_reader()
-                        on_menu = True
-                    odoo = instance_connection()
+                        on_menu=True
+                    odoo=instance_connection()
                     if odoo.uid and on_menu:
                         OLED1106._display_msg("configured")
                         time.sleep(3)
-                while odoo.uid is False:
+                if odoo.uid is False:
                     OLED1106.screen_drawing("comERR1")
                     time.sleep(3)
                     OLED1106.screen_drawing("comERR2")
                     time.sleep(3)
-                    OLED1106._display_ip()
-                    time.sleep(3)
-                    odoo = instance_connection()
-                    if odoo.uid:
-                        OLED1106.display_drawing("configured")
+                    while odoo.uid is False:
+                        OLED1106._display_ip()
+                        rfid_reader()
                         time.sleep(3)
+                        odoo=instance_connection()
+                        if odoo.uid:
+                            OLED1106.display_drawing("configured")
+                            time.sleep(3)
 
             else:
                 # TODO Add more move between menus functions
