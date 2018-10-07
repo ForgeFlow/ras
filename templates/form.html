@@ -18,6 +18,12 @@
       <input type="text" id="odoo_host" name="odoo_host" value="{{ data['odoo_host'][0] }}">
       <label for="name">Port:</label>
       <input type="text" id="odoo_port" name="odoo_port" value="{{ data['odoo_port'][0] }}">
+      <label for="https">Click the checkbox if your Odoo employs HTTPS: </label>
+      {%if 'https' in data and data['https'][0] == 'https' %}
+      <input type="checkbox" id="https" value="https" name="https" checked><label class="light" for="https"></label><br>
+      {%else%}
+      <input type="checkbox" id="https" value="https" name="https"><label class="light" for="https"></label><br>
+      {%endif%}
       <label for="user">Username:</label>
       <input type="text" id="user" name="user_name" value="{{ data['user_name'][0] }}">
       <label for="password">Password:</label>
@@ -29,17 +35,9 @@
       <label for="timezone">Country:</label>
       <select name="timezone" form="testform" value="{{ data['timezone'][0] }}">
         {% for tz in tz_dic %}
-        <option value="tz['value']" {% if tz == data['timezone'][0] %} selected="selected" {% endif %}>(GMT {{ tz['value'] }}) {{ tz['timezone'] }}</option>
+        <option value="tz" {% if tz==data['timezone'][0] %} selected="selected" {% endif %}>(GMT {{ tz }}) {{ tz.key }}</option>
         {% endfor %}
       </select>
-    </fieldset>
-    <fieldset>
-      <label for="https">Click the checkbox if your Odoo employs HTTPS: </label>
-      {%if 'https' in data and data['https'][0] == 'https' %}
-      <input type="checkbox" id="https" value="https" name="https" checked><label class="light" for="https"></label><br>
-      {%else%}
-      <input type="checkbox" id="https" value="https" name="https"><label class="light" for="https" ></label><br>
-      {%endif%}
     </fieldset>
     {% else %}
     <h1>Configuration portal</h1>
@@ -49,6 +47,8 @@
       <input type="text" id="odoo_host" name="odoo_host" placeholder="demo.odoo.com">
       <label for="name">Port:</label>
       <input type="text" id="odoo_port" name="odoo_port" placeholder="8069">
+      <label for="https">Click the checkbox if your Odoo employs HTTPS: </label>
+      <input type="checkbox" id="https" value="https" name="https"><label class="light" for="https"></label><br>
       <label for="user">Username:</label>
       <input type="text" id="user" name="user_name" placeholder="username@example.com">
       <label for="password">Password:</label>
@@ -63,8 +63,6 @@
         <option value="tz['value']">(GMT {{ tz['value'] }}) {{ tz['timezone'] }}</option>
         {% endfor %}
       </select>
-      <label for="https">Click the checkbox if your Odoo employs HTTPS: </label>
-      <input type="checkbox" id="https" value="https" name="https"><label class="light" for="https"></label><br>
     </fieldset>
     {% endif %}
     <fieldset>

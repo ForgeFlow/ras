@@ -81,19 +81,14 @@ class DisplayDrawning(object):
             num_ones = hour.count('1')
             if num_ones == 0:
                 draw.text((23, 20), hour, font=d_font, fill="white")
+            elif num_ones == 1:
+                draw.text((25, 20), hour, font=d_font, fill="white")
+            elif num_ones == 2:
+                draw.text((28, 20), hour, font=d_font, fill="white")
+            elif num_ones == 3:
+                draw.text((31, 20), hour, font=d_font, fill="white")
             else:
-                if num_ones == 1:
-                    draw.text((25, 20), hour, font=d_font, fill="white")
-                else:
-                    if num_ones == 2:
-                        draw.text((28, 20), hour, font=d_font, fill="white")
-                    else:
-                        if num_ones == 3:
-                            draw.text((31, 20), hour, font=d_font,
-                                      fill="white")
-                        else:
-                            draw.text((34, 20), hour, font=d_font,
-                                      fill="white")
+                draw.text((34, 20), hour, font=d_font, fill="white")
 
     def _display_msg(self, info):
         with canvas(self.device) as draw:
@@ -111,7 +106,7 @@ class DisplayDrawning(object):
                     draw.text((dic[info][3],
                                37 + (24 - dic[info][5]) / 2), b,
                               font=d_font, fill="white")
-                else:
+                elif dic[info][2] == 3:
                     a, b, c = dic[info][0].split(";")
                     draw.text((dic[info][1],
                                2 + (24 - dic[info][5]) / 2), a,
@@ -122,6 +117,8 @@ class DisplayDrawning(object):
                     draw.text((dic[info][4],
                                37 + (24 - dic[info][5]) / 2), c,
                               font=d_font, fill="white")
+                else:
+                    raise ("Incorrect number of lines")
             except:
                 draw.text((5, 20),'error display: '+info, font=d_font, fill="white")
 
