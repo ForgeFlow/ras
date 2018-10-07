@@ -110,15 +110,17 @@ def instance_connection():
 
 # Create a function to run when the input is high
 def inputStateDown(channel):
-    global on_Down
+    global on_Down, on_menu
     _logger.debug('Down Pressed')
-    on_Down = True
+    if on_menu:
+        on_Down = True
 
 
 def inputStateOK(channel):
-    global on_OK
+    global on_OK, on_menu
     _logger.debug('OK Pressed')
-    on_OK = True
+    if on_menu:
+        on_OK = True
 
 
 GPIO.add_event_detect(INPUT_PIN_DOWN, GPIO.FALLING, callback=inputStateDown,
