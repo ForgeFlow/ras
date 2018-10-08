@@ -35,7 +35,7 @@
       <label for="timezone">Country:</label>
       <select name="timezone" form="testform" value="{{ data['timezone'][0] }}">
         {% for tz in tz_dic %}
-        <option value="tz" {% if tz==data['timezone'][0] %} selected="selected" {% endif %}>(GMT {{ tz }}) {{ tz.key }}</option>
+        <option value="{{ tz }}" {% if tz==data['timezone'][0] %} selected="selected" {% endif %}>(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
         {% endfor %}
       </select>
     </fieldset>
@@ -60,7 +60,7 @@
       <label for="timezone">Country:</label>
       <select name="timezone" form="testform">
         {% for tz in tz_dic %}
-        <option value="tz['value']">(GMT {{ tz['value'] }}) {{ tz['timezone'] }}</option>
+        <option value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
         {% endfor %}
       </select>
     </fieldset>

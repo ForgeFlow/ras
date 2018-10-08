@@ -5,6 +5,7 @@ import threading
 import time
 
 import RPi.GPIO as GPIO
+from lib.tz_dic import tz_dic
 
 from lib import MFRC522, PasBuz, display_drawing, odoo_xmlrpc
 from lib.reset_lib import (have_internet, is_wifi_active, reboot,
@@ -27,25 +28,6 @@ ap_mode = False
 
 odoo = False
 
-tz_dic = {'-12:00': "Pacific/Kwajalein", '-11:00': "Pacific/Samoa",
-          '-10:00': "US/Hawaii", '-09:50': "Pacific/Marquesas",
-          '-09:00': "US/Alaska", '-08:00': "Etc/GMT-8", '-07:00': "Etc/GMT-7",
-          '-06:00': "America/Mexico_City", '-05:00': "America/Lima",
-          '-04:00': "America/La_Paz", '-03:50': "Canada/Newfoundland",
-          '-03:00': "America/Buenos_Aires", '-02:00': "Etc/GMT-2",
-          '-01:00': "Atlantic/Azores", '+00:00': "Europe/London",
-          '+01:00': "Europe/Madrid", '+02:00': "Europe/Kaliningrad",
-          '+03:00': "Asia/Baghdad", '+03:50': "Asia/Tehran",
-          '+04:00': "Asia/Baku", '+04:50': "Asia/Kabul",
-          '+05:00': "Asia/Karachi", '+05:50': "Asia/Calcutta",
-          '+05:75': "Asia/Kathmandu", '+06:00': "Asia/Dhaka",
-          '+06:50': "Asia/Rangoon", '+07:00': "Asia/Bangkok",
-          '+08:00': "Asia/Hong_Kong", '+08:75': "Australia/Eucla",
-          '+09:00': "Asia/Tokyo", '+09:50': "Australia/Adelaide",
-          '+10:00': "Pacific/Guam", '+10:50': "Australia/Lord_Howe",
-          '+11:00': "Asia/Magadan", '+11:50': "Pacific/Norfolk",
-          '+12:00': "Pacific/Auckland", '+12:75': "Pacific/Chatham",
-          '+13:00': "Pacific/Apia", '+14:00': "Pacific/Fakaofo"}
 
 global PBuzzer
 PinSignalBuzzer = 13  # Pin to feed the Signal to the Buzzer - Signal Pin
@@ -263,6 +245,7 @@ def reset_parameters():
     if os.path.isfile(os.path.abspath(
             os.path.join(WORK_DIR, 'dicts/data.json'))):
         reset_params()
+        reboot_system()
     on_menu=True
 
 
@@ -385,7 +368,7 @@ def main():
                         time.sleep(3)
                         odoo=instance_connection()
                         if odoo.uid:
-                            OLED1106.display_drawing("configured")
+                            OLED1106.screen_drawing("configured")
                             time.sleep(3)
 
             else:
