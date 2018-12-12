@@ -73,3 +73,14 @@ def have_internet():
         _logger.debug(e)
         conn.close()
         return False
+
+# from urllib.request import urlopen
+
+# def have_internet(): 
+## alternative definition from https://stackoverflow.com/questions/50558000/test-internet-connection-for-python3
+#   try:
+#        response = urlopen('https://www.google.com/', timeout=10)
+#        return True
+#    except: 
+#        return False  
+  
