@@ -28,6 +28,7 @@ dic = {
     'comERR1': ['Odoo;communication;failed', 41, 3, 5, 40, 19],
     'comERR2': ['Check;connection;parameters', 41, 3, 20, 20, 19],
     'configured': ['Odoo;connection;ready', 40, 3, 20, 40, 19],
+    'ERRUpdate': ['Unable to update RAS; Github connection refused', 12, 2, 2, 0, 12],
 }
 
 menus = {

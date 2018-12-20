@@ -54,7 +54,7 @@ def get_admin_id():
         json_file.close()
         return json_data["admin_id"][0]
     else:
-        return 'FFFFFFFF'
+        return False
 
 
 admin_id = get_admin_id()
@@ -113,30 +113,37 @@ GPIO.add_event_detect(INPUT_PIN_OK, GPIO.FALLING, callback=inputStateOK,
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
 
-
-def print_wifi_config():
-    global ap_mode
-    while ap_mode:
-        _logger.debug("Display AP connection instructions")
-        OLED1106.wifi_ap_mode_display()
-
-
-def launch_ap_mode():
-    global ap_mode
-    reset_to_host_mode()
-    _logger.debug("AP Mode Finished")
-    ap_mode = False
-
-
 def configure_ap_mode():
     global ap_mode, on_menu
+
+    def launch_ap_mode():
+        global ap_mode
+        reset_to_host_mode()
+        _logger.debug("AP Mode Finished")
+        ap_mode = False
+
+    def print_wifi_config():
+        global ap_mode
+        _logger.debug("Display AP connection instructions")
+        instructions = [(4,"Wifi1"), (1, "1"), (3, "Wifi2"), (1, "2"),(3, "Wifi3")]
+        while ap_mode:
+            for seconds, instruction in instructions:
+                if not ap_mode:
+                    break
+                OLED1106._display_msg(instruction)
+                for s in range(seconds):
+                    if not ap_mode:
+                        break
+                    time.sleep(1)
+        _logger.debug("Exiting print_wifi_config()..")
+
     ap_mode = True
     _logger.debug("Starting Wifi Connect")
     try:
         thread1 = threading.Thread(target=print_wifi_config)
         thread2 = threading.Thread(target=launch_ap_mode)
     except:
-        print("Error: unable to start thread")
+        _logger.debug("Error: unable to start thread")
     finally:
         thread1.start()
         thread2.start()
@@ -248,25 +255,25 @@ def reset_parameters():
         reboot_system()
     on_menu=True
 
-
-def updating_repo():
-    global updating
-    update_repo()
-    _logger.debug("Update finished")
-    updating=False
-
-
-def print_update_repo():
-    global updating
-    while updating:
-        _logger.debug("Display updating firmware")
-        OLED1106.screen_drawing("update")
-        time.sleep(4)
-
-
 def update_firmware():
-    if have_internet():
+    global updating, on_menu
+    def print_update_repo():
         global updating
+        while updating:
+            _logger.debug("Display updating firmware")
+            OLED1106.screen_drawing("update")
+            for s in range(4):
+                time.sleep(1)
+                if not updating:
+                    break
+    
+    def updating_repo():
+        global updating
+        update_repo()
+        _logger.debug("Update finished")
+        updating=False
+    
+    if have_internet():
         _logger.debug("Updating repository")
         updating=True
         try:
@@ -281,7 +288,10 @@ def update_firmware():
             pass
         _logger.debug("Leaving update_firmware and rebooting")
         reboot_system()
-
+    else:
+        OLED1106.screen_drawing("ERRUpdate")
+        on_menu = True
+        time.sleep(3)
 
 ops={'0': rfid_hr_attendance, '1': rfid_reader, '2': settings,
        '3': reboot_system,
