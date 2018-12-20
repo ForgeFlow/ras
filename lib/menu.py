@@ -8,7 +8,7 @@ import RPi.GPIO as GPIO
 from lib.tz_dic import tz_dic
 
 from lib import MFRC522, PasBuz, display_drawing, odoo_xmlrpc
-from lib.reset_lib import (have_internet, is_wifi_active, reboot,
+from lib.reset_lib import (can_connect, is_wifi_active, reboot,
                            reset_to_host_mode, update_repo, run_tests,
                            reset_params)
 
@@ -166,6 +166,7 @@ def scan_card(MIFAREReader, odoo):
 
     # If we have the UID, continue
     if status == MIFAREReader.MI_OK:
+        OLED1106.screen_drawing('reading')
 
         # _logger.debug(UID)
         _logger.debug(
@@ -194,6 +195,7 @@ def scan_card(MIFAREReader, odoo):
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
             if odoo:
+                OLED1106.screen_drawing('connecting')
                 res = odoo.check_attendance(card)
                 if res:
                     msg = res["action"]
@@ -204,6 +206,10 @@ def scan_card(MIFAREReader, odoo):
                         PBuzzer.CheckOut()  # Acoustic Melody for Check Out
                     if res["action"] == "FALSE":
                         PBuzzer.BuzError()  # Acoustic Melody for Error - RFID Card is not in Database
+                else:
+                    OLED1106.screen_drawing('comERR1')
+                    time.sleep(3)
+
     return card, msg
 
 
@@ -273,7 +279,7 @@ def update_firmware():
         _logger.debug("Update finished")
         updating=False
     
-    if have_internet():
+    if can_connect("https://github.com"):
         _logger.debug("Updating repository")
         updating=True
         try:
