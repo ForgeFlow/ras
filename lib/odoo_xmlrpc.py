@@ -1,6 +1,8 @@
 import logging
 import xmlrpc.client as xmlrpclib
 
+from lib.reset_lib import can_connect
+
 _logger = logging.getLogger(__name__)
 
 class OdooXmlRPC(object):
@@ -13,10 +15,12 @@ class OdooXmlRPC(object):
 
         # TODO Analyze case HTTPS and port diferent from 443
         if https_on:
-            self.url_template = ("https://%s/xmlrpc/" % host)
+            if port:
+                self.url_template = ("https://%s:%s" % (host, port))
+            else:    
+                self.url_template = ("https://%s" % host)
         else:
-            self.url_template = ("http://%s:%s/xmlrpc/" % (host, port))
-        
+            self.url_template = ("http://%s:%s" % (host, port))
         self.uid = self._get_user_id()
 
     def _get_object_facade(self, url):
@@ -27,7 +31,7 @@ class OdooXmlRPC(object):
 
     def _get_user_id(self):
         _logger.debug("Validating Connection to Odoo via XMLRPC")
-        login_facade = self._get_object_facade('common')
+        login_facade = self._get_object_facade('/xmlrpc/common')
         try:
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
@@ -42,11 +46,14 @@ class OdooXmlRPC(object):
 
     def check_attendance(self, card):
         try:
-            object_facade = self._get_object_facade('object')
-            res = object_facade.execute(
-                self.db, self.uid, self.pswd, "hr.employee",
-                "register_attendance", card)
-            _logger.debug(res)
+            if can_connect(self.url_template):
+                object_facade = self._get_object_facade('/xmlrpc/object')
+                res = object_facade.execute(
+                    self.db, self.uid, self.pswd, "hr.employee",
+                    "register_attendance", card)
+                _logger.debug(res)
+            else: 
+                res = False
             return res
         except Exception as e:
             _logger.debug("check_attendance exception request: "+ str(e))

@@ -1,11 +1,11 @@
-import http.client as httplib
 import logging
 import os
 import socket
 import subprocess
 
-_logger = logging.getLogger(__name__)
+from urllib.request import urlopen
 
+_logger = logging.getLogger(__name__)
 
 def is_wifi_active():
     iwconfig_out = subprocess.check_output(
@@ -16,29 +16,19 @@ def is_wifi_active():
 
     return wifi_active
 
-
 def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # doesn't even have to be reachable
-        s.connect(('8.8.8.8', 80))
-        IP = s.getsockname()[0]
+        # https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+        IP = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if
+            not ip.startswith("127.")] or [
+               [(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close())
+                for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][
+                   0][1]]) + ["raspberrypi.local"])[0]
     except:
-        IP = 'not determined'
-        wifi = is_wifi_active()
-        while not wifi:
-            if not have_internet():
-                IP = '127.0.0.1'
-                break
-            else:
-                IP = get_ip()
-                wifi = True
-    finally:
-        s.close()
+        IP = "raspberrypi.local"
     return IP
  
-
-
 def reset_to_host_mode():
     os.system('sudo wifi-connect --portal-ssid "RFID Attendance System"')
     os.system('sudo systemctl restart ras-portal.service')
@@ -61,15 +51,10 @@ def run_tests():
     os.chdir('/home/pi/ras')
     os.system('sudo sh run_tests.sh')
     
-def have_internet():
+def can_connect(url):
     _logger.debug("check internet connection")
-    conn = httplib.HTTPConnection("www.google.com", timeout=10)
     try:
-        conn.request("HEAD", "/")
-        _logger.debug("Have internet")
-        conn.close()
+        response = urlopen(url, timeout=10)
         return True
-    except Exception as e:
-        _logger.debug(e)
-        conn.close()
+    except: 
         return False
