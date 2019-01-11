@@ -1,72 +1,87 @@
-#!/usr/bin/env python
-#---------------------------------------------------
+#!/usr/bin/env python3
+#---------------------------------------------
 #
 #    This file defines a class to use
 #    a Passive Buzzer Module
 #
 #    Passive buzzer     RPi GPIO Pin
-#    VCC ----------------- PinPower 
+#    VCC ----------------- PinPower
 #    GND ----------------- GND
 #    SIG ----------------- PinBuz
 #
-#---------------------------------------------------
+#---------------------------------------------
 
 
 import time
 
 import RPi.GPIO as GPIO
 
+GPIO.setwarnings(False)
+
+hz  = 554 # Pitch in Hz
+sec = 0.1 # Duration in seconds
+vol = 99  # Duty in % - Volume
+
+# Every Tuple in the Dictionary dic represents a different melody
+# The Melody Tuple can contain any number of 3 numbers Tuples
+# Every Tuple in the Melody represent a musical Note
+# 0: Duty Cycle in % PWM (similar to Volume)
+# 1: Pitch in Hz
+# 2: Duration of the Note in Seconds
+
+dic = {'check_in':  ( (vol,hz,sec*2)   ,(vol,hz*1.28,sec*2),(vol,5,sec*2)    ),
+
+       'check_out': ( (vol,hz*1.26,sec),(vol,hz,sec)       ,(vol,5,sec)      ),
+
+       'FALSE':     ( (vol,hz*2,sec/2) ,(vol,20,sec)       ,(vol,hz*2,sec/2),
+                      (vol,20,sec)     ,(vol,hz*2,sec/2)   ,(vol,20,sec)     ),
+
+       'comERR1':   ( (vol,hz*2,sec/2) ,(vol,20,sec)       ,(vol,hz*2,sec/2),
+                      (vol,20,sec)     ,(vol,hz*2,sec/2)   ,(vol,20,sec)     ),
+
+       'Local':     ( (vol,hz  ,sec/2) ,(vol,20,sec)       ,(vol,hz  ,sec/2),
+                      (vol,20,sec)                                           ),
+
+       'ContactAdm':( (vol,hz*4,sec/4) ,(vol,20,sec/2)     ,(vol,hz*4,sec/4),
+                      (vol,20,sec/2)   ,(vol,hz*4,sec/4)   ,(vol,20,sec/2)  ,
+                      (vol,hz*4,sec/4) ,(vol,20,sec/2)     ,(vol,hz*4,sec/4),
+                      (vol,20,sec/2)   ,(vol,hz*4,sec/4)   ,(vol,20,sec/2)   ),
+
+       'odoo_async':( (vol,hz  ,sec/2) ,(vol,20,sec)       ,(vol,hz  ,sec/2),
+                      (vol,20,sec)                                           ),
+
+       'cardswiped':( (vol,hz,sec/4) ,(vol,20,sec/2)       ,(vol,hz*1.28,sec),
+                      (vol,20,sec/2)     ,(vol,hz,sec/2)   ,(vol,20,sec)     )
+       }
+
+
 
 class PasBuz:
 
   def __init__(self, PinBuzzer, PinPower):
-    self.PinBuz = PinBuzzer   #defines which Pin sends the signal to the Passive Buzzer
-    self.PinPower = PinPower  # defines which GPIO is set high in order to deliver the power to make the Buzzer work
+    self.PinBuz = PinBuzzer
+    # defines which Pin sends the signal to the Passive Buzzer
+    self.PinPower = PinPower
+    # defines which GPIO is set high to power the Buzzer
 
-  def CheckOut(self): #Going Down a Major Third
+  def Play(self,msg):
     self.InitBuz()
-    Pitch = 554 #Pitch in Hz corresponds to the musical note C#5
-    Duration = 0.1 # Duration in seconds - changing this parameter the notes will play faster or slower
 
-    self.PlayBuz(99,1.26*Pitch,Duration) # Factor 1.26 represents a Major third above Pitch
-    self.PlayBuz(95,Pitch,Duration)
-    self.PlayBuz(99,5,Duration)
+    data = dic[msg]
+
+    while data:
+      self.PlayBuz(data[0])
+      data = data[1:]
 
     self.ResetBuz()
     return True
 
-  def CheckIn(self): #Going Up a Major Third
-    self.InitBuz()
-    Pitch = 554 #Pitch in Hz corresponds to the musical note c#5
-    Duration = 0.2 # Duration in seconds - changing this parameter the notes will play faster or slower
 
-    self.PlayBuz(99,Pitch,Duration)
-    self.PlayBuz(99,Pitch*1.28,Duration)
-    self.PlayBuz(99,5,Duration)
-
-    self.ResetBuz()
-    return True
-
-  def BuzError(self):
-    self.InitBuz()
-    Pitch = 1109 # Pitch in Hz corresponds to the musical note c#6
-    Duration = 0.05 # Duration in seconds - changing this parameter the notes will play faster or slower
-
-    self.PlayBuz(99,Pitch,Duration)
-    self.PlayBuz(95,20,Duration*2)
-    self.PlayBuz(99,Pitch,Duration)
-    self.PlayBuz(95,20,Duration*2)
-    self.PlayBuz(99,Pitch,Duration)
-    self.PlayBuz(95,20,Duration*2)
-
-    self.ResetBuz()
-    return True
-
-  def PlayBuz(self, Duty, Freq, Duration):
+  def PlayBuz(self,d):
     GPIO.output(self.PinPower, 1)
-    self.Buzz.ChangeDutyCycle(Duty) # Duty goes from 0 to 99(% of PWM) - similar to volume
-    self.Buzz.ChangeFrequency(Freq) # Frequency of the note you want to play - 440Hz is A4 for example
-    time.sleep(Duration) # Duration of the note you want to play in seconds
+    self.Buzz.ChangeDutyCycle(d[0]) # Duty goes from 0 to 99(% of PWM) - similar to volume
+    self.Buzz.ChangeFrequency(d[1]) # Frequency of the note you want to play - 440Hz is A4 for example
+    time.sleep(d[2]) # Duration of the note you want to play in seconds
     GPIO.output(self.PinPower, 0)
 
   def InitBuz(self):
@@ -82,4 +97,3 @@ class PasBuz:
                                           # the majority of the time the buzzer will be unpowered
                                           # this will allow the buzzer to do not become hot
     GPIO.output(self.PinBuz, 0)          # Set Buzzer pin to Low
-    #GPIO.cleanup()                  # Release resource

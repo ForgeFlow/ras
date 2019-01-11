@@ -28,7 +28,7 @@ def get_ip():
     except:
         IP = "raspberrypi.local"
     return IP
- 
+
 def reset_to_host_mode():
     os.system('sudo wifi-connect --portal-ssid "RFID Attendance System"')
     os.system('sudo systemctl restart ras-portal.service')
@@ -50,7 +50,7 @@ def reboot():
 def run_tests():
     os.chdir('/home/pi/ras')
     os.system('sudo sh run_tests.sh')
-    
+
 def can_connect(url):
     _logger.debug("check internet connection")
     try:
