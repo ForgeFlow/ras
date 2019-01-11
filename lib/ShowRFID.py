@@ -23,3 +23,5 @@ class ShowRFID:
                 self.Disp.show_card(self.card)
                 self.Buzz.Play('cardswiped')
 
+        self.card = False # Reset the value of the card, in order to allow its value to be changed
+                          # (avoid closed loop)

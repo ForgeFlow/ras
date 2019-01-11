@@ -50,8 +50,12 @@ dic = {'check_in':  ( (vol,hz,sec*2)   ,(vol,hz*1.28,sec*2),(vol,5,sec*2)    ),
        'odoo_async':( (vol,hz  ,sec/2) ,(vol,20,sec)       ,(vol,hz  ,sec/2),
                       (vol,20,sec)                                           ),
 
-       'cardswiped':( (vol,hz,sec/4) ,(vol,20,sec/2)       ,(vol,hz*1.28,sec),
-                      (vol,20,sec/2)     ,(vol,hz,sec/2)   ,(vol,20,sec)     )
+       'cardswiped':( (vol,hz,sec/4)   ,(vol,20,sec/2)     ,(vol,hz*1.28,sec),
+                      (vol,20,sec/2)   ,(vol,hz,sec/2)     ,(vol,20,sec)     ),
+
+       'OK'        :( (vol,hz/2,sec)   , (vol,5,sec/2)                       ),
+
+       'down'        :( (vol,hz/2*1.26,sec) , (vol,5,sec/2)                  )
        }
 
 
@@ -88,8 +92,8 @@ class PasBuz:
     GPIO.setmode(GPIO.BOARD)     # Numbers GPIOs by physical location
     GPIO.setup(self.PinBuz, GPIO.OUT) # pin mode is output
     GPIO.setup(self.PinPower, GPIO.OUT) # pin mode is output
-    self.Buzz = GPIO.PWM(self.PinBuz, 5) # 880 is initial frequency.
-    self.Buzz.start(99)                # Start Buzzer pin with 1% duty rate
+    self.Buzz = GPIO.PWM(self.PinBuz, 5) # initial frequency.
+    self.Buzz.start(99)                # Start Buzzer duty rate
 
   def ResetBuz(self):
     self.Buzz.stop()                     # Stop the buzzer

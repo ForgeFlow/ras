@@ -34,7 +34,11 @@ dic = {
     'odoo_async': ['Clocking;to Odoo', 20, 2, 20, 0, 24],
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
-    'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19]
+    'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19],
+    'Clock': ['PRESS OK;TO BEGIN;CLOCKING',22,3,36,32,19],
+    'Reader':['PRESS OK;TO READ THE;RFID CODES',22,3,36,32,19],
+    'Settings':['PRESS OK;TO CHANGE;THE SETTINGS',22,3,36,32,19],
+    'Reboot': ['PRESS OK;TO REBOOT', 45, 2, 10, 0, 24]
 }
 
 # 0: message
@@ -50,7 +54,7 @@ menus = {
 }
 
 
-class Display(object):
+class Display():
 
     def __init__(self):
         self.font_ttf = os.path.abspath(
