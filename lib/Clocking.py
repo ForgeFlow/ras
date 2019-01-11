@@ -169,4 +169,6 @@ class Clocking:
                if rest_time<0: rest_time=0 # the rest time can not be negative
                time.sleep(rest_time)
 
+        self.card = False # Reset the value of the card, in order to allow
+                          # to enter in the loop again (avoid closed loop)
 

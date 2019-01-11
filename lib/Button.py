@@ -23,3 +23,7 @@ class Button():
 
     def poweroff(self):
         GPIO.output(self.pin_power, 0)
+
+    def poweron(self):
+        GPIO.output(self.pin_power, 1)
+

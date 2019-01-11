@@ -47,17 +47,24 @@ ButtonDown= Button.Button(PinSignalDown, PinPowerDown) # create Instance for But
 
 ButtonOK= Button.Button(PinSignalOK, PinPowerOK) # create Instance for Button OK
 
-Menu = Menu.Menu(PBuzzer,
-                 Clock,
-                 ShowRFID) # Create an Instance for the Menu Operations
+Menu = Menu.Menu(Clock,ShowRFID) # Create an Instance for the Menu Operations
 
 while not (Menu.reboot == True):
 
    RAS_Display.show_message(Menu.action[Menu.option])
 
    if (ButtonOK.pressed):
+       PBuzzer.Play('OK')
+       ButtonDown.poweroff() # keep the electronics cool
+       ButtonOK.poweroff()
+
        Menu.selected()
+
+       ButtonDown.poweron() # switch back on
+       ButtonOK.poweron()
+
    elif (ButtonDown.pressed):
+       PBuzzer.Play('down')
        Menu.down()
    ButtonDown.scanning()
    ButtonOK.scanning()

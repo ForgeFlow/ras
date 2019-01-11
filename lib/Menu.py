@@ -4,8 +4,7 @@ import Settings
 
 class Menu():
 
-   def __init__(self,Buz,Clock,ShowRFID):
-       self.Buz      = Buz
+   def __init__(self,Clock,ShowRFID):
        self.Clock    = Clock
        self.ShowRFID = ShowRFID
        self.option   = 0
@@ -17,7 +16,7 @@ class Menu():
        self.reboot   = False
 
    def selected(self):
-       self.Buz.Play('OK')
+
        if self.action[self.option] == 'Clock':
            self.Clock.clocking()
        elif self.action[self.option] == 'Reader':
@@ -28,7 +27,6 @@ class Menu():
            self.reboot = True
 
    def down(self):
-       self.Buz.Play('down')
        self.option += 1
        if self.option > 3:
            self.option = 0
