@@ -35,10 +35,11 @@ dic = {
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
     'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19],
-    'Clock': ['PRESS OK;TO BEGIN;CLOCKING',22,3,36,32,19],
-    'Reader':['PRESS OK;TO READ THE;RFID CODES',22,3,36,32,19],
-    'Settings':['PRESS OK;TO CHANGE;THE SETTINGS',22,3,36,32,19],
-    'Reboot': ['PRESS OK;TO REBOOT', 45, 2, 10, 0, 24]
+    'Clock': ['PRESS OK;TO BEGIN;CLOCKING',22,3,36,32,15],
+    'Reader':['PRESS OK;TO READ THE;RFID CODES',22,3,36,32,15],
+    'Settings':['PRESS OK;TO CHANGE;THE SETTINGS',22,3,36,32,15],
+    'Reboot': ['PRESS OK;TO REBOOT', 45, 2, 10, 0, 15],
+    'sure?' : ['ARE YOU SURE?;Press OK again;if you are sure',22,3,36,32,15]
 }
 
 # 0: message

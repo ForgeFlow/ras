@@ -28,15 +28,11 @@ import Menu
 #       on the RPi Zero W         #
 #                                 #
 #---------------------------------#
-# We use the BOARD numbering system,
-# which uses the pin numbers on the
+# We use the BOARD numbering system, which uses the pin numbers on the
 # P1 Header of the RPi board.
 #
-# Advantage: your hardware will
-# always work, regardless of the
-# board revision of the RPi.
-# You will not need to rewire or
-# change your code.
+# Advantage: the hardware will always work, regardless of the
+# board revision of the RPi: no need to rewire or change the code.
 #---------------------------------#
 
 PinSignalBuzzer = 13  # Pin to feed the Signal to the Buzzer
@@ -86,17 +82,15 @@ B_OK     = Button.Button( PinSignalOK, PinPowerOK )
 Odoo     = Odooxlm.Odooxlm( WORK_DIR )
                # communicate to Odoo via xlm
                #
-               # the directory location is given to find
-               # the data.json file  where
-               # the needed parameters to communicate
-               # with odoo are stored
+               # the directory location is given to find the data.json file,
+               # where the needed parameters to communicate with odoo are stored.
 
 Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
                # Show Time & Clocking (check in/out)
                #
-               # Two modes of operation are possible and
-               # switchable through an instance flag.
-               # Synchronous mode (standard) and Asynchronous
+               # Two modes of operation are possible and switchable
+               # through an instance flag: synchronous mode (standard)
+               # and asynchronous mode.
 
 ShowRFID = ShowRFID.ShowRFID( Disp, Reader, Odoo, Buz )
                # Display the RFID code (in HEX) of the swiped card
@@ -115,13 +109,11 @@ Menu     = Menu.Menu( Clock , ShowRFID )
 #                                 #
 #---------------------------------#
 #
-# The Main Loop only ends when the option
-# to reboot is chosen.
+# The Main Loop only ends when the option to reboot is chosen.
 #
-# In all the Tasks, when the Admin Card
-# is swiped, the program returns to this Loop,
-# where a new Task can be selected using
-# the OK and Down Buttons.
+# In all the Tasks, when the Admin Card is swiped,
+# the program returns to this Loop,
+# where a new Task can be selected using the OK and Down Buttons.
 #
 #--------------------------------------------
 
@@ -136,34 +128,54 @@ while not ( Menu.reboot == True ):
                # The Task that can be selected when
                # pressing the OK Button is shown on the Display
 
-   if ( B_OK.pressed ):   # When the Button OK is pressed
+   if B_OK.pressed:       # When the Button OK is pressed
 
        Buz.Play('OK')     # Acoustic Feedback
                           # that the OK Button was pressed
 
-       B_Down.poweroff()  # Swith Buttons Power off
-       B_OK.poweroff()    # to keep the electronics cool
+       # WE WANT TO BE SURE ###############################
+       Disp.show_message('sure?')
 
-       Menu.selected()    # The selected Task is run.
-                          # When the Admin Card is swiped
-                          # the Program returns here again.
+       B_OK.pressed     = False # avoid false positives
+       B_Down.pressed   = False
 
-       Buz.Play('OK')     # Acoustic Feedback
-                          # to mark the end of the Task
+       while not ( B_OK.pressed or B_Down.pressed): # wait for an answer
+           B_Down.scanning() # If no Button was Pressed continue scanning
+           B_OK.scanning()   # if the Buttons are pressed
 
-       B_Down.poweron()   # switch the Buttons back on
-       B_OK.poweron()     # to detect what the user wants
+       if B_OK.pressed:    # the OK Button was pressed for
+                           # a second time
 
-   elif ( B_Down.pressed ): # When the Button Down is pressed
+           Buz.Play('OK')
+
+           B_Down.poweroff() # Swith Buttons Power off
+           B_OK.poweroff()   # to keep the electronics cool
+
+           Menu.selected() # The selected Task is run.
+                           # When the Admin Card is swiped
+                           # the Program returns here again.
+
+           Buz.Play('OK')  # Acoustic Feedback to mark the end of the Task
+                           # and the coming back to the menu
+           B_Down.poweron()   # switch the Buttons back on
+           B_OK.poweron()     # to detect what the user wants
+
+       else:
+
+           Buz.Play('down')
+
+       B_OK.pressed     = False # avoid false positives
+       B_Down.pressed   = False
+
+   elif B_Down.pressed:   # When the Button Down is pressed
 
        Buz.Play('down')   # Acoustic Feedback
                           # that the Down Button was pressed
 
        Menu.down()
 
-   ButtonDown.scanning()  # If no Button was Pressed
-   ButtonOK.scanning()    # continue scanning
-                          # if the Buttons are pressed
+   B_Down.scanning()      # If no Button was Pressed continue scanning
+   B_OK.scanning()        # if the Buttons are pressed
 
 #---------------------------------#
 #                                 #
@@ -171,7 +183,7 @@ while not ( Menu.reboot == True ):
 #                                 #
 #---------------------------------#
 
-RAS_Display.show_message('shut_down')
-time.sleep(3)
+# Disp.show_message('shut_down')
+# time.sleep(3)
 
-print('reboot')
+# print('reboot')
