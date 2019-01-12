@@ -2,72 +2,174 @@ import os
 import sys
 import time
 
+# Defining where the Firmware is stored
 WORK_DIR = '/home/pi/ras_1901/'
 
+# Ensure that the imports are found
 sys.path.append(WORK_DIR)
 sys.path.append(WORK_DIR+'lib/')
 
-# ensure that the imports are found
-
+# Hardware Components imports
 import Display
 import CardReader
 import PasBuz
+import Button
+
+# Software Tasks imports
 import Clocking
 import Odooxlm
 import ShowRFID
-import Button
 import Menu
 
-PinSignalBuzzer = 13 # Pin to feed the Signal to the Buzzer-Signal Pin
-PinPowerBuzzer = 12 # Pin for the feeding Voltage for the Buzzer -Power Pin
-PBuzzer = PasBuz.PasBuz(PinSignalBuzzer, PinPowerBuzzer) # Creating one Passive Buzzer instance
+#---------------------------------#
+#                                 #
+#      I/O PINS DEFINITION        #
+#                                 #
+#       on the RPi Zero W         #
+#                                 #
+#---------------------------------#
+# We use the BOARD numbering system,
+# which uses the pin numbers on the
+# P1 Header of the RPi board.
+#
+# Advantage: your hardware will
+# always work, regardless of the
+# board revision of the RPi.
+# You will not need to rewire or
+# change your code.
+#---------------------------------#
 
-RAS_Display = Display.Display() # create a Display instance
+PinSignalBuzzer = 13  # Pin to feed the Signal to the Buzzer
+PinPowerBuzzer  = 12  # Pin to power the Buzzer
 
-RAS_Reader = CardReader.CardReader() # create an RFID Card Reader instance
+PinSignalDown   = 31  # Pin to read the DOWN button signal
+PinPowerDown    = 35  # Pin to power the DOWN button
 
-Odoo = Odooxlm.Odooxlm(WORK_DIR) # create an Instance to communicate with Odoo
+PinSignalOK     = 29  # Pin to read OK button signal
+PinPowerOK      = 35  # Pin to power the OK button
 
-Clock = Clocking.Clocking(RAS_Display,
-                          RAS_Reader,
-                          Odoo,
-                          PBuzzer) # Create an Instance for the Clocking Operations
 
-ShowRFID = ShowRFID.ShowRFID(RAS_Display,
-                             RAS_Reader,
-                             Odoo,
-                             PBuzzer) # Create an Instance for the Show RFID code Operations
+#---------------------------------#
+#                                 #
+#   Creating Instances for the    #
+#                                 #
+#      HARDWARE COMPONENTS        #
+#                                 #
+#---------------------------------#
 
-PinSignalDown =31  # Pin for the DOWN button signal
-PinSignalOK   =29  # Pin for the OK button signal
-PinPowerDown  =35  # Pin for the DOWN button power
-PinPowerOK    =35  # Pin for the OK button power
+Buz      = PasBuz.PasBuz( PinSignalBuzzer, PinPowerBuzzer )
+               # Passive Buzzer
 
-ButtonDown= Button.Button(PinSignalDown, PinPowerDown) # create Instance for Button Down
+Disp     = Display.Display()
+               # the Display Type - for example: OLED SH1106
+               # is defined in the Class
 
-ButtonOK= Button.Button(PinSignalOK, PinPowerOK) # create Instance for Button OK
+Reader   = CardReader.CardReader()
+               # Card Reader based on the Chip MFRC522
 
-Menu = Menu.Menu(Clock,ShowRFID) # Create an Instance for the Menu Operations
+B_Down   = Button.Button( PinSignalDown, PinPowerDown )
+               # Button Down
 
-while not (Menu.reboot == True):
+B_OK     = Button.Button( PinSignalOK, PinPowerOK )
+               # Button OK
 
-   RAS_Display.show_message(Menu.action[Menu.option])
 
-   if (ButtonOK.pressed):
-       PBuzzer.Play('OK')
-       ButtonDown.poweroff() # keep the electronics cool
-       ButtonOK.poweroff()
+#---------------------------------#
+#                                 #
+#   Creating Instances for the    #
+#                                 #
+#         SOFTWARE TASKS          #
+#                                 #
+#---------------------------------#
 
-       Menu.selected()
 
-       ButtonDown.poweron() # switch back on
-       ButtonOK.poweron()
+Odoo     = Odooxlm.Odooxlm( WORK_DIR )
+               # communicate to Odoo via xlm
+               #
+               # the directory location is given to find
+               # the data.json file  where
+               # the needed parameters to communicate
+               # with odoo are stored
 
-   elif (ButtonDown.pressed):
-       PBuzzer.Play('down')
+Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
+               # Show Time & Clocking (check in/out)
+               #
+               # Two modes of operation are possible and
+               # switchable through an instance flag.
+               # Synchronous mode (standard) and Asynchronous
+
+ShowRFID = ShowRFID.ShowRFID( Disp, Reader, Odoo, Buz )
+               # Display the RFID code (in HEX) of the swiped card
+
+Menu     = Menu.Menu( Clock , ShowRFID )
+               # This Menu is shown when the Terminal (RAS)
+               # is switched On or when the Admin Card is swiped.
+               # It allows to switch between the different
+               # Functions/Tasks available
+
+#---------------------------------#
+#                                 #
+#            MAIN LOOP            #
+#                                 #
+#     RFID Attendance Terminal    #
+#                                 #
+#---------------------------------#
+#
+# The Main Loop only ends when the option
+# to reboot is chosen.
+#
+# In all the Tasks, when the Admin Card
+# is swiped, the program returns to this Loop,
+# where a new Task can be selected using
+# the OK and Down Buttons.
+#
+#--------------------------------------------
+
+
+
+while not ( Menu.reboot == True ):
+                          # The Main Loop only ends
+                          # when the option
+                          # to reboot is chosen.
+
+   Disp.show_message( Menu.action[Menu.option] )
+               # The Task that can be selected when
+               # pressing the OK Button is shown on the Display
+
+   if ( B_OK.pressed ):   # When the Button OK is pressed
+
+       Buz.Play('OK')     # Acoustic Feedback
+                          # that the OK Button was pressed
+
+       B_Down.poweroff()  # Swith Buttons Power off
+       B_OK.poweroff()    # to keep the electronics cool
+
+       Menu.selected()    # The selected Task is run.
+                          # When the Admin Card is swiped
+                          # the Program returns here again.
+
+       Buz.Play('OK')     # Acoustic Feedback
+                          # to mark the end of the Task
+
+       B_Down.poweron()   # switch the Buttons back on
+       B_OK.poweron()     # to detect what the user wants
+
+   elif ( B_Down.pressed ): # When the Button Down is pressed
+
+       Buz.Play('down')   # Acoustic Feedback
+                          # that the Down Button was pressed
+
        Menu.down()
-   ButtonDown.scanning()
-   ButtonOK.scanning()
+
+   ButtonDown.scanning()  # If no Button was Pressed
+   ButtonOK.scanning()    # continue scanning
+                          # if the Buttons are pressed
+
+#---------------------------------#
+#                                 #
+#            REBOOTING            #
+#                                 #
+#---------------------------------#
 
 RAS_Display.show_message('shut_down')
 time.sleep(3)
