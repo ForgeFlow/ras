@@ -2,10 +2,9 @@ import os
 import sys
 import time
 
-# Defining where the Firmware is stored
+
 WORK_DIR = '/home/pi/ras_1901/'
 
-# Ensure that the imports are found
 sys.path.append(WORK_DIR)
 sys.path.append(WORK_DIR+'lib/')
 
@@ -21,62 +20,41 @@ import Odooxlm
 import ShowRFID
 import Menu
 
-#---------------------------------#
-#                                 #
-#      I/O PINS DEFINITION        #
-#                                 #
-#       on the RPi Zero W         #
-#                                 #
-#---------------------------------#
-# We use the BOARD numbering system, which uses the pin numbers on the
+#      I/O PINS DEFINITION
+#       on the RPi Zero W
+# Using the BOARD numbering system, which uses the pin numbers on the
 # P1 Header of the RPi board.
 #
 # Advantage: the hardware will always work, regardless of the
 # board revision of the RPi: no need to rewire or change the code.
-#---------------------------------#
 
-PinSignalBuzzer = 13  # Pin to feed the Signal to the Buzzer
-PinPowerBuzzer  = 12  # Pin to power the Buzzer
+PinSignalBuzzer = 13  # Buzzer
+PinPowerBuzzer  = 12
 
-PinSignalDown   = 31  # Pin to read the DOWN button signal
-PinPowerDown    = 35  # Pin to power the DOWN button
+PinSignalDown   = 31  # DOWN button
+PinPowerDown    = 35
 
-PinSignalOK     = 29  # Pin to read OK button signal
-PinPowerOK      = 35  # Pin to power the OK button
+PinSignalOK     = 29  # OK button signal
+PinPowerOK      = 35
 
 
-#---------------------------------#
-#                                 #
-#   Creating Instances for the    #
-#                                 #
-#      HARDWARE COMPONENTS        #
-#                                 #
-#---------------------------------#
+#   Creating Instances for the
+#      HARDWARE COMPONENTS
 
 Buz      = PasBuz.PasBuz( PinSignalBuzzer, PinPowerBuzzer )
-               # Passive Buzzer
 
 Disp     = Display.Display()
                # the Display Type - for example: OLED SH1106
                # is defined in the Class
 
 Reader   = CardReader.CardReader()
-               # Card Reader based on the Chip MFRC522
 
 B_Down   = Button.Button( PinSignalDown, PinPowerDown )
-               # Button Down
 
 B_OK     = Button.Button( PinSignalOK, PinPowerOK )
-               # Button OK
 
-
-#---------------------------------#
-#                                 #
 #   Creating Instances for the    #
-#                                 #
 #         SOFTWARE TASKS          #
-#                                 #
-#---------------------------------#
 
 
 Odoo     = Odooxlm.Odooxlm( WORK_DIR )
@@ -86,7 +64,8 @@ Odoo     = Odooxlm.Odooxlm( WORK_DIR )
                # where the needed parameters to communicate with odoo are stored.
 
 Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
-               # Show Time & Clocking (check in/out)
+               # Main Functions of the Terminal:
+               # Show Time and do the clockings (check in/out)
                #
                # Two modes of operation are possible and switchable
                # through an instance flag: synchronous mode (standard)
@@ -101,24 +80,18 @@ Menu     = Menu.Menu( Clock , ShowRFID )
                # It allows to switch between the different
                # Functions/Tasks available
 
-#---------------------------------#
-#                                 #
 #            MAIN LOOP            #
-#                                 #
 #     RFID Attendance Terminal    #
-#                                 #
-#---------------------------------#
-#
+
 # The Main Loop only ends when the option to reboot is chosen.
 #
 # In all the Tasks, when the Admin Card is swiped,
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
-#
-#--------------------------------------------
 
+Disp.testing()
 
-
+"""
 while not ( Menu.reboot == True ):
                           # The Main Loop only ends
                           # when the option
@@ -187,3 +160,5 @@ while not ( Menu.reboot == True ):
 # time.sleep(3)
 
 # print('reboot')
+
+"""

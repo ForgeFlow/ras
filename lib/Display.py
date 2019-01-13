@@ -5,6 +5,7 @@ import time
 from PIL import Image, ImageFont
 
 from luma.core.render import canvas
+from luma.core.virtual import terminal
 
 from demo_opts import get_device
 from reset_lib import get_ip
@@ -208,3 +209,29 @@ class Display():
         time.sleep(1)
         self._display_msg("Wifi3")
         time.sleep(3)
+#        self.term   = terminal( self.device, self.font )
+#        self.term.println("Terminal mode")
+#        self.term.println("   demo")
+#        self.term.clear()
+
+
+    def testing(self):
+
+        size        = 20
+        self.font   = ImageFont.truetype(self.font_ttf,size)
+
+        with canvas(self.device) as draw:
+            text = 'Terminal\ndemo'
+            draw.multiline_text((10,5),text,
+                                fill="white",
+                                font=self.font,
+                                align='center')
+
+        input()
+        draw.multiline_text((0,0),' ')
+
+
+#        self.term   = terminal( self.device, self.font )
+#        self.term.println("Terminal mode")
+#        self.term.println("   demo")
+#        self.term.clear()
