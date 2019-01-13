@@ -7,8 +7,8 @@ from PIL import Image, ImageFont
 from luma.core.render import canvas
 from luma.core.virtual import terminal
 
-from demo_opts import get_device
-from reset_lib import get_ip
+from .demo_opts import get_device
+from .reset_lib import get_ip
 
 _logger = logging.getLogger(__name__)
 WORK_DIR = '/home/pi/ras/'

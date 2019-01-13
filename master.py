@@ -1,3 +1,4 @@
+#! /usr/bin/python3.5
 import os
 import sys
 import time
@@ -5,23 +6,16 @@ import time
 
 WORK_DIR = '/home/pi/ras_1901/'
 
-sys.path.append(WORK_DIR)
-sys.path.append(WORK_DIR+'lib/')
+#sys.path.append(WORK_DIR)
+#sys.path.append(WORK_DIR+'lib/')
 
 # Hardware Components imports
-import Display
-import CardReader
-import PasBuz
-import Button
+from lib import Display, CardReader, PasBuz, Button
 
 # Software Tasks imports
-import Clocking
-import Odooxlm
-import ShowRFID
-import Menu
+from lib import Clocking, Odooxlm, ShowRFID, Menu
 
-#      I/O PINS DEFINITION
-#       on the RPi Zero W
+# I/O PINS DEFINITION on the RPi Zero W
 # Using the BOARD numbering system, which uses the pin numbers on the
 # P1 Header of the RPi board.
 #
@@ -38,8 +32,7 @@ PinSignalOK     = 29  # OK button signal
 PinPowerOK      = 35
 
 
-#   Creating Instances for the
-#      HARDWARE COMPONENTS
+# Creating Instances for the HARDWARE COMPONENTS
 
 Buz      = PasBuz.PasBuz( PinSignalBuzzer, PinPowerBuzzer )
 
@@ -53,21 +46,20 @@ B_Down   = Button.Button( PinSignalDown, PinPowerDown )
 
 B_OK     = Button.Button( PinSignalOK, PinPowerOK )
 
-#   Creating Instances for the    #
-#         SOFTWARE TASKS          #
+# Creating Instances for the SOFTWARE TASKS
 
 
 Odoo     = Odooxlm.Odooxlm( WORK_DIR )
                # communicate to Odoo via xlm
                #
-               # the directory location is given to find the data.json file,
-               # where the needed parameters to communicate with odoo are stored.
+               # data.json lives in WORK_DIR : the parameters
+               # to communicate with odoo are stored there
 
 Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
                # Main Functions of the Terminal:
                # Show Time and do the clockings (check in/out)
                #
-               # Two modes of operation are possible and switchable
+               # There are two modes of operation possible and switchable
                # through an instance flag: synchronous mode (standard)
                # and asynchronous mode.
 
