@@ -1,13 +1,10 @@
 #! /usr/bin/python3.5
+
 import os
 import sys
 import time
 
-
 WORK_DIR = '/home/pi/ras_1901/'
-
-#sys.path.append(WORK_DIR)
-#sys.path.append(WORK_DIR+'lib/')
 
 # Hardware Components imports
 from lib import Display, CardReader, PasBuz, Button
@@ -16,11 +13,7 @@ from lib import Display, CardReader, PasBuz, Button
 from lib import Clocking, Odooxlm, ShowRFID, Menu
 
 # I/O PINS DEFINITION on the RPi Zero W
-# Using the BOARD numbering system, which uses the pin numbers on the
-# P1 Header of the RPi board.
-#
-# Advantage: the hardware will always work, regardless of the
-# board revision of the RPi: no need to rewire or change the code.
+# Using the BOARD numbering system
 
 PinSignalBuzzer = 13  # Buzzer
 PinPowerBuzzer  = 12
@@ -36,9 +29,7 @@ PinPowerOK      = 35
 
 Buz      = PasBuz.PasBuz( PinSignalBuzzer, PinPowerBuzzer )
 
-Disp     = Display.Display()
-               # the Display Type - for example: OLED SH1106
-               # is defined in the Class
+Disp     = Display.Display( WORK_DIR, 'sh1106') # we pass the driver
 
 Reader   = CardReader.CardReader()
 
@@ -66,14 +57,12 @@ Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
 ShowRFID = ShowRFID.ShowRFID( Disp, Reader, Odoo, Buz )
                # Display the RFID code (in HEX) of the swiped card
 
-Menu     = Menu.Menu( Clock , ShowRFID )
+Menu     = Menu.Menu( Clock , ShowRFID, Buz, B_Down, B_OK)
                # This Menu is shown when the Terminal (RAS)
                # is switched On or when the Admin Card is swiped.
                # It allows to switch between the different
                # Functions/Tasks available
 
-#            MAIN LOOP            #
-#     RFID Attendance Terminal    #
 
 # The Main Loop only ends when the option to reboot is chosen.
 #
@@ -81,66 +70,53 @@ Menu     = Menu.Menu( Clock , ShowRFID )
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
 
-Disp.testing()
+# Disp.testing()
 
-"""
-while not ( Menu.reboot == True ):
-                          # The Main Loop only ends
-                          # when the option
-                          # to reboot is chosen.
+def OKpressed_firsttime():
+    Disp.show_message('sure?')
 
-   Disp.show_message( Menu.action[Menu.option] )
-               # The Task that can be selected when
-               # pressing the OK Button is shown on the Display
+    B_OK.pressed     = False # avoid false positives
+    B_Down.pressed   = False
 
-   if B_OK.pressed:       # When the Button OK is pressed
+    while not ( B_OK.pressed or B_Down.pressed): #wait answer
+       B_Down.scanning()
+       B_OK.scanning()
 
-       Buz.Play('OK')     # Acoustic Feedback
-                          # that the OK Button was pressed
+    if B_OK.pressed:    # OK pressed for a second time
+        Menu.selected() # The selected Task is run.
+                        # When the Admin Card is swiped
+                        # the Program returns here again.
+    else:
+        Buz.Play('down')
 
-       # WE WANT TO BE SURE ###############################
-       Disp.show_message('sure?')
+    B_OK.pressed     = False # avoid false positives
+    B_Down.pressed   = False
 
-       B_OK.pressed     = False # avoid false positives
-       B_Down.pressed   = False
+def main_loop():
+# The Main Loop only ends when the option to reboot is chosen.
+# In all the Tasks, when the Admin Card is swiped,
+# the program returns to this Loop,
+# where a new Task can be selected using the OK and Down Buttons.
 
-       while not ( B_OK.pressed or B_Down.pressed): # wait for an answer
-           B_Down.scanning() # If no Button was Pressed continue scanning
-           B_OK.scanning()   # if the Buttons are pressed
+    Clock.clocking () # clocking is per default what you
+                      # find when the Terminal is switched on.
+    Buz.Play('OK') # if you are here it is because the admin card
+                   # was swiped, so you get acoustic feedback
 
-       if B_OK.pressed:    # the OK Button was pressed for
-                           # a second time
+    while not ( Menu.reboot == True ):
 
-           Buz.Play('OK')
+        Disp.show_message( Menu.action[Menu.option] )
 
-           B_Down.poweroff() # Swith Buttons Power off
-           B_OK.poweroff()   # to keep the electronics cool
+        if B_OK.pressed:
+            OKpressed_firsttime()
+        elif B_Down.pressed:
+            Menu.down()
 
-           Menu.selected() # The selected Task is run.
-                           # When the Admin Card is swiped
-                           # the Program returns here again.
+        B_Down.scanning() # If no Button was Pressed
+        B_OK.scanning()   # continue scanning
 
-           Buz.Play('OK')  # Acoustic Feedback to mark the end of the Task
-                           # and the coming back to the menu
-           B_Down.poweron()   # switch the Buttons back on
-           B_OK.poweron()     # to detect what the user wants
 
-       else:
-
-           Buz.Play('down')
-
-       B_OK.pressed     = False # avoid false positives
-       B_Down.pressed   = False
-
-   elif B_Down.pressed:   # When the Button Down is pressed
-
-       Buz.Play('down')   # Acoustic Feedback
-                          # that the Down Button was pressed
-
-       Menu.down()
-
-   B_Down.scanning()      # If no Button was Pressed continue scanning
-   B_OK.scanning()        # if the Buttons are pressed
+main_loop()
 
 #---------------------------------#
 #                                 #
@@ -153,4 +129,4 @@ while not ( Menu.reboot == True ):
 
 # print('reboot')
 
-"""
+#"""

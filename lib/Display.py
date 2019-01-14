@@ -11,7 +11,7 @@ from .demo_opts import get_device
 from .reset_lib import get_ip
 
 _logger = logging.getLogger(__name__)
-WORK_DIR = '/home/pi/ras/'
+#WORK_DIR = '/home/pi/ras/'
 
 dic = {
     ' ': [" ", 0, 1, 0, 0, 24],
@@ -58,12 +58,12 @@ menus = {
 
 class Display():
 
-    def __init__(self):
+    def __init__(self, WORK_DIR, driver):
         self.font_ttf = os.path.abspath(
             os.path.join(WORK_DIR, 'fonts/Orkney.ttf'))
         self.img_path = os.path.abspath(
             os.path.join(WORK_DIR, 'images'))
-        self.device = get_device(('-d','sh1106')) # Specify which kind of Device we use
+        self.device = get_device(('-d',driver)) # Specify which kind of Device we use
 
     def display_menu(self, menu, loc):
         m_font = ImageFont.truetype(self.font_ttf, 16)
