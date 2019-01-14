@@ -1,4 +1,5 @@
 from . import Settings
+import time
 
 class Menu():
 
@@ -36,6 +37,8 @@ class Menu():
 
    def down(self):
        self.Buzzer.Play('down')
+       time.sleep(0.4) # allow time to take the finger
+                       # away from the button
 
        self.option += 1
        if self.option > 3:

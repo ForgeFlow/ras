@@ -37,6 +37,8 @@ B_Down   = Button.Button( PinSignalDown, PinPowerDown )
 
 B_OK     = Button.Button( PinSignalOK, PinPowerOK )
 
+Hardware = [Buz,Disp,Reader,B_Down,B_OK]
+
 # Creating Instances for the SOFTWARE TASKS
 
 
@@ -46,7 +48,7 @@ Odoo     = Odooxlm.Odooxlm( WORK_DIR )
                # data.json lives in WORK_DIR : the parameters
                # to communicate with odoo are stored there
 
-Clock    = Clocking.Clocking( Disp, Reader, Odoo, Buz )
+Clock    = Clocking.Clocking( Odoo, Hardware )
                # Main Functions of the Terminal:
                # Show Time and do the clockings (check in/out)
                #
@@ -73,10 +75,13 @@ Menu     = Menu.Menu( Clock , ShowRFID, Buz, B_Down, B_OK)
 # Disp.testing()
 
 def OKpressed_firsttime():
+    Buz.Play('OK')
     Disp.show_message('sure?')
 
     B_OK.pressed     = False # avoid false positives
     B_Down.pressed   = False
+    time.sleep(0.4) # allow time to take the finger
+                    # away from the button
 
     while not ( B_OK.pressed or B_Down.pressed): #wait answer
        B_Down.scanning()
@@ -88,6 +93,9 @@ def OKpressed_firsttime():
                         # the Program returns here again.
     else:
         Buz.Play('down')
+        time.sleep(0.4) # allow time to take the finger
+                        # away from the button
+
 
     B_OK.pressed     = False # avoid false positives
     B_Down.pressed   = False

@@ -4,13 +4,16 @@ import os
 
 class Clocking:
 
-    def __init__(self, Disp, Reader, Odoo, Buzz):
+    def __init__(self, Odoo, Hardware):
        self.card   = False  # currently swipped card code
-       self.Disp   = Disp   # Display Instance
-       self.Reader = Reader # Card Reader Instance
-       self.Odoo   = Odoo   # Odoo Instance
-       self.Buzz   = Buzz   # Passive Buzzer Instance
-       self.card_logging_min = 1.5
+
+       self.Odoo   = Odoo
+       self.Buzz   = Hardware[0] # Passive Buzzer
+       self.Disp   = Hardware[1] # Display
+       self.Reader = Hardware[2] # Card Reader
+       self.Odoo   = Odoo
+
+       self.card_logging_time_min = 1.5
            # minimum amount of seconds allowed for
            # the card logging process
            # making this time smaller means the terminal
@@ -150,23 +153,25 @@ class Clocking:
 
 
             if self.card and not(self.card == self.Odoo.adm):
-               # To do only when a Card is swipped and it is not the admin
 
                begin_card_logging = time.perf_counter()
                # store the time when the card logging process begin
 
                if self.sync:
 
-                   self.clock_sync() # clocking process for synchronous mode
+                   self.clock_sync()  # synchronous: to odoo db
                else:
-                   self.clock_async() # clocking process for asynchronous mode
+                   self.clock_async() # asynchronous: to local RPi file
 
-               self.Disp.show_message(self.msg) # Display the appropiate Message that resulted from the clocking process
-               self.Buzz.Play(self.msg) # Buzzer plays the Melody for the Message
+               self.Disp.show_message(self.msg) # clocking message
+               self.Buzz.Play(self.msg)         # clocking acoustic feedback
 
-               rest_time = self.card_logging_min - (time.perf_counter() - begin_card_logging)
-               # calculating the minimum rest time allowed for the card logging process 
-               if rest_time<0: rest_time=0 # the rest time can not be negative
+               rest_time = self.card_logging_time_min - (time.perf_counter() - begin_card_logging)
+               # calculating the minimum rest time
+               # allowed for the card logging process 
+               if rest_time<0:
+                   rest_time=0 # the rest time can not be negative
+
                time.sleep(rest_time)
 
         self.card = False # Reset the value of the card, in order to allow

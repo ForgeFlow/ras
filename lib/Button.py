@@ -19,7 +19,7 @@ class Button():
             self.pressed = True
         elif self.pressed == True and GPIO.input(self.pin_signal)==GPIO.LOW:
             self.pressed = False
-        time.sleep (0.05)
+        time.sleep (0.02)
 
     def poweroff(self):
         GPIO.output(self.pin_power, 0)
