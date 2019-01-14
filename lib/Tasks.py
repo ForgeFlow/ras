@@ -38,5 +38,5 @@ class Tasks:
     def update_firmware(self):
         pass
 
-    def reboot(self):
+    def rebooting(self):
         self.reboot = True

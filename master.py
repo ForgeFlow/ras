@@ -54,7 +54,7 @@ Tasks = Tasks.Tasks( Odoo, Hardware )
 tasks_menu = [ Tasks.clocking,
                Tasks.showRFID,
                Tasks.update_firmware,
-               Tasks.reboot
+               Tasks.rebooting
               ]
                # list of Tasks for the selection Menu
 
@@ -105,7 +105,7 @@ def main_loop():
     Buz.Play('OK') # if you are here it is because the admin card
                    # was swiped, so you get acoustic feedback
 
-    while not ( Menu.reboot == True ):
+    while not ( Tasks.reboot == True ):
 
         Disp.show_message( Menu.action[Menu.option] )
 
