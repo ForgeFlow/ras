@@ -10,7 +10,7 @@ WORK_DIR = '/home/pi/ras_1901/'
 from lib import Display, CardReader, PasBuz, Button
 
 # Software Tasks imports
-from lib import Clocking, Odooxlm, ShowRFID, Menu
+from lib import Odooxlm, Menu, Tasks
 
 # I/O PINS DEFINITION on the RPi Zero W
 # Using the BOARD numbering system
@@ -25,6 +25,7 @@ PinSignalOK     = 29  # OK button signal
 PinPowerOK      = 35
 
 
+
 # Creating Instances for the HARDWARE COMPONENTS
 
 Buz      = PasBuz.PasBuz( PinSignalBuzzer, PinPowerBuzzer )
@@ -37,40 +38,33 @@ B_Down   = Button.Button( PinSignalDown, PinPowerDown )
 
 B_OK     = Button.Button( PinSignalOK, PinPowerOK )
 
-Hardware = [Buz,Disp,Reader,B_Down,B_OK]
+Hardware = [ Buz, Disp, Reader, B_Down, B_OK]
+
+
 
 # Creating Instances for the SOFTWARE TASKS
 
-
 Odoo     = Odooxlm.Odooxlm( WORK_DIR )
-               # communicate to Odoo via xlm
-               #
-               # data.json lives in WORK_DIR : the parameters
-               # to communicate with odoo are stored there
+           # communicate to Odoo via xlm
+           # data.json lives in WORK_DIR : the parameters
+           # to communicate with odoo are stored there
 
-Clock    = Clocking.Clocking( Odoo, Hardware )
-               # Main Functions of the Terminal:
-               # Show Time and do the clockings (check in/out)
-               #
-               # There are two modes of operation possible and switchable
-               # through an instance flag: synchronous mode (standard)
-               # and asynchronous mode.
+Tasks = Tasks.Tasks( Odoo, Hardware )
 
-ShowRFID = ShowRFID.ShowRFID( Disp, Reader, Odoo, Buz )
-               # Display the RFID code (in HEX) of the swiped card
+tasks_menu = [ Tasks.clocking,
+               Tasks.showRFID,
+               Tasks.update_firmware,
+               Tasks.reboot
+              ]
+               # list of Tasks for the selection Menu
 
-Menu     = Menu.Menu( Clock , ShowRFID, Buz, B_Down, B_OK)
-               # This Menu is shown when the Terminal (RAS)
-               # is switched On or when the Admin Card is swiped.
-               # It allows to switch between the different
-               # Functions/Tasks available
+Menu     = Menu.Menu( Tasks, tasks_menu, Hardware)
+              # This Menu is shown when the Terminal (RAS)
+              # is switched On or when the Admin Card is swiped.
+              # It allows to switch between the different
+              # Functions/Tasks available
 
 
-# The Main Loop only ends when the option to reboot is chosen.
-#
-# In all the Tasks, when the Admin Card is swiped,
-# the program returns to this Loop,
-# where a new Task can be selected using the OK and Down Buttons.
 
 # Disp.testing()
 
@@ -84,8 +78,8 @@ def OKpressed_firsttime():
                     # away from the button
 
     while not ( B_OK.pressed or B_Down.pressed): #wait answer
-       B_Down.scanning()
-       B_OK.scanning()
+        B_Down.scanning()
+        B_OK.scanning()
 
     if B_OK.pressed:    # OK pressed for a second time
         Menu.selected() # The selected Task is run.
@@ -106,7 +100,7 @@ def main_loop():
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
 
-    Clock.clocking () # clocking is per default what you
+    Tasks.clocking () # clocking is per default what you
                       # find when the Terminal is switched on.
     Buz.Play('OK') # if you are here it is because the admin card
                    # was swiped, so you get acoustic feedback

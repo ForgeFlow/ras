@@ -11,7 +11,6 @@ class Clocking:
        self.Buzz   = Hardware[0] # Passive Buzzer
        self.Disp   = Hardware[1] # Display
        self.Reader = Hardware[2] # Card Reader
-       self.Odoo   = Odoo
 
        self.card_logging_time_min = 1.5
            # minimum amount of seconds allowed for
@@ -129,6 +128,13 @@ class Clocking:
 
 
     def clocking(self):
+        # Main Functions of the Terminal:
+        # Show Time and do the clockings (check in/out)
+        #
+        # There are two modes of operation possible and switchable
+        # through an instance flag: synchronous mode (standard)
+        # and asynchronous mode.
+
 
         count =0
         count_max = 300
