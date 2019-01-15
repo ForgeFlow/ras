@@ -22,14 +22,14 @@ dic = {
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
 
     'ERRUpdate':
-                [ (5,5) , 16,
+                [ (1,1) , 15,
                   'Unable to update,'+'\n'+
                   'GitHub connection'+'\n'+
                   'refused'      ],
 
 
     'update':
-               [ (15,1) , 22,
+               [ (15,1) , 20,
                   'Updating'+'\n'+
                   ''+'\n'+
                   'Firmware'     ],

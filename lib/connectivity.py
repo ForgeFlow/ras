@@ -5,7 +5,7 @@ def can_connect(url):
     # returns True if it can connect
     # and false if it can not connect
     try:
-        response = urlopen(self.url, timeout=10)
+        response = urlopen(url, timeout=10)
         return True
     except:
         return False

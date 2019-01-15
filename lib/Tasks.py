@@ -49,7 +49,7 @@ class Tasks:
             os.system('sudo git reset --hard origin')
             self.Buzz.Play('OK')
             time.sleep(0.5)
-            Disp.clear_display()
+            self.Disp.clear_display()
             self.reboot = True
         else:
             self.Buzz.Play('FALSE')
