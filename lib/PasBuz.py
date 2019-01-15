@@ -3,7 +3,7 @@
 import time
 import RPi.GPIO as GPIO
 
-from .buz_dic import dic # dic with melodies
+from dicts.buzzer_dic import dic # dic with melodies
 
 GPIO.setwarnings(False)
 

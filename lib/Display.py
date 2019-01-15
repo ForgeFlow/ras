@@ -10,50 +10,9 @@ from luma.core.virtual import terminal
 from .demo_opts import get_device
 from .reset_lib import get_ip
 
+from dicts.display_dic import dic
+
 _logger = logging.getLogger(__name__)
-#WORK_DIR = '/home/pi/ras/'
-
-dic = {
-    ' ': [" ", 0, 1, 0, 0, 24],
-    'check_in': ['CHECKED IN', 6, 1, 0, 0, 22],
-    'check_out': ['CHECKED OUT', 2, 1, 0, 0, 20],
-    'FALSE': ['NOT;AUTHORIZED', 45, 2, 10, 0, 18],
-    'shut_down': ['Rebooting', 6, 1, 0, 0, 24],
-    '1': ['1', 50, 1, 0, 0, 50],
-    '2': ['2', 50, 1, 0, 0, 50],
-    'Wifi1': ['Wi-Fi;Connection', 35, 2, 15, 0, 20],
-    'Wifi2': ['Connect to AP;RFID Attendance System', 30, 2, 10, 0, 12],
-    'Wifi3': ['Browse 192.168.42.1;for Wi-Fi Configuration', 20, 2, 10, 0, 12],
-    'update': ['Updating;Firmware', 20, 2, 20, 0, 24],
-    'comERR1': ['Odoo;communication;failed', 41, 3, 5, 40, 19],
-    'comERR2': ['Check;connection;parameters', 41, 3, 20, 20, 19],
-    'configured': ['Odoo;connection;ready', 40, 3, 20, 40, 19],
-    'ERRUpdate': ['Unable to update RAS; Github connection refused', 12, 2, 2, 0, 12],
-    'connecting': ['Connecting...', 10, 1, 0, 0, 20],
-    'reading': ['Reading...', 25, 1, 0, 0, 20],
-    'Local': ['Clocking;Locally', 20, 2, 20, 0, 24],
-    'odoo_async': ['Clocking;to Odoo', 20, 2, 20, 0, 24],
-    'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
-    'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
-    'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19],
-    'Clock': ['PRESS OK;TO BEGIN;CLOCKING',22,3,36,32,15],
-    'Reader':['PRESS OK;TO READ THE;RFID CODES',22,3,36,32,15],
-    'Update':['PRESS OK;TO UPDATE;THE FIRMWARE',22,3,36,32,15],
-    'Reboot': ['PRESS OK;TO REBOOT', 45, 2, 10, 0, 15],
-    'sure?' : ['ARE YOU SURE?;Press OK again;if you are sure',22,3,36,32,15]
-}
-
-# 0: message
-# 1: position 1st Line
-# 2: number of lines
-# 3: position 2nd Line
-# 4: position 3rd Line
-# 5: Font Size
-
-menus = {
-    'Main': ["RFID - Odoo", "RFID reader", "Settings", "Reboot"],
-    'Settings': ["WiFi Reset", "Update RAS", "Reset Data", "Back"],
-}
 
 
 class Display():
@@ -62,34 +21,6 @@ class Display():
         self.font_ttf = WORK_DIR+'fonts/Orkney.ttf'
         self.img_path = WORK_DIR+'images'
         self.device = get_device(('-d',driver))
-
-    def display_menu(self, menu, loc):
-        m_font = ImageFont.truetype(self.font_ttf, 16)
-        with canvas(self.device) as draw:
-            if loc == 0:
-                draw.rectangle((3, 1, 124, 16), outline="white", fill="white")
-                draw.text((5, 0), menus[menu][0], font=m_font, fill="black")
-                draw.text((5, 15), menus[menu][1], font=m_font, fill="white")
-                draw.text((5, 30), menus[menu][2], font=m_font, fill="white")
-                draw.text((5, 45), menus[menu][3], font=m_font, fill="white")
-            elif loc == 1:
-                draw.rectangle((3, 17, 124, 30), outline="white", fill="white")
-                draw.text((5, 0), menus[menu][0], font=m_font, fill="white")
-                draw.text((5, 15), menus[menu][1], font=m_font, fill="black")
-                draw.text((5, 30), menus[menu][2], font=m_font, fill="white")
-                draw.text((5, 45), menus[menu][3], font=m_font, fill="white")
-            elif loc == 2:
-                draw.rectangle((3, 31, 124, 46), outline="white", fill="white")
-                draw.text((5, 0), menus[menu][0], font=m_font, fill="white")
-                draw.text((5, 15), menus[menu][1], font=m_font, fill="white")
-                draw.text((5, 30), menus[menu][2], font=m_font, fill="black")
-                draw.text((5, 45), menus[menu][3], font=m_font, fill="white")
-            elif loc == 3:
-                draw.rectangle((3, 47, 124, 60), outline="white", fill="white")
-                draw.text((5, 0), menus[menu][0], font=m_font, fill="white")
-                draw.text((5, 15), menus[menu][1], font=m_font, fill="white")
-                draw.text((5, 30), menus[menu][2], font=m_font, fill="white")
-                draw.text((5, 45), menus[menu][3], font=m_font, fill="black")
 
     def _display_time(self):
         with canvas(self.device) as draw:
@@ -215,9 +146,9 @@ class Display():
 
     def display_msg(self, param):
 
-        origin = param[0] # in the form (x0, y0)
-        size   = param[1]
-        text   = param[2]
+        origin = dic[param][0] # in the form (x0, y0)
+        size   = dic[param][1]
+        text   = dic[param][2]
 
         self.font   = ImageFont.truetype(self.font_ttf,size)
 

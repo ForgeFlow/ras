@@ -57,24 +57,16 @@ tasks_menu = [ Tasks.clocking,
                Tasks.reset_wifi,
                Tasks.reset_odoo,
                Tasks.toggle_sync,
-               Tasks.rebooting
-              ]
-      # list of Tasks for the selection Menu
-      # They appear in the Menu in the same order as here.
+               Tasks.rebooting    ]
+# The Tasks appear in the Menu in the same order as here.
 
 Menu     = Menu.Menu( Tasks, tasks_menu, Hardware)
-              # This Menu is shown when the Terminal (RAS)
-              # is switched On or when the Admin Card is swiped.
-              # It allows to switch between the different
-              # Functions/Tasks available
-
-
-
-# Disp.testing()
+# The Menu is shown when the Admin Card is swiped.
+# It allows to switch between the different Tasks available
 
 def OKpressed_firsttime():
     Buz.Play('OK')
-    Disp.show_message('sure?')
+    Disp.display_msg('sure?')
 
     B_OK.pressed     = False # avoid false positives
     B_Down.pressed   = False
@@ -104,14 +96,12 @@ def main_loop():
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
 
-    Tasks.clocking ('do') # clocking is per default what you
-                      # find when the Terminal is switched on.
-    Buz.Play('OK') # if you are here it is because the admin card
-                   # was swiped, so you get acoustic feedback
+    Menu.selected() # when the terminal is switched on it goes to
+                    # the predefined Task
 
     while not ( Tasks.reboot == True ):
 
-        Disp.display_msg( tasks_menu[Menu.option]('msg') )
+        Disp.display_msg( tasks_menu[Menu.option].__name__ )
 
         if B_OK.pressed:
             OKpressed_firsttime()
@@ -129,4 +119,3 @@ def main_loop():
 
 
 main_loop()
-

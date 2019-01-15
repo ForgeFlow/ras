@@ -19,7 +19,7 @@ class Menu():
        self.B_Down.poweroff() # switch off Buttons
        self.B_OK.poweroff()   # to keep the electronics cool
 
-       self.tasks_menu[self.option]('do')
+       self.tasks_menu[self.option]()
 
        self.B_Down.poweron() # switch the Buttons back on
        self.B_OK.poweron()   # to detect what the user wants

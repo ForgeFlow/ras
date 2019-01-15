@@ -1,5 +1,5 @@
 import json
-from . import tz_dic
+from dicts import tz_dic
 import os
 import time
 import xmlrpc.client as xmlrpclib
