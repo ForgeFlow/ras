@@ -21,6 +21,14 @@ dic = {
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
 
+    'shut_down':
+                [ (1,1) , 20,
+                  ' '+'\n'+
+                  'REBOOTING'+'\n'+
+                  ' '             ],
+
+
+
     'ERRUpdate':
                 [ (1,1) , 15,
                   'Unable to update,'+'\n'+
@@ -31,7 +39,7 @@ dic = {
     'update':
                [ (22,1) , 16,
                   'Updating'+'\n'+
-                  ''+'\n'+
+                  ' '+'\n'+
                   'Firmware'     ],
 
 
