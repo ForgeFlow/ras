@@ -110,10 +110,10 @@ def main_loop():
         B_Down.scanning() # If no Button was Pressed
         B_OK.scanning()   # continue scanning
 
-    #Disp.show_message('shut_down')
+    Disp.display_msg('shut_down')
     time.sleep(1.5)
     Disp.clear_display()
-    print('reboot') # here comes the rebooting
+    os.system('sudo reboot')
 
 
 

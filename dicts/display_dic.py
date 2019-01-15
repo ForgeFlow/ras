@@ -29,7 +29,7 @@ dic = {
 
 
     'update':
-               [ (15,1) , 20,
+               [ (22,1) , 16,
                   'Updating'+'\n'+
                   ''+'\n'+
                   'Firmware'     ],
