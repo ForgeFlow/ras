@@ -10,12 +10,8 @@ class Menu():
        self.B_Down     = Hardware[3] # Button Down
        self.B_OK       = Hardware[4] # Button OK
 
-       self.option     = 0
-       self.action     = ('Clock',
-                        'Reader',
-                        'Settings',
-                        'Reboot')
-
+       self.option     = 0  # the first menu option
+       self.optionmax  = len(tasks_menu) - 1
        self.reboot     = False
 
    def selected(self):
@@ -23,7 +19,7 @@ class Menu():
        self.B_Down.poweroff() # switch off Buttons
        self.B_OK.poweroff()   # to keep the electronics cool
 
-       self.tasks_menu[self.option]()
+       self.tasks_menu[self.option]('do')
 
        self.B_Down.poweron() # switch the Buttons back on
        self.B_OK.poweron()   # to detect what the user wants
@@ -35,7 +31,7 @@ class Menu():
                        # away from the button
 
        self.option += 1
-       if self.option > 3:
+       if self.option > self.optionmax:
            self.option = 0
 
 

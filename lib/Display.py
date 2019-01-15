@@ -38,7 +38,7 @@ dic = {
     'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19],
     'Clock': ['PRESS OK;TO BEGIN;CLOCKING',22,3,36,32,15],
     'Reader':['PRESS OK;TO READ THE;RFID CODES',22,3,36,32,15],
-    'Settings':['PRESS OK;TO CHANGE;THE SETTINGS',22,3,36,32,15],
+    'Update':['PRESS OK;TO UPDATE;THE FIRMWARE',22,3,36,32,15],
     'Reboot': ['PRESS OK;TO REBOOT', 45, 2, 10, 0, 15],
     'sure?' : ['ARE YOU SURE?;Press OK again;if you are sure',22,3,36,32,15]
 }
@@ -59,11 +59,9 @@ menus = {
 class Display():
 
     def __init__(self, WORK_DIR, driver):
-        self.font_ttf = os.path.abspath(
-            os.path.join(WORK_DIR, 'fonts/Orkney.ttf'))
-        self.img_path = os.path.abspath(
-            os.path.join(WORK_DIR, 'images'))
-        self.device = get_device(('-d',driver)) # Specify which kind of Device we use
+        self.font_ttf = WORK_DIR+'fonts/Orkney.ttf'
+        self.img_path = WORK_DIR+'images'
+        self.device = get_device(('-d',driver))
 
     def display_menu(self, menu, loc):
         m_font = ImageFont.truetype(self.font_ttf, 16)
@@ -215,23 +213,22 @@ class Display():
 #        self.term.clear()
 
 
-    def testing(self):
+    def display_msg(self, param):
 
-        size        = 20
+        origin = param[0] # in the form (x0, y0)
+        size   = param[1]
+        text   = param[2]
+
         self.font   = ImageFont.truetype(self.font_ttf,size)
 
         with canvas(self.device) as draw:
-            text = 'Terminal\ndemo'
-            draw.multiline_text((10,5),text,
+            draw.multiline_text(origin,text,
                                 fill="white",
                                 font=self.font,
                                 align='center')
 
-        input()
-        draw.multiline_text((0,0),' ')
+    def clear_display(self):
+        with canvas(self.device) as draw:
+            draw.multiline_text((0,0),' ') # erase display
 
 
-#        self.term   = terminal( self.device, self.font )
-#        self.term.println("Terminal mode")
-#        self.term.println("   demo")
-#        self.term.clear()

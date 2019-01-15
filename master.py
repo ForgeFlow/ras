@@ -54,9 +54,13 @@ Tasks = Tasks.Tasks( Odoo, Hardware )
 tasks_menu = [ Tasks.clocking,
                Tasks.showRFID,
                Tasks.update_firmware,
+               Tasks.reset_wifi,
+               Tasks.reset_odoo,
+               Tasks.toggle_sync,
                Tasks.rebooting
               ]
-               # list of Tasks for the selection Menu
+      # list of Tasks for the selection Menu
+      # They appear in the Menu in the same order as here.
 
 Menu     = Menu.Menu( Tasks, tasks_menu, Hardware)
               # This Menu is shown when the Terminal (RAS)
@@ -100,14 +104,14 @@ def main_loop():
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
 
-    Tasks.clocking () # clocking is per default what you
+    Tasks.clocking ('do') # clocking is per default what you
                       # find when the Terminal is switched on.
     Buz.Play('OK') # if you are here it is because the admin card
                    # was swiped, so you get acoustic feedback
 
     while not ( Tasks.reboot == True ):
 
-        Disp.show_message( Menu.action[Menu.option] )
+        Disp.display_msg( tasks_menu[Menu.option]('msg') )
 
         if B_OK.pressed:
             OKpressed_firsttime()
@@ -117,18 +121,12 @@ def main_loop():
         B_Down.scanning() # If no Button was Pressed
         B_OK.scanning()   # continue scanning
 
+    #Disp.show_message('shut_down')
+    time.sleep(1.5)
+    Disp.clear_display()
+    print('reboot') # here comes the rebooting
+
+
 
 main_loop()
 
-#---------------------------------#
-#                                 #
-#            REBOOTING            #
-#                                 #
-#---------------------------------#
-
-# Disp.show_message('shut_down')
-# time.sleep(3)
-
-# print('reboot')
-
-#"""
