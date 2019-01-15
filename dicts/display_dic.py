@@ -20,7 +20,12 @@ dic = {
     'odoo_async': ['Clocking;to Odoo', 20, 2, 20, 0, 24],
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
-    'swipecard' : ['Please;swipe;your card', 36, 3, 40, 25, 19],
+
+    'swipecard' :
+               [ (17,1), 20,
+                  'Please'+'\n'+
+                  'swipe'+'\n'+
+                  'your card'    ],
 
     'clocking':
                 [ (15,1), 18,

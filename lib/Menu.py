@@ -12,7 +12,6 @@ class Menu():
 
        self.option     = 0  # the first menu option
        self.optionmax  = len(tasks_menu) - 1
-       self.reboot     = False
 
    def selected(self):
        self.Buzzer.Play('OK')

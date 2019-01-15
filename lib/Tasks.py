@@ -18,7 +18,7 @@ class Tasks:
         self.Clock.clocking()
 
     def showRFID( self):
-        self.Disp.show_message('swipecard')
+        self.Disp.display_msg('swipecard')
 
         while not (self.card == self.Odoo.adm):
 
