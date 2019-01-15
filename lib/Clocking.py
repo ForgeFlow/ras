@@ -1,6 +1,7 @@
 import time
 import shelve
 import os
+from . import connectivity
 
 class Clocking:
 
@@ -44,15 +45,12 @@ class Clocking:
 
 
 
-#__________________________________________________________________
-#
-#       FUNCTIONS FOR SYNCHRONOUS MODE
-#
-#__________________________________________________________________
+# FUNCTIONS FOR SYNCHRONOUS MODE
 
     def clock_sync(self):
 
-        if self.Odoo.can_connect(): # when Odoo Connection existing Store Clocking directly on odoo database
+        if connectivity.can_connect(self.Odoo.url_template):
+        # when Odoo Connection existing Store Clocking directly on odoo database
             self.Disp.show_message('connecting') # Inform of the Beginning of the Connection with Odo
             res = self.Odoo.check_attendance(self.card)
             if res:
@@ -63,12 +61,7 @@ class Clocking:
 
             self.msg = 'ContactAdm' # No Odoo Connection: Contact Your Admin
 
-#__________________________________________________________________
-#
-#       FUNCTIONS FOR ASYNCHRONOUS MODE
-#
-#__________________________________________________________________
-
+# FUNCTIONS FOR ASYNCHRONOUS MODE
 
     def store_odoo_async(self): # Odoo can connect & Asynchronous Operation
 
@@ -82,7 +75,6 @@ class Clocking:
            if res['action'] == 'FALSE':
                self.msg = 'FALSE' # Only can show if it is not authorized
 
-
     def store_locally_async(self):
        self.msg = 'Local'
 
@@ -91,7 +83,6 @@ class Clocking:
        db[t] = self.card
        self.stored = self.stored + 1
        db.close()
-
 
     def recover_queue(self):
        self.Disp.show_message('wait') # ask the user to please wait 
@@ -108,24 +99,19 @@ class Clocking:
        db.close()
 
 #__________________________________________________________________
-#__________________________________________________________________
-
 
     def clock_async(self):
 
-       if self.Odoo.can_connect(): # when Odoo Connection existing Store Clocking directly on odoo database
-
+       if connectivity.can_connect(self.Odoo.url_template):
+       # when Odoo Connection existing Store Clocking directly on odoo database
            self.Disp.show_message('connecting') # Inform of the Beginning of the Connection with Odoo
            self.store_odoo_async()
        else:
            self.store_locally_async()  # No Odoo Connection: Store Clocking on Local File RAS_Buffer
 
-#__________________________________________________________________
-#
-#       COMMON FUNCTIONS fOR SYNC and ASYNC
-#
-#__________________________________________________________________
 
+
+# COMMON FUNCTIONS fOR SYNC and ASYNC
 
     def clocking(self):
         # Main Functions of the Terminal:
@@ -134,7 +120,6 @@ class Clocking:
         # There are two modes of operation possible and switchable
         # through an instance flag: synchronous mode (standard)
         # and asynchronous mode.
-
 
         count =0
         count_max = 300
@@ -153,7 +138,7 @@ class Clocking:
                                 #that can be uploaded to the Odoo Database
                count=0
                if (not self.sync) and (self.stored>0):
-                   if self.Odoo.can_connect():
+                   if connectivity.can_connect(self.Odoo.url_template):
                        self.recover_queue() # if needed and possible
                                             # the data in the queue is uploaded
 
@@ -174,7 +159,7 @@ class Clocking:
 
                rest_time = self.card_logging_time_min - (time.perf_counter() - begin_card_logging)
                # calculating the minimum rest time
-               # allowed for the card logging process 
+               # allowed for the card logging process
                if rest_time<0:
                    rest_time=0 # the rest time can not be negative
 

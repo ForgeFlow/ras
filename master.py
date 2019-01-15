@@ -1,5 +1,5 @@
 #! /usr/bin/python3.5
-
+# test
 import os
 import sys
 import time
@@ -85,7 +85,6 @@ def OKpressed_firsttime():
         Buz.Play('down')
         time.sleep(0.4) # allow time to take the finger
                         # away from the button
-
 
     B_OK.pressed     = False # avoid false positives
     B_Down.pressed   = False

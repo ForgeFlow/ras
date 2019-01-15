@@ -71,15 +71,3 @@ class Odooxlm():
         except Exception as e:
             return False
 
-
-
-    def can_connect(self):
-    # Checks if it can connect to odoo url
-    # returns True if it can connect
-    # and false if it can not connect
-        try:
-            response = urlopen(self.url_template, timeout=10)
-            return True
-        except:
-            return False
-
