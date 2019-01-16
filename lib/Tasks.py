@@ -1,6 +1,7 @@
 import time, os, shelve
 
 from . import Clocking, connectivity
+from dicts.display_dic import ask_twice
 
 class Tasks:
 
@@ -18,6 +19,7 @@ class Tasks:
         self.Reader     = Hardware[2] # Card Reader
         self.Clock      = Clocking.Clocking( Odoo, Hardware )
         self.workdir    = Odoo.workdir
+        self.ask_twice  = ask_twice #'are you sure?' upon selection
 
     def clocking(self):
         self.Clock.clocking()

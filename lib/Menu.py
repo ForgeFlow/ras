@@ -3,15 +3,16 @@ import time
 class Menu():
 
    def __init__(self, Tasks, tasks_menu, Hardware):
-       self.Tasks      = Tasks
-       self.tasks_menu = tasks_menu
+       self.Tasks       = Tasks
+       self.tasks_menu  = tasks_menu
 
-       self.Buzzer     = Hardware[0]
-       self.B_Down     = Hardware[3] # Button Down
-       self.B_OK       = Hardware[4] # Button OK
+       self.Buzzer      = Hardware[0]
+       self.B_Down      = Hardware[3] # Button Down
+       self.B_OK        = Hardware[4] # Button OK
 
-       self.option     = 0  # the first menu option
-       self.optionmax  = len(tasks_menu) - 1
+       self.option      = 0  # the first menu option
+       self.optionmax   = len(tasks_menu) - 1
+       self.option_name = tasks_menu[self.option].__name__
 
    def selected(self):
        self.Buzzer.Play('OK')
@@ -22,6 +23,8 @@ class Menu():
 
        self.B_Down.poweron() # switch the Buttons back on
        self.B_OK.poweron()   # to detect what the user wants
+       self.B_Down.pressed = False # avoid false positives
+       self.B_OK.pressed   = False
        self.Buzzer.Play('OK')
 
    def down(self):
@@ -33,4 +36,5 @@ class Menu():
        if self.option > self.optionmax:
            self.option = 0
 
+       self.option_name = self.tasks_menu[self.option].__name__
 

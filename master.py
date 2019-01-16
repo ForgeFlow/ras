@@ -64,7 +64,10 @@ Menu     = Menu.Menu( Tasks, tasks_menu, Hardware)
 # The Menu is shown when the Admin Card is swiped.
 # It allows to switch between the different Tasks available
 
-def OKpressed_firsttime():
+def ask_twice():
+# the user is asked twice before executing
+# some tasks ('are you sure?')
+
     Buz.Play('OK')
     Disp.display_msg('sure?')
 
@@ -85,9 +88,8 @@ def OKpressed_firsttime():
         Buz.Play('down')
         time.sleep(0.4) # allow time to take the finger
                         # away from the button
-
-    B_OK.pressed     = False # avoid false positives
-    B_Down.pressed   = False
+        B_OK.pressed     = False # avoid false positives
+        B_Down.pressed   = False
 
 def main_loop():
 # The Main Loop only ends when the option to reboot is chosen.
@@ -100,10 +102,13 @@ def main_loop():
 
     while not ( Tasks.reboot == True ):
 
-        Disp.display_msg( tasks_menu[Menu.option].__name__ )
+        Disp.display_msg( Menu.option_name )
 
         if B_OK.pressed:
-            OKpressed_firsttime()
+            if (Menu.option_name in Tasks.ask_twice):
+                ask_twice()
+            else:
+                Menu.selected()
         elif B_Down.pressed:
             Menu.down()
 

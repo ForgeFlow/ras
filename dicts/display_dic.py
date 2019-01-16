@@ -1,3 +1,11 @@
+ask_twice = [  'reset_wifi',
+               'reset_odoo',
+               'rebooting'  ]
+# 'ask_twice' stores a list of tasks, which upon selection
+# on the menu of the Terminal, will be asked twice before
+# execution ('are you sure?' Question)
+
+
 dic = {
     ' ': [" ", 0, 1, 0, 0, 24],
     'check_in': ['CHECKED IN', 6, 1, 0, 0, 22],
