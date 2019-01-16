@@ -21,13 +21,22 @@ dic = {
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
 
+    'sync':
+               [ (22,1) , 16,
+                  'Clocking'+'\n'+
+                  ' '+'\n'+
+                  'SYNCHRONOUS'   ],
+    'async':
+               [ (22,1) , 16,
+                  'Clocking'+'\n'+
+                  ' '+'\n'+
+                  'ASYNCHRONOUS'   ],
+
     'shut_down':
                 [ (1,1) , 20,
                   ' '+'\n'+
                   'REBOOTING'+'\n'+
                   ' '             ],
-
-
 
     'ERRUpdate':
                 [ (1,1) , 15,
@@ -35,13 +44,11 @@ dic = {
                   'GitHub connection'+'\n'+
                   'refused'      ],
 
-
     'update':
                [ (22,1) , 16,
                   'Updating'+'\n'+
                   ' '+'\n'+
                   'Firmware'     ],
-
 
     'swipecard' :
                [ (17,1), 20,

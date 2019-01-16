@@ -21,7 +21,14 @@ class Clocking:
            # making this time bigger allows
            # the user more time to read the message
            # shown in the display
-       self.sync  = True
+       self.file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
+       fs = shelve.open(self.file_sync_flag)
+       if ('sync_flag' not in fs.keys()):
+           self.sync = True
+           db['sync_flag'] = True
+       else:
+           self.sync = db['sync_flag']
+       fs.close()
            # Flag for synchronous operation mode
            # when True, Synchronous Operation Mode is activated
            # the Attendances are stored immediately in the Odoo db
@@ -35,7 +42,7 @@ class Clocking:
            # Message that is used to Play a Melody or
            # Display which kind of Event happened: for example check in,
            # check out, communication with odoo not possible ...
-       self.db     = self.Odoo.workdir+'dicts/RAS_queue'
+       self.db     = self.Odoo.workdir+'dicts/attendances'
            # queue File where the attendances are stored
            # when the working mode is asynchronous
        db = shelve.open(self.db)

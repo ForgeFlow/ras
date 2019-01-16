@@ -63,7 +63,18 @@ class Tasks:
         input('reset_odoo')
 
     def toggle_sync(self):
-        input('toggle_sync')
+       file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
+       fs = shelve.open(file_sync_flag)
+       flag = db['sync_flag']
+       db['sync_flag'] = not flag
+       self.Clock.sync = not flag
+       fs.close()
+       if self.Clock.sync:
+           self.Disp.display_msg('sync')
+       else:
+           self.Disp.display_msg('async')
+       time.sleep(1.5)
+
 
     def rebooting(self):
         time.sleep(1)
