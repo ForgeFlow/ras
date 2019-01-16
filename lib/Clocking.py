@@ -1,6 +1,5 @@
-import time
-import shelve
-import os
+import time, os,  shelve
+
 from . import connectivity
 
 class Clocking:
@@ -25,9 +24,9 @@ class Clocking:
        fs = shelve.open(self.file_sync_flag)
        if ('sync_flag' not in fs.keys()):
            self.sync = True
-           db['sync_flag'] = True
+           fs['sync_flag'] = True
        else:
-           self.sync = db['sync_flag']
+           self.sync = fs['sync_flag']
        fs.close()
            # Flag for synchronous operation mode
            # when True, Synchronous Operation Mode is activated

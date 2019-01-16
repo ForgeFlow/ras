@@ -22,12 +22,12 @@ dic = {
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
 
     'sync':
-               [ (22,1) , 16,
+               [ (1,1) , 16,
                   'Clocking'+'\n'+
                   ' '+'\n'+
                   'SYNCHRONOUS'   ],
     'async':
-               [ (22,1) , 16,
+               [ (1,1) , 14,
                   'Clocking'+'\n'+
                   ' '+'\n'+
                   'ASYNCHRONOUS'   ],

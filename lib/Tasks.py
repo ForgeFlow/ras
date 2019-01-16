@@ -1,4 +1,4 @@
-import time, os
+import time, os, shelve
 
 from . import Clocking, connectivity
 
@@ -65,8 +65,8 @@ class Tasks:
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
        fs = shelve.open(file_sync_flag)
-       flag = db['sync_flag']
-       db['sync_flag'] = not flag
+       flag = fs['sync_flag']
+       fs['sync_flag'] = not flag
        self.Clock.sync = not flag
        fs.close()
        if self.Clock.sync:
