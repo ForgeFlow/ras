@@ -6,3 +6,6 @@
 __pycache__
 dicts/credentials.json
 dicts/data.json
+*.json
+attendances.*
+sync_flag.*

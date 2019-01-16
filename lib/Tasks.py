@@ -62,7 +62,9 @@ class Tasks:
         input('reset wifi')
 
     def reset_odoo(self):
-        input('reset_odoo')
+        if self.Odoo.datajson: # TODO this "if" is probably not necessary
+            os.system('sudo rm ' + self.Odoo.datajson)
+            self.reboot = True
 
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
