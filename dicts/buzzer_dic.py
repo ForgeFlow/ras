@@ -35,6 +35,10 @@ dic = {'check_in':  ( (vol,hz,sec*2)   ,(vol,hz*1.28,sec*2),(vol,5,sec*2)    ),
 
        'OK'        :( (vol,hz/2,sec)   , (vol,5,sec/2)                       ),
 
-       'down'        :( (vol,hz/2*1.26,sec) , (vol,5,sec/2)                  )
+       'down'      :( (vol,hz/2*1.26,sec) , (vol,5,sec/2)                    ),
+
+       'back_to_menu':
+                    ( (vol,hz/3  ,sec/2),(vol,20,sec)     ,(vol,hz/3  ,sec/2),
+                      (vol,20,sec)                                           )
        }
 

@@ -25,7 +25,7 @@ class Menu():
        self.B_OK.poweron()   # to detect what the user wants
        self.B_Down.pressed = False # avoid false positives
        self.B_OK.pressed   = False
-       self.Buzzer.Play('OK')
+       self.Buzzer.Play('back_to_menu')
 
    def down(self):
        self.Buzzer.Play('down')
