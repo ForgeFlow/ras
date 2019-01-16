@@ -1,4 +1,5 @@
-ask_twice = [  'reset_wifi',
+ask_twice = [  'update_firmware',
+               'reset_wifi',
                'reset_odoo',
                'rebooting'  ]
 # 'ask_twice' stores a list of tasks, which upon selection
