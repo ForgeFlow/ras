@@ -76,7 +76,7 @@ messages_dic = {
                   ' '             ],
 
     'odoo_async':
-                [ (18,1) , 20,
+                [ (22,1) , 20,
                   'Clocking'+'\n'+
                   'to'+'\n'+
                   'odoo'          ],
@@ -90,13 +90,13 @@ messages_dic = {
 
 
     'connecting':
-                [ (1,1) , 18,
+                [ (1,1) , 20,
                   ' '+'\n'+
                   'Connecting...'+'\n'+
                   ' '             ],
 
     'reading':
-                [ (1,1) , 18,
+                [ (1,1) , 20,
                   ' '+'\n'+
                   'Reading...'+'\n'+
                   ' '             ],
@@ -141,7 +141,7 @@ messages_dic = {
                   'ASYNCHRONOUS'   ],
 
     'shut_down':
-                [ (1,1) , 20,
+                [ (1,1) , 24,
                   ' '+'\n'+
                   'REBOOTING'+'\n'+
                   ' '             ],
@@ -165,37 +165,37 @@ messages_dic = {
                   'your card'    ],
 
     'clocking':
-                [ (15,1), 18,
+                [ (18,1), 18,
                   'press OK'+'\n'+
                   'to begin'+'\n'+
                   'CLOCKING'      ],
 
     'showRFID':
-                [ (15,1), 18,
+                [ (18,1), 18,
                   'press OK'+'\n'+
                   'to read'+'\n'+
                   'RFID codes'    ],
 
     'update_firmware':
-                [ (5,1) , 18,
+                [ (8,1) , 18,
                   'press OK'+'\n'+
                   'to UPDATE'+'\n'+
                   'the firmware'  ],
 
     'reset_wifi':
-                [ (5,5) , 16,
+                [ (7,5) , 16,
                   'press OK to'+'\n'+
                   'RESET the WiFi'+'\n'+
                   'parameters'    ],
 
     'reset_odoo':
-                [ (5,5) , 16,
+                [ (7,5) , 16,
                   'press OK to'+'\n'+
                   'RESET the odoo'+'\n'+
                   'parameters'    ],
 
     'toggle_sync':
-                [ (5,5) , 18,
+                [ (8,5) , 18,
                   'press OK to'+'\n'+
                   'to toggle the'+'\n'+
                   'sync mode'     ],
