@@ -19,6 +19,9 @@ dic = {'check_in':  ( (vol,hz,sec*2)   ,(vol,hz*1.28,sec*2),(vol,5,sec*2)    ),
        'comERR1':   ( (vol,hz*2,sec/2) ,(vol,20,sec)       ,(vol,hz*2,sec/2),
                       (vol,20,sec)     ,(vol,hz*2,sec/2)   ,(vol,20,sec)     ),
 
+       'comm_failed':((vol,hz*2,sec/2) ,(vol,20,sec)       ,(vol,hz*2,sec/2),
+                      (vol,20,sec)     ,(vol,hz*2,sec/2)   ,(vol,20,sec)     ),
+
        'Local':     ( (vol,hz  ,sec/2) ,(vol,20,sec)       ,(vol,hz  ,sec/2),
                       (vol,20,sec)                                           ),
 

@@ -77,7 +77,7 @@ class Clocking:
                                #know if it is a Check-In or a Check-Out
 
        if not res:
-           self.msg = 'comERR1'  # this is the message if the
+           self.msg = 'comm_failed'  # this is the message if the
                                  #attendance could not be stored in odoo
                                  # Odoo Communication Failure
        else:

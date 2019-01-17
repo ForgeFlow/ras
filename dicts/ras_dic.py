@@ -32,7 +32,9 @@ ask_twice = [  'update_firmware',
 # allows to display the different messages
 # by defining the parameters needed to  use
 # the function multiline of luma.core
+#
 # [ (x0,y0), font size , text of the message]
+#
 # (x0,y0) positions the message in the screen
 #         defining the origin
 # the message can extend over several lines
@@ -51,13 +53,13 @@ messages_dic = {
 
 
     'check_in':
-                [ (1,1) , 20,
+                [ (1,1) , 18,
                   ' '+'\n'+
                   'CHECKED IN'+'\n'+
                   ' '             ],
 
     'check_out':
-                [ (1,1) , 20,
+                [ (1,1) , 18,
                   ' '+'\n'+
                   'CHECKED OUT'+'\n'+
                   ' '             ],
@@ -74,7 +76,7 @@ messages_dic = {
                   ' '             ],
 
     'odoo_async':
-                [ (1,1) , 20,
+                [ (18,1) , 20,
                   'Clocking'+'\n'+
                   'to'+'\n'+
                   'odoo'          ],
@@ -88,20 +90,20 @@ messages_dic = {
 
 
     'connecting':
-                [ (1,1) , 20,
+                [ (1,1) , 18,
                   ' '+'\n'+
                   'Connecting...'+'\n'+
                   ' '             ],
 
     'reading':
-                [ (1,1) , 20,
+                [ (1,1) , 18,
                   ' '+'\n'+
                   'Reading...'+'\n'+
                   ' '             ],
 
 
     'comm_failed':
-               [ (12,0) , 16,
+               [ (9,0) , 16,
                   'Communication'+'\n'+
                   'with odoo' +'\n'+
                   'failed'  ],
@@ -200,7 +202,7 @@ messages_dic = {
 
 
     'rebooting':
-                [ (15,1) , 20,
+                [ (22,1) , 20,
                   'press OK'+'\n'+
                   'to'+'\n'+
                   'REBOOT'        ],
