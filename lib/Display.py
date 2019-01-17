@@ -7,7 +7,6 @@ from luma.core.render import canvas
 from luma.core.virtual import terminal
 
 from .demo_opts import get_device
-from .reset_lib import get_ip
 
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
