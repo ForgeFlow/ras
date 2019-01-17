@@ -1,4 +1,3 @@
-import logging
 import os
 import time
 
@@ -11,8 +10,6 @@ from .demo_opts import get_device
 from .reset_lib import get_ip
 
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
-
-_logger = logging.getLogger(__name__)
 
 
 class Display():
@@ -39,55 +36,6 @@ class Display():
             else:
                 draw.text((34, 20), hour, font=d_font, fill="white")
 
-    def _display_msg(self, info):
-        with canvas(self.device) as draw:
-            dic = messages_dic  # TODO  remove this definition
-            d_font = ImageFont.truetype(self.font_ttf, dic[info][5] - 2)
-            try:
-                if dic[info][2] == 1:
-                    draw.text((dic[info][1],
-                               22 + (24 - dic[info][5]) / 2),
-                              dic[info][0], font=d_font, fill="white")
-                elif dic[info][2] == 2:
-                    a, b = dic[info][0].split(";")
-                    draw.text((dic[info][1],
-                               10 + (24 - dic[info][5]) / 2), a,
-                              font=d_font, fill="white")
-                    draw.text((dic[info][3],
-                               37 + (24 - dic[info][5]) / 2), b,
-                              font=d_font, fill="white")
-                elif dic[info][2] == 3:
-                    a, b, c = dic[info][0].split(";")
-                    draw.text((dic[info][1],
-                               2 + (24 - dic[info][5]) / 2), a,
-                              font=d_font, fill="white")
-                    draw.text((dic[info][3],
-                               22 + (24 - dic[info][5]) / 2), b,
-                              font=d_font, fill="white")
-                    draw.text((dic[info][4],
-                               37 + (24 - dic[info][5]) / 2), c,
-                              font=d_font, fill="white")
-                else:
-                    raise ("Incorrect number of lines")
-            except:
-                draw.text((5, 20),'error display: '+info, font=d_font, fill="white")
-
-    def _display_ip(self):
-        with canvas(self.device) as draw:
-            d_font = ImageFont.truetype(self.font_ttf, 13)
-            try:
-                a, b = str('Connect to;' + get_ip() + ':3000').split(";")
-                draw.text((20,14.5), a, font=d_font, fill="white")
-                draw.text((5,41.5), b, font=d_font, fill="white")
-            except Exception:
-                raise Exception
-
-    def show_message(self, info):
-        if info == "time":
-            self._display_time()
-        else:
-            self._display_msg(info)
-
     def show_card(self, card_id):
         c_font = ImageFont.truetype(self.font_ttf, 22)
         with canvas(self.device) as draw:
@@ -96,18 +44,8 @@ class Display():
             except:
                 draw.text((15, 20), card_id, font=c_font, fill="white")
 
-    def _welcome_msg(self):
-        # use custom font
-        w_font = ImageFont.truetype(self.font_ttf, 14)
-        with canvas(self.device) as draw:
-            # draw.rectangle(self.device.bounding_box, outline="white")
-            draw.text((15, 10), "Welcome to the", font=w_font, fill="white")
-            draw.text((50, 28), "RFID", font=w_font, fill="white")
-            draw.text((1, 43), "Attendance system", font=w_font, fill="white")
-
     def _welcome_logo(self):
-        logo = Image.open(os.path.abspath(
-            os.path.join(self.img_path, 'eficent.png'))).convert("RGBA")
+        logo = Image.open(self.img_path+'eficent.png').convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
         background = Image.new("RGBA", self.device.size, "black")
@@ -119,14 +57,9 @@ class Display():
 
     def initial_display(self):
         self._welcome_logo()
-        time.sleep(4)
-        self._welcome_msg()
-        time.sleep(4)
-
-    def shut_down(self):
-        self._display_msg("shut_down")
-        time.sleep(3)
-        self._display_msg(" ")
+        time.sleep(2)
+        self.display_msg('welcome')
+        time.sleep(2)
 
 #        self.term   = terminal( self.device, self.font )
 #        self.term.println("Terminal mode")

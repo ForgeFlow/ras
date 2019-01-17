@@ -45,6 +45,12 @@ messages_dic = {
                 [ (0,0) , 20,
                   ' '             ],
 
+    'welcome':
+                [ (1,1) , 15,
+                  'Welcome,'+'\n'+
+                  'to the RFID'+'\n'+
+                  'attendance system' ],
+
     'wait':
                 [ (1,1) , 20,
                   'Please'+'\n'+

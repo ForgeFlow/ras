@@ -1,7 +1,8 @@
 import time, os, shelve, subprocess
 
-from . import Clocking, connectivity
+from . import Clocking
 from dicts.ras_dic import ask_twice, SSID_reset
+from urllib.request import urlopen
 
 class Tasks:
 
@@ -9,10 +10,7 @@ class Tasks:
 
         self.card       = False  # currently swipped card code
         self.reboot     = False  # Flag to signal the main Loop
-                                 # rebooting was choosed
-        self.updating   = False  # True only while updating
-                                 # fetching from github
-
+                                 # rebooting was chosen
         self.Odoo       = Odoo
         self.Buzz       = Hardware[0] # Passive Buzzer
         self.Disp       = Hardware[1] # Display
@@ -28,11 +26,8 @@ class Tasks:
         self.Disp.display_msg('swipecard')
 
         while not (self.card == self.Odoo.adm):
-
             self.card = self.Reader.scan_card()
-
             if self.card and not(self.card == self.Odoo.adm):
-
                 self.Disp.show_card(self.card)
                 self.Buzz.Play('cardswiped')
 
@@ -42,7 +37,7 @@ class Tasks:
 
     def update_firmware( self):
 
-        if connectivity.can_connect('https://github.com'):
+        if self.can_connect('https://github.com'):
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
             # os.system('sudo git fetch origin stable')
@@ -101,7 +96,7 @@ class Tasks:
         time.sleep(2)
         self.Disp.clear_display()
 
-        #self.reboot = True
+        #self.reboot = True # TODO you don't need to reboot(?)
 
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
@@ -135,3 +130,14 @@ class Tasks:
             wifi_active = True
 
         return wifi_active
+
+    def can_connect(self, url):
+        # Checks if it can connect tothe specified  url
+        # returns True if it can connect
+        # and false if it can not connect
+        try:
+            response = urlopen(url, timeout=10)
+            return True
+        except:
+            return False
+

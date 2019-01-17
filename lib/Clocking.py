@@ -1,6 +1,6 @@
 import time, os, shelve
 
-from . import connectivity
+from .Tasks import can_connect
 
 class Clocking:
 
@@ -55,7 +55,7 @@ class Clocking:
 
     def clock_sync(self):
 
-        if connectivity.can_connect(self.Odoo.url_template):
+        if can_connect(self.Odoo.url_template):
         # when Odoo Connection existing Store Clocking directly on odoo database
             self.Disp.display_msg('connecting')
            # Inform of the Beginning of the Connection with Odo
@@ -65,7 +65,6 @@ class Clocking:
             else:
                self.msg = 'comm_failed'
         else:
-
             self.msg = 'ContactAdm' # No Odoo Connection: Contact Your Admin
 
 # FUNCTIONS FOR ASYNCHRONOUS MODE
@@ -111,7 +110,7 @@ class Clocking:
 
     def clock_async(self):
 
-       if connectivity.can_connect(self.Odoo.url_template):
+       if can_connect(self.Odoo.url_template):
        # when Odoo Connection existing Store Clocking directly on odoo database
            self.Disp.display_msg('connecting')
            self.store_odoo_async()
@@ -148,7 +147,7 @@ class Clocking:
                                 #that can be uploaded to the Odoo Database
                count=0
                if (not self.sync) and (self.stored>0):
-                   if connectivity.can_connect(self.Odoo.url_template):
+                   if can_connect(self.Odoo.url_template):
                        self.recover_queue() # if needed and possible
                                             # the data in the queue is uploaded
 
