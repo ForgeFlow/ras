@@ -141,7 +141,7 @@ messages_dic = {
                   'ASYNCHRONOUS'   ],
 
     'shut_down':
-                [ (1,1) , 24,
+                [ (1,1) , 21,
                   ' '+'\n'+
                   'REBOOTING'+'\n'+
                   ' '             ],
