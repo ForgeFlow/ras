@@ -1,13 +1,44 @@
+# reference to find different files in
+# the memory of the device
+WORK_DIR = '/home/pi/ras/'
+
+
+display_driver = 'sh1106'
+
+# I/O PINS DEFINITION on the RPi Zero W
+# Using the BOARD numbering system
+
+PinSignalBuzzer = 13  # Buzzer
+PinPowerBuzzer  = 12
+
+PinSignalDown   = 31  # DOWN button
+PinPowerDown    = 35
+
+PinSignalOK     = 29  # OK button signal
+PinPowerOK      = 35
+
+PinsBuzzer      = ( PinSignalBuzzer, PinPowerBuzzer)
+PinsDown        = ( PinSignalDown  , PinPowerDown  )
+PinsOK          = ( PinSignalOK    , PinPowerOK    )
+
+# stores a list of tasks, which upon selection
+# on the menu of the Terminal, will be asked twice before
+# execution ('are you sure?' Question)
 ask_twice = [  'update_firmware',
                'reset_wifi',
                'reset_odoo',
                'rebooting'  ]
-# 'ask_twice' stores a list of tasks, which upon selection
-# on the menu of the Terminal, will be asked twice before
-# execution ('are you sure?' Question)
 
+# allows to display the different messages
+# by defining the parameters needed to  use
+# the function multiline of luma.core
+# [ (x0,y0), font size , text of the message]
+# (x0,y0) positions the message in the screen
+#         defining the origin
+# the message can extend over several lines
+# this is indicated with the escape character \n
 
-dic = {
+messages_dic = {
     ' ': [" ", 0, 1, 0, 0, 24],
     'check_in': ['CHECKED IN', 6, 1, 0, 0, 22],
     'check_out': ['CHECKED OUT', 2, 1, 0, 0, 20],

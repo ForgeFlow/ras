@@ -10,17 +10,17 @@ from luma.core.virtual import terminal
 from .demo_opts import get_device
 from .reset_lib import get_ip
 
-from dicts.display_dic import dic
+from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
 _logger = logging.getLogger(__name__)
 
 
 class Display():
 
-    def __init__(self, WORK_DIR, driver):
+    def __init__(self):
         self.font_ttf = WORK_DIR+'fonts/Orkney.ttf'
         self.img_path = WORK_DIR+'images'
-        self.device = get_device(('-d',driver))
+        self.device = get_device(('-d',display_driver))
 
     def _display_time(self):
         with canvas(self.device) as draw:
@@ -41,6 +41,7 @@ class Display():
 
     def _display_msg(self, info):
         with canvas(self.device) as draw:
+            dic = messages_dic  # TODO  remove this definition
             d_font = ImageFont.truetype(self.font_ttf, dic[info][5] - 2)
             try:
                 if dic[info][2] == 1:
@@ -146,9 +147,9 @@ class Display():
 
     def display_msg(self, param):
 
-        origin = dic[param][0] # in the form (x0, y0)
-        size   = dic[param][1]
-        text   = dic[param][2]
+        origin = messages_dic[param][0]
+        size   = messages_dic[param][1]
+        text   = messages_dic[param][2]
 
         self.font   = ImageFont.truetype(self.font_ttf,size)
 

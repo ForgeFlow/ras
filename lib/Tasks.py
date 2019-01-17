@@ -1,7 +1,7 @@
 import time, os, shelve
 
 from . import Clocking, connectivity
-from dicts.display_dic import ask_twice
+from dicts.ras_dic import ask_twice
 
 class Tasks:
 

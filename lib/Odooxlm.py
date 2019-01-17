@@ -1,17 +1,17 @@
-import json
-from dicts import tz_dic
-import os
-import time
-import xmlrpc.client as xmlrpclib
+import os, time, json
 
+from dicts import tz_dic
+from dicts.ras_dic import WORK_DIR
+
+import xmlrpc.client as xmlrpclib
 from urllib.request import urlopen
 
 class Odooxlm():
 
-    def __init__(self, workdir):
+    def __init__(self):
 
-        self.workdir  = workdir
-        self.datajson = workdir+'dicts/data.json'
+        self.workdir  = WORK_DIR
+        self.datajson = self.workdir+'dicts/data.json'
         j_file        = open(self.datajson)
         self.j_data   = json.load(j_file)
         j_file.close()

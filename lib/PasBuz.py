@@ -9,9 +9,9 @@ GPIO.setwarnings(False)
 
 class PasBuz:
 
-  def __init__(self, PinBuzzer, PinPower):
-    self.PinBuz = PinBuzzer # signal Pin
-    self.PinPower = PinPower
+  def __init__(self, pins):
+    self.PinBuz    = pins[0] # signal Pin
+    self.PinPower  = pins[1]
 
   def Play(self,msg):
     self.InitBuz()
