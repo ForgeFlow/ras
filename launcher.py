@@ -106,5 +106,7 @@ def main_loop():
 #    os.system('sudo reboot')
 
 
+#if not Tasks.is_wifi_active():
+Tasks.reset_wifi()
 
-main_loop()
+#main_loop()

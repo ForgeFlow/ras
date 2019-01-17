@@ -1,7 +1,7 @@
-import time, os, shelve
+import time, os, shelve, subprocess
 
 from . import Clocking, connectivity
-from dicts.ras_dic import ask_twice
+from dicts.ras_dic import ask_twice, SSID_reset
 
 class Tasks:
 
@@ -59,7 +59,11 @@ class Tasks:
             time.sleep(1.5)
 
     def reset_wifi(self):
-        input('reset wifi')
+        self.Disp.display_msg('configure_wifi')
+        os.system('sudo wifi-connect --portal-ssid '+ SSID_reset)
+        os.system('sudo systemctl restart ras-portal.service')
+        self.Buzz.Play('back_to_menu')
+        self.Disp.clear_display()
 
     def reset_odoo(self):
         if self.Odoo.datajson: # TODO this "if" is probably not necessary
@@ -83,3 +87,16 @@ class Tasks:
     def rebooting(self):
         time.sleep(1)
         self.reboot = True
+
+
+#_________________________________________________________
+
+    def is_wifi_active(self):
+        iwconfig_out = subprocess.check_output(
+            'iwconfig wlan0', shell=True).decode('utf-8')
+        print (iwconfig_out)
+        wifi_active = True
+        if "Access Point: Not-Associated" in iwconfig_out:
+            wifi_active = False
+
+        return wifi_active

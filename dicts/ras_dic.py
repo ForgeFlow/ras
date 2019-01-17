@@ -44,11 +44,6 @@ messages_dic = {
     'check_out': ['CHECKED OUT', 2, 1, 0, 0, 20],
     'FALSE': ['NOT;AUTHORIZED', 45, 2, 10, 0, 18],
     'shut_down': ['Rebooting', 6, 1, 0, 0, 24],
-    '1': ['1', 50, 1, 0, 0, 50],
-    '2': ['2', 50, 1, 0, 0, 50],
-    'Wifi1': ['Wi-Fi;Connection', 35, 2, 15, 0, 20],
-    'Wifi2': ['Connect to AP;RFID Attendance System', 30, 2, 10, 0, 12],
-    'Wifi3': ['Browse 192.168.42.1;for Wi-Fi Configuration', 20, 2, 10, 0, 12],
 
     'comERR1': ['Odoo;communication;failed', 41, 3, 5, 40, 19],
     'comERR2': ['Check;connection;parameters', 41, 3, 20, 20, 19],
@@ -60,6 +55,13 @@ messages_dic = {
     'odoo_async': ['Clocking;to Odoo', 20, 2, 20, 0, 24],
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
+
+    'configure_wifi':
+               [ (12,0) , 14,
+                  '1. Connect to AP'+'\n'+
+                  '__RAS__'+'\n'+
+                  '2. Browse to '+'\n'+
+                  '192.168.42.1'   ],
 
     'sync':
                [ (1,1) , 16,
