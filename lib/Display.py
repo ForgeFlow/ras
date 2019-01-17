@@ -16,7 +16,7 @@ class Display():
 
     def __init__(self):
         self.font_ttf = WORK_DIR+'fonts/Orkney.ttf'
-        self.img_path = WORK_DIR+'images'
+        self.img_path = WORK_DIR+'images/'
         self.device = get_device(('-d',display_driver))
 
     def _display_time(self):

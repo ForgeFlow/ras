@@ -1,7 +1,5 @@
 import time, os, shelve
 
-from .Tasks import can_connect
-
 class Clocking:
 
     def __init__(self, Odoo, Hardware):
@@ -48,6 +46,7 @@ class Clocking:
        self.stored = len(db) # how many attendances are already stored
        db.close()
 
+       self.can_connect = Odoo.can_connect
 
 
 
@@ -55,7 +54,7 @@ class Clocking:
 
     def clock_sync(self):
 
-        if can_connect(self.Odoo.url_template):
+        if self.can_connect(self.Odoo.url_template):
         # when Odoo Connection existing Store Clocking directly on odoo database
             self.Disp.display_msg('connecting')
            # Inform of the Beginning of the Connection with Odo
@@ -110,7 +109,7 @@ class Clocking:
 
     def clock_async(self):
 
-       if can_connect(self.Odoo.url_template):
+       if self.can_connect(self.Odoo.url_template):
        # when Odoo Connection existing Store Clocking directly on odoo database
            self.Disp.display_msg('connecting')
            self.store_odoo_async()
@@ -147,7 +146,7 @@ class Clocking:
                                 #that can be uploaded to the Odoo Database
                count=0
                if (not self.sync) and (self.stored>0):
-                   if can_connect(self.Odoo.url_template):
+                   if self.can_connect(self.Odoo.url_template):
                        self.recover_queue() # if needed and possible
                                             # the data in the queue is uploaded
 
@@ -166,7 +165,8 @@ class Clocking:
                self.Disp.display_msg(self.msg) # clocking message
                self.Buzz.Play(self.msg)         # clocking acoustic feedback
 
-               rest_time = self.card_logging_time_min - (time.perf_counter() - begin_card_logging)
+               rest_time = self.card_logging_time_min - \
+                           (time.perf_counter() - begin_card_logging)
                # calculating the minimum rest time
                # allowed for the card logging process
                if rest_time<0:
