@@ -34,7 +34,7 @@ def result():
         results = request.form
         dic = results.to_dict(flat=False)
         jsonarray = json.dumps(dic)
-        with open(WORK_DIR+'dicts/data.json')), 'w+') as outfile:
+        with open( WORK_DIR+'dicts/data.json', 'w+') as outfile:
             json.dump(dic, outfile)
         return render_template("result.html", result=results)
 
@@ -63,15 +63,12 @@ def change_credentials():
         results = request.form
         dic = results.to_dict(flat=False)
         jsonarray = json.dumps(dic)
-        json_file = open(os.path.abspath(
-            os.path.join(WORK_DIR, 'dicts/credentials.json')))
+        json_file = open(WORK_DIR+'dicts/credentials.json')
         json_data = json.load(json_file)
         json_file.close()
-        if str(dic['old password'][0]) == json_data['new password'][0] and str(
-                dic['username'][0]) == json_data['username'][0]:
-            with open(os.path.abspath(
-                    os.path.join(WORK_DIR, 'dicts/credentials.json')),
-                    'w+') as outfile:
+        if str(dic['old password'][0]) == json_data['new password'][0] \
+           and str(dic['username'][0]) == json_data['username'][0]:
+            with open(WORK_DIR+'dicts/credentials.json','w+') as outfile:
                 json.dump(dic, outfile)
         else:
             flash('wrong password!')

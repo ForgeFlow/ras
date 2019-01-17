@@ -82,6 +82,12 @@ def main_loop():
 # the program returns to this Loop,
 # where a new Task can be selected using the OK and Down Buttons.
 
+    if not Tasks.wifi_active(): # make sure that the Terminal is
+        Tasks.reset_wifi()      # connected to a WiFi
+
+    if not Odoo.uid:        # make sure that we have
+        Tasks.reset_odoo()  # access to an odoo db
+
     Menu.selected() # when the terminal is switched on it goes to
                     # the predefined Task
 
@@ -106,10 +112,4 @@ def main_loop():
 #    os.system('sudo reboot')
 
 
-if not Tasks.wifi_active(): # make sure that the Terminal is
-    Tasks.reset_wifi()      # connected to a WiFi
-
-if not Odoo.uid:        # make sure that we have
-    Tasks.reset_odoo()  # access to an odoo db
-
-#main_loop()
+main_loop()
