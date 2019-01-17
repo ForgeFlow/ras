@@ -69,16 +69,17 @@ class Tasks:
         if os.path.isfile(self.Odoo.datajson):
             os.system('sudo rm ' + self.Odoo.datajson)
 
-        self.IP_address = subprocess.check_output(
-            'hostname -I | awk '{ print $1}' ',
-            shell=True).decode('utf-8')
+        command = "hostname -I | awk '{ print $1}' "
 
-        origin = (1,1)
+        self.IP_address = subprocess.check_output(
+            command, shell=True).decode('utf-8').strip('\n')
+
+        origin = (0,0)
         size   = 14
-        text   =  'Browse to'+'\n'+
-                  self.IP_address +':3000\n'+
-                  'to introduce the'+'\n'+
-                  'new odoo parameters'   ],
+        text   =  'Browse to'+'\n'+             \
+                  self.IP_address +':3000\n'+   \
+                  'to introduce new'+'\n'+      \
+                  'odoo parameters'
 
         self.Odoo.uid = False
 
@@ -89,7 +90,7 @@ class Tasks:
                 if self.card:
                     self.Disp.show_card(self.card)
                     self.Buzz.Play('cardswiped')
-
+                    time.sleep(2)
             self.Odoo.set_params()
             if not self.Odoo.uid:
                 self.Disp.display_msg('odoo_failed')
