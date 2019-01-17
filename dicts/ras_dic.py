@@ -1,8 +1,11 @@
 # reference to find different files in
 # the memory of the device
 WORK_DIR       = '/home/pi/ras/'
+
+#SSID when resetting the WiFi
 SSID_reset     = '__RAS__'
 
+#driver to be used by luma.core
 display_driver = 'sh1106'
 
 # I/O PINS DEFINITION on the RPi Zero W
@@ -47,7 +50,7 @@ messages_dic = {
 
     'welcome':
                 [ (1,1) , 15,
-                  'Welcome,'+'\n'+
+                  'Welcome'+'\n'+
                   'to the RFID'+'\n'+
                   'attendance system' ],
 
