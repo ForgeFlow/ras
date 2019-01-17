@@ -66,7 +66,7 @@ class Tasks:
         self.Disp.clear_display()
 
     def reset_odoo(self):
-        if self.Odoo.datajson:
+        if os.path.isfile(self.Odoo.datajson):
             os.system('sudo rm ' + self.Odoo.datajson)
 
         self.IP_address = subprocess.check_output(
