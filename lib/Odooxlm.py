@@ -12,6 +12,9 @@ class Odooxlm():
 
         self.workdir  = WORK_DIR
         self.datajson = self.workdir+'dicts/data.json'
+        self.set_params()
+
+    def set_params(self):
         j_file        = open(self.datajson)
         self.j_data   = json.load(j_file)
         j_file.close()
@@ -38,13 +41,16 @@ class Odooxlm():
 
         if self.https_on:
             if self.port:
-                self.url_template = ("https://%s:%s" % (self.host, self.port))
+                self.url_template = ("https://%s:%s" %
+                                    (self.host, self.port))
             else:
                 self.url_template = ("https://%s" % self.host)
         else:
-            self.url_template = ("http://%s:%s" % (self.host, self.port))
+            self.url_template = ("http://%s:%s" %
+                                (self.host, self.port))
 
         self.uid = self._get_user_id()
+
 
 
     def _get_object_facade(self, url):

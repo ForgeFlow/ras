@@ -66,9 +66,41 @@ class Tasks:
         self.Disp.clear_display()
 
     def reset_odoo(self):
-        if self.Odoo.datajson: # TODO this "if" is probably not necessary
+        if self.Odoo.datajson:
             os.system('sudo rm ' + self.Odoo.datajson)
-            self.reboot = True
+
+        self.IP_address = subprocess.check_output(
+            'hostname -I | awk '{ print $1}' ',
+            shell=True).decode('utf-8')
+
+        origin = (1,1)
+        size   = 14
+        text   =  'Browse to'+'\n'+
+                  self.IP_address +':3000\n'+
+                  'to introduce the'+'\n'+
+                  'new odoo parameters'   ],
+
+        self.Odoo.uid = False
+
+        while not self.Odoo.uid:
+            while not os.path.isfile(self.Odoo.datajson):
+                self.Disp.display_msg_raw( origin, size, text)
+                self.card = self.Reader.scan_card()
+                if self.card:
+                    self.Disp.show_card(self.card)
+                    self.Buzz.Play('cardswiped')
+
+            self.Odoo.set_params()
+            if not self.Odoo.uid:
+                self.Disp.display_msg('odoo_failed')
+
+        self.Disp.display_msg('odoo_success')
+
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
+        self.Disp.clear_display()
+
+        #self.reboot = True
 
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
@@ -91,12 +123,14 @@ class Tasks:
 
 #_________________________________________________________
 
-    def is_wifi_active(self):
+    def wifi_active(self):
+
         iwconfig_out = subprocess.check_output(
             'iwconfig wlan0', shell=True).decode('utf-8')
-        print (iwconfig_out)
-        wifi_active = True
+
         if "Access Point: Not-Associated" in iwconfig_out:
             wifi_active = False
+        else:
+            wifi_active = True
 
         return wifi_active

@@ -128,29 +128,12 @@ class Display():
         time.sleep(3)
         self._display_msg(" ")
 
-    def wifi_ap_mode_display(self):
-        self._display_msg("Wifi1")
-        time.sleep(4)
-        self._display_msg("1")
-        time.sleep(1)
-        self._display_msg("Wifi2")
-        time.sleep(3)
-        self._display_msg("2")
-        time.sleep(1)
-        self._display_msg("Wifi3")
-        time.sleep(3)
 #        self.term   = terminal( self.device, self.font )
 #        self.term.println("Terminal mode")
 #        self.term.println("   demo")
 #        self.term.clear()
 
-
-    def display_msg(self, param):
-
-        origin = messages_dic[param][0]
-        size   = messages_dic[param][1]
-        text   = messages_dic[param][2]
-
+    def display_msg_raw(self, origin, size, text):
         self.font   = ImageFont.truetype(self.font_ttf,size)
 
         with canvas(self.device) as draw:
@@ -159,8 +142,16 @@ class Display():
                                 font=self.font,
                                 align='center')
 
+    def display_msg(self, param):
+
+        origin = messages_dic[param][0]
+        size   = messages_dic[param][1]
+        text   = messages_dic[param][2]
+
+        self.display_msg_raw( origin, size, text)
+
     def clear_display(self):
         with canvas(self.device) as draw:
-            draw.multiline_text((0,0),' ') # erase display
+            draw.multiline_text((0,0),' ') # display shows nothing (blank)
 
 

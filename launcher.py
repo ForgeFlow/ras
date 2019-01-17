@@ -106,7 +106,10 @@ def main_loop():
 #    os.system('sudo reboot')
 
 
-#if not Tasks.is_wifi_active():
-Tasks.reset_wifi()
+if not Tasks.wifi_active(): # make sure that the Terminal is
+    Tasks.reset_wifi()      # connected to a WiFi
+
+if not Odoo.uid:        # make sure that we have
+    Tasks.reset_odoo()  # access to an odoo db
 
 #main_loop()

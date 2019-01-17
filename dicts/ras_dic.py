@@ -1,7 +1,7 @@
 # reference to find different files in
 # the memory of the device
-WORK_DIR = '/home/pi/ras/'
-
+WORK_DIR       = '/home/pi/ras/'
+SSID_reset     = '__RAS__'
 
 display_driver = 'sh1106'
 
@@ -45,9 +45,6 @@ messages_dic = {
     'FALSE': ['NOT;AUTHORIZED', 45, 2, 10, 0, 18],
     'shut_down': ['Rebooting', 6, 1, 0, 0, 24],
 
-    'comERR1': ['Odoo;communication;failed', 41, 3, 5, 40, 19],
-    'comERR2': ['Check;connection;parameters', 41, 3, 20, 20, 19],
-    'configured': ['Odoo;connection;ready', 40, 3, 20, 40, 19],
 
     'connecting': ['Connecting...', 10, 1, 0, 0, 20],
     'reading': ['Reading...', 25, 1, 0, 0, 20],
@@ -56,10 +53,23 @@ messages_dic = {
     'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
     'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
 
+    'odoo_failed':
+               [ (12,0) , 14,
+                  'Communication with'+'\n'+
+                  'odoo failed,' +'\n'+
+                  'please check the'+'\n'+
+                  'parameters'   ],
+
+    'odoo_success':
+               [ (12,0) , 14,
+                  'Communication'+'\n'+
+                  'with odoo' +'\n'+
+                  'established'  ],
+
     'configure_wifi':
                [ (12,0) , 14,
                   '1. Connect to AP'+'\n'+
-                  '__RAS__'+'\n'+
+                  SSID_reset +'\n'+
                   '2. Browse to '+'\n'+
                   '192.168.42.1'   ],
 
