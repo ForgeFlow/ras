@@ -1,4 +1,4 @@
-import time, os,  shelve
+import time, os, shelve
 
 from . import connectivity
 
@@ -57,12 +57,13 @@ class Clocking:
 
         if connectivity.can_connect(self.Odoo.url_template):
         # when Odoo Connection existing Store Clocking directly on odoo database
-            self.Disp.show_message('connecting') # Inform of the Beginning of the Connection with Odo
+            self.Disp.display_msg('connecting')
+           # Inform of the Beginning of the Connection with Odo
             res = self.Odoo.check_attendance(self.card)
             if res:
                self.msg = res['action']
             else:
-               self.msg = 'comERR1'
+               self.msg = 'comm_failed'
         else:
 
             self.msg = 'ContactAdm' # No Odoo Connection: Contact Your Admin
@@ -72,11 +73,13 @@ class Clocking:
     def store_odoo_async(self): # Odoo can connect & Asynchronous Operation
 
        res = self.Odoo.check_attendance(self.card)
-       self.msg = 'odoo_async' # In Asynchronous mode we do not know if it is a Check-In or a Check-Out
+       self.msg = 'odoo_async' # In Asynchronous mode we do not
+                               #know if it is a Check-In or a Check-Out
 
        if not res:
-           self.msg = 'comERR1'  # this is the message if the attendance could not be stored in odoo
-                            # Odoo Communication Failure
+           self.msg = 'comERR1'  # this is the message if the
+                                 #attendance could not be stored in odoo
+                                 # Odoo Communication Failure
        else:
            if res['action'] == 'FALSE':
                self.msg = 'FALSE' # Only can show if it is not authorized
@@ -91,7 +94,7 @@ class Clocking:
        db.close()
 
     def recover_queue(self):
-       self.Disp.show_message('wait') # ask the user to please wait 
+       self.Disp.display_msg('wait') # ask the user to please wait
        db = shelve.open(self.db)
 
        for key in sorted(db.keys()):
@@ -110,10 +113,11 @@ class Clocking:
 
        if connectivity.can_connect(self.Odoo.url_template):
        # when Odoo Connection existing Store Clocking directly on odoo database
-           self.Disp.show_message('connecting') # Inform of the Beginning of the Connection with Odoo
+           self.Disp.display_msg('connecting')
            self.store_odoo_async()
        else:
-           self.store_locally_async()  # No Odoo Connection: Store Clocking on Local File RAS_Buffer
+           self.store_locally_async()  # No Odoo Connection:Store Clocking
+                                       # on Local File
 
 
 
@@ -160,7 +164,7 @@ class Clocking:
                else:
                    self.clock_async() # asynchronous: to local RPi file
 
-               self.Disp.show_message(self.msg) # clocking message
+               self.Disp.display_msg(self.msg) # clocking message
                self.Buzz.Play(self.msg)         # clocking acoustic feedback
 
                rest_time = self.card_logging_time_min - (time.perf_counter() - begin_card_logging)

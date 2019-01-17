@@ -39,19 +39,73 @@ ask_twice = [  'update_firmware',
 # this is indicated with the escape character \n
 
 messages_dic = {
-    ' ': [" ", 0, 1, 0, 0, 24],
-    'check_in': ['CHECKED IN', 6, 1, 0, 0, 22],
-    'check_out': ['CHECKED OUT', 2, 1, 0, 0, 20],
-    'FALSE': ['NOT;AUTHORIZED', 45, 2, 10, 0, 18],
-    'shut_down': ['Rebooting', 6, 1, 0, 0, 24],
+    ' ':
+                [ (0,0) , 20,
+                  ' '             ],
+
+    'wait':
+                [ (1,1) , 20,
+                  'Please'+'\n'+
+                  'wait'+'\n'+
+                  ' '             ],
 
 
-    'connecting': ['Connecting...', 10, 1, 0, 0, 20],
-    'reading': ['Reading...', 25, 1, 0, 0, 20],
-    'Local': ['Clocking;Locally', 20, 2, 20, 0, 24],
-    'odoo_async': ['Clocking;to Odoo', 20, 2, 20, 0, 24],
-    'ContactAdm': ['CONTACT;YOUR;ADMIN',22,3,36,32,19],
-    'wait': ['PLEASE;WAIT', 45, 2, 10, 0, 24],
+    'check_in':
+                [ (1,1) , 20,
+                  ' '+'\n'+
+                  'CHECKED IN'+'\n'+
+                  ' '             ],
+
+    'check_out':
+                [ (1,1) , 20,
+                  ' '+'\n'+
+                  'CHECKED OUT'+'\n'+
+                  ' '             ],
+    'FALSE':
+                [ (1,1) , 20,
+                  'NOT'+'\n'+
+                  'AUTHORIZED'+'\n'+
+                  ' '             ],
+
+    'Local':
+                [ (1,1) , 20,
+                  'Clocking'+'\n'+
+                  'locally'+'\n'+
+                  ' '             ],
+
+    'odoo_async':
+                [ (1,1) , 20,
+                  'Clocking'+'\n'+
+                  'to'+'\n'+
+                  'odoo'          ],
+
+    'ContactAdm':
+                [ (1,1) , 20,
+                  'Contact'+'\n'+
+                  'your'+'\n'+
+                  'Admin'             ],
+
+
+
+    'connecting':
+                [ (1,1) , 20,
+                  ' '+'\n'+
+                  'Connecting...'+'\n'+
+                  ' '             ],
+
+    'reading':
+                [ (1,1) , 20,
+                  ' '+'\n'+
+                  'Reading...'+'\n'+
+                  ' '             ],
+
+
+    'comm_failed':
+               [ (12,0) , 16,
+                  'Communication'+'\n'+
+                  'with odoo' +'\n'+
+                  'failed'  ],
+
 
     'odoo_failed':
                [ (12,0) , 14,
