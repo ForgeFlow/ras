@@ -1,8 +1,9 @@
-import time, os, shelve, subprocess
+import time, os, shelve
 
 from . import Clocking
 from dicts.ras_dic import ask_twice, SSID_reset
 from urllib.request import urlopen
+import config-server
 
 class Tasks:
 
@@ -18,6 +19,8 @@ class Tasks:
         self.Clock      = Clocking.Clocking( Odoo, Hardware )
         self.workdir    = Odoo.workdir
         self.ask_twice  = ask_twice #'are you sure?' upon selection
+        self.get_ip     = config-server.get_ip
+        self.server_up  = config-server.server_up
 
     def clocking(self):
         self.Clock.clocking()
@@ -64,15 +67,12 @@ class Tasks:
         if os.path.isfile(self.Odoo.datajson):
             os.system('sudo rm ' + self.Odoo.datajson)
 
-        command = "hostname -I | awk '{ print $1}' "
-
-        self.IP_address = subprocess.check_output(
-            command, shell=True).decode('utf-8').strip('\n')
+        self.server_up()
 
         origin = (0,0)
         size   = 14
         text   =  'Browse to'+'\n'+             \
-                  self.IP_address +':3000\n'+   \
+                  self.get_ip() +':3000\n'+   \
                   'to introduce new'+'\n'+      \
                   'odoo parameters'
 
@@ -140,4 +140,7 @@ class Tasks:
             return True
         except:
             return False
+
+
+
 

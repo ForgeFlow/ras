@@ -1,15 +1,23 @@
-import json
-import os
+import json, os, subprocess
+
 from collections import OrderedDict
 
 from flask import Flask, flash, render_template, request, session
 
-from lib.reset_lib import get_ip
 from dicts.tz_dic import tz_dic
 from dicts.ras_dic import WORK_DIR
 
 app = Flask(__name__)
 
+
+def get_ip(self):
+
+    command = "hostname -I | awk '{ print $1}' "
+
+    IP_address = subprocess.check_output(
+            command, shell=True).decode('utf-8').strip('\n')
+
+return IP_address
 
 @app.route('/')
 def form():
@@ -75,7 +83,7 @@ def change_credentials():
 
         return form()
 
-
-if __name__ == '__main__':
+def server_up():
+    # if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run(host=str(get_ip()), port=3000, debug=False)
