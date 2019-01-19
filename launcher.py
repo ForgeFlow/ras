@@ -85,7 +85,7 @@ def main_loop():
 
     while not ( Tasks.reboot == True ):
 
-        Disp.display_msg( Menu.option_name )
+        Disp.display_msg( Tasks.option_name )
 
         if B_OK.pressed:
             if (Tasks.option_name in Tasks.ask_twice):

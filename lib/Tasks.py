@@ -25,18 +25,18 @@ class Tasks:
         self.workdir    = Odoo.workdir
         self.ask_twice  = ask_twice #'are you sure?' upon selection
         self.get_ip     = routes.get_ip
-# Menu
+
+        # Menu vars
         self.begin_option = 0 # the Terminal begins with this option
         self.option       = self.begin_option
-        self.tasks_menu = [
-               self.clocking,
+        self.tasks_menu = [   # The Tasks appear in the Menu
+               self.clocking, # in the same order as here.
                self.showRFID,
                self.update_firmware,
                self.reset_wifi,
                self.reset_odoo,
                self.toggle_sync,
                self.rebooting    ]
-# The Tasks appear in the Menu in the same order as here.
 
         self.optionmax    = len(self.tasks_menu) - 1
         self.option_name  = self.tasks_menu[self.option].__name__
@@ -54,21 +54,21 @@ class Tasks:
         self.B_OK.pressed   = False
         self.Buzz.Play('back_to_menu')
 
-   def down(self):
-       self.Buzz.Play('down')
-       time.sleep(0.4) # allow time to take the finger
+    def down(self):
+        self.Buzz.Play('down')
+        time.sleep(0.4) # allow time to take the finger
                        # away from the button
-
-       self.option += 1
-       if self.option > self.optionmax:
-           self.option = 0
-
-       self.option_name = self.tasks_menu[self.option].__name__
+        self.option += 1
+        if self.option > self.optionmax:
+            self.option = 0
+        self.option_name = self.tasks_menu[self.option].__name__
 #___________________________________
 
-    def back_to_begin_option():
+    def back_to_begin_option(self):
+        self.Disp.clear_display()
         self.option = self.begin_option
         self.selected()
+        self.Disp.clear_display()
 #_______________________________
 
 
@@ -100,19 +100,19 @@ class Tasks:
             os.system('sudo git reset --hard origin')
             self.Buzz.Play('OK')
             time.sleep(0.5)
-            self.Disp.clear_display()
             self.reboot = True
         else:
             self.Buzz.Play('FALSE')
             self.Disp.display_msg('ERRUpdate')
             time.sleep(1.5)
 
+        self.Disp.clear_display()
+
     def reset_wifi(self):
         self.Disp.display_msg('configure_wifi')
         os.system('sudo wifi-connect --portal-ssid '+ SSID_reset)
         os.system('sudo systemctl restart ras-portal.service')
         self.Buzz.Play('back_to_menu')
-        self.Disp.clear_display()
         self.back_to_begin_option()
 
     def odoo_config(self):
@@ -141,7 +141,6 @@ class Tasks:
 
         self.Buzz.Play('back_to_menu')
         time.sleep(2)
-        self.Disp.clear_display()
 
 
     def reset_odoo(self):
@@ -149,7 +148,7 @@ class Tasks:
             os.system('sudo rm ' + self.Odoo.datajson)
 
         if not self.wifi_active(): # make sure that the Terminal is
-        self.reset_wifi()          # connected to a WiFi
+            self.reset_wifi()      # connected to a WiFi
 
 
         routes.start_server()
@@ -179,7 +178,7 @@ class Tasks:
     def rebooting(self):
         time.sleep(1)
         self.reboot = True
-
+        self.Disp.clear_display()
 
 #_________________________________________________________
 
