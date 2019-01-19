@@ -1,15 +1,10 @@
 import time, os, shelve, subprocess, threading
-
-from . import Clocking
+from . import Clocking, routes
 from dicts.ras_dic import ask_twice, SSID_reset
 from urllib.request import urlopen
 
-from . import routes
-
 class Tasks:
-
     def __init__(self, Odoo, Hardware):
-
         self.card       = False  # currently swipped card code
         self.reboot     = False  # Flag to signal the main Loop
                                  # rebooting was chosen
@@ -17,9 +12,8 @@ class Tasks:
         self.Buzz       = Hardware[0] # Passive Buzzer
         self.Disp       = Hardware[1] # Display
         self.Reader     = Hardware[2] # Card Reader
-        self.B_Down      = Hardware[3] # Button Down
-        self.B_OK        = Hardware[4] # Button OK
-
+        self.B_Down     = Hardware[3] # Button Down
+        self.B_OK       = Hardware[4] # Button OK
 
         self.Clock      = Clocking.Clocking( Odoo, Hardware )
         self.workdir    = Odoo.workdir
@@ -29,18 +23,17 @@ class Tasks:
         # Menu vars
         self.begin_option = 0 # the Terminal begins with this option
         self.option       = self.begin_option
-        self.tasks_menu = [   # The Tasks appear in the Menu
-               self.clocking, # in the same order as here.
+        self.tasks_menu   = [   # The Tasks appear in the Menu
+               self.clocking,   # in the same order as here.
                self.showRFID,
                self.update_firmware,
                self.reset_wifi,
                self.reset_odoo,
-               self.toggle_sync,
+#               self.toggle_sync,    # uncomment when implemented
                self.rebooting    ]
 
         self.optionmax    = len(self.tasks_menu) - 1
-        #self.option_name  = self.tasks_menu[self.option].__name__
-
+#__________________________________
     def selected(self):
         self.Buzz.Play('OK')
         self.B_Down.poweroff() # switch off Buttons
@@ -65,7 +58,6 @@ class Tasks:
     def option_name(self):
         return self.tasks_menu[self.option].__name__
 #___________________________________
-
     def back_to_begin_option(self):
         self.Disp.clear_display()
         self.option = self.begin_option
@@ -73,26 +65,20 @@ class Tasks:
         self.Disp.clear_display()
 #_______________________________
 
-
     def clocking(self):
         self.Clock.clocking()
 
     def showRFID( self):
         self.Disp.display_msg('swipecard')
-
         while not (self.card == self.Odoo.adm):
             self.card = self.Reader.scan_card()
             if self.card and not(self.card == self.Odoo.adm):
                 self.Disp.show_card(self.card)
                 self.Buzz.Play('cardswiped')
-
-        self.card = False # Reset the value of the card,
-                        # in order to allow its value to be changed
-                        # (avoid closed loop)
+        self.card = False # avoid closed loop
         self.back_to_begin_option()
 
     def update_firmware( self):
-
         if self.can_connect('https://github.com'):
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
@@ -107,7 +93,6 @@ class Tasks:
             self.Buzz.Play('FALSE')
             self.Disp.display_msg('ERRUpdate')
             time.sleep(1.5)
-
         self.Disp.clear_display()
 
     def reset_wifi(self):
@@ -124,7 +109,6 @@ class Tasks:
                   self.get_ip() +':3000\n'+   \
                   'to introduce new'+'\n'+      \
                   'Odoo parameters'
-
         while not os.path.isfile(self.Odoo.datajson):
             self.Disp.display_msg_raw( origin, size, text)
             self.card = self.Reader.scan_card()
@@ -141,7 +125,7 @@ class Tasks:
 
     def reset_odoo(self):
         self.Odoo.uid = False
-        if not self.wifi_active(): # make sure that the Terminal $
+        if not self.wifi_active(): # is the Terminal
             self.reset_wifi()      # connected to a WiFi
         routes.start_server()
         while not self.Odoo.uid:
@@ -166,33 +150,25 @@ class Tasks:
        else:
            self.Disp.display_msg('async')
        time.sleep(1.5)
-
        self.back_to_begin_option()
-
 
     def rebooting(self):
         time.sleep(1)
         self.reboot = True
         self.Disp.clear_display()
-
 #_________________________________________________________
 
     def wifi_active(self):
-
         iwconfig_out = subprocess.check_output(
             'iwconfig wlan0', shell=True).decode('utf-8')
-
         if "Access Point: Not-Associated" in iwconfig_out:
             wifi_active = False
         else:
             wifi_active = True
-
         return wifi_active
 
     def can_connect(self, url):
-        # Checks if it can connect tothe specified  url
-        # returns True if it can connect
-        # and false if it can not connect
+        # returns True if it can connect to url
         try:
             response = urlopen(url, timeout=10)
             return True

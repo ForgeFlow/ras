@@ -1,15 +1,9 @@
-import os
-import time
-
+import os, time
 from PIL import Image, ImageFont
-
 from luma.core.render import canvas
 from luma.core.virtual import terminal
-
 from .demo_opts import get_device
-
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
-
 
 class Display():
 
@@ -21,7 +15,6 @@ class Display():
     def _display_time(self):
         with canvas(self.device) as draw:
             d_font = ImageFont.truetype(self.font_ttf, 30)
-
             hour = time.strftime("%H:%M", time.localtime())
             num_ones = hour.count('1')
             if num_ones == 0:
@@ -63,7 +56,6 @@ class Display():
 
     def display_msg_raw(self, origin, size, text):
         self.font   = ImageFont.truetype(self.font_ttf,size)
-
         with canvas(self.device) as draw:
             draw.multiline_text(origin,text,
                                 fill="white",
@@ -71,11 +63,9 @@ class Display():
                                 align='center')
 
     def display_msg(self, param):
-
         origin = messages_dic[param][0]
         size   = messages_dic[param][1]
         text   = messages_dic[param][2]
-
         self.display_msg_raw( origin, size, text)
 
     def clear_display(self):
