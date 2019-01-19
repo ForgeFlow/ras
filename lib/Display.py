@@ -56,14 +56,10 @@ class Display():
 
     def initial_display(self):
         self._welcome_logo()
-        time.sleep(2)
+        time.sleep(1.5)
         self.display_msg('welcome')
-        time.sleep(2)
+        time.sleep(1.5)
         self.clear_display()
-#        self.term   = terminal( self.device, self.font )
-#        self.term.println("Terminal mode")
-#        self.term.println("   demo")
-#        self.term.clear()
 
     def display_msg_raw(self, origin, size, text):
         self.font   = ImageFont.truetype(self.font_ttf,size)

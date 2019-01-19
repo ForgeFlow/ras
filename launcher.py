@@ -35,8 +35,6 @@ Odoo     = Odooxlm.Odooxlm()
 
 Tasks = Tasks.Tasks( Odoo, Hardware )
 
-# The Menu is shown when the Admin Card is swiped.
-# It allows to switch between the different Tasks available
 
 def ask_twice():
 # the user is asked twice before executing
@@ -85,10 +83,10 @@ def main_loop():
 
     while not ( Tasks.reboot == True ):
 
-        Disp.display_msg( Tasks.option_name )
+        Disp.display_msg( Tasks.option_name() )
 
         if B_OK.pressed:
-            if (Tasks.option_name in Tasks.ask_twice):
+            if (Tasks.option_name() in Tasks.ask_twice):
                 ask_twice()
             else:
                 Tasks.selected()

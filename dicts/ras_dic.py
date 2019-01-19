@@ -81,20 +81,20 @@ messages_dic = {
     'Local':
                 [ (1,1) , 20,
                   'Clocking'+'\n'+
-                  'locally'+'\n'+
+                  'LOCALLY'+'\n'+
                   ' '             ],
 
     'odoo_async':
                 [ (22,1) , 20,
                   'Clocking'+'\n'+
                   'to'+'\n'+
-                  'odoo'          ],
+                  'ODOO'          ],
 
     'ContactAdm':
                 [ (1,1) , 20,
                   'Contact'+'\n'+
                   'your'+'\n'+
-                  'Admin'             ],
+                  'ADMIN'             ],
 
 
 
@@ -114,21 +114,21 @@ messages_dic = {
     'comm_failed':
                [ (9,0) , 16,
                   'Communication'+'\n'+
-                  'with odoo' +'\n'+
-                  'failed'  ],
+                  'with ODOO' +'\n'+
+                  'FAILED'  ],
 
 
     'odoo_failed':
-               [ (12,0) , 14,
-                  'Communication with'+'\n'+
-                  'odoo failed,' +'\n'+
-                  'please check the'+'\n'+
-                  'parameters'   ],
+               [ (0,0) , 14,
+                  'Communication'+'\n'+
+                  'with ODOO FAILED,' +'\n'+
+                  'please check'+'\n'+
+                  'the parameters'   ],
 
     'odoo_success':
                [ (12,0) , 14,
                   'Communication'+'\n'+
-                  'with odoo' +'\n'+
+                  'with ODOO' +'\n'+
                   'established'  ],
 
     'configure_wifi':
@@ -165,13 +165,13 @@ messages_dic = {
                [ (22,1) , 16,
                   'Updating'+'\n'+
                   ' '+'\n'+
-                  'Firmware'     ],
+                  'FIRMWARE'     ],
 
     'swipecard' :
                [ (17,1), 20,
                   'Please'+'\n'+
                   'swipe'+'\n'+
-                  'your card'    ],
+                  'your CARD'    ],
 
     'clocking':
                 [ (18,1), 18,

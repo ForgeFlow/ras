@@ -39,7 +39,7 @@ class Tasks:
                self.rebooting    ]
 
         self.optionmax    = len(self.tasks_menu) - 1
-        self.option_name  = self.tasks_menu[self.option].__name__
+        #self.option_name  = self.tasks_menu[self.option].__name__
 
     def selected(self):
         self.Buzz.Play('OK')
@@ -61,7 +61,9 @@ class Tasks:
         self.option += 1
         if self.option > self.optionmax:
             self.option = 0
-        self.option_name = self.tasks_menu[self.option].__name__
+
+    def option_name(self):
+        return self.tasks_menu[self.option].__name__
 #___________________________________
 
     def back_to_begin_option(self):
@@ -123,40 +125,33 @@ class Tasks:
                   'to introduce new'+'\n'+      \
                   'odoo parameters'
 
-        self.Odoo.uid = False
-
-        while not self.Odoo.uid:
-            while not os.path.isfile(self.Odoo.datajson):
-                self.Disp.display_msg_raw( origin, size, text)
-                self.card = self.Reader.scan_card()
-                if self.card:
-                    self.Disp.show_card(self.card)
-                    self.Buzz.Play('cardswiped')
-                    time.sleep(2)
-            self.Odoo.set_params()
-            if not self.Odoo.uid:
-                self.Disp.display_msg('odoo_failed')
-
-        self.Disp.display_msg('odoo_success')
-
-        self.Buzz.Play('back_to_menu')
-        time.sleep(2)
-
+        while not os.path.isfile(self.Odoo.datajson):
+            self.Disp.display_msg_raw( origin, size, text)
+            self.card = self.Reader.scan_card()
+            if self.card:
+                self.Disp.show_card(self.card)
+                self.Buzz.Play('cardswiped')
+                time.sleep(2)
+        self.Odoo.set_params()
+        if not self.Odoo.uid:
+            self.Buzz.Play('FALSE')
+            self.Disp.display_msg('odoo_failed')
+            time.sleep(3)
+            self.Disp.clear_display()
 
     def reset_odoo(self):
-        if os.path.isfile(self.Odoo.datajson):
-            os.system('sudo rm ' + self.Odoo.datajson)
-
-        if not self.wifi_active(): # make sure that the Terminal is
+        self.Odoo.uid = False
+        if not self.wifi_active(): # make sure that the Terminal $
             self.reset_wifi()      # connected to a WiFi
-
-
         routes.start_server()
-
-        self.odoo_config()
-
+        while not self.Odoo.uid:
+            if os.path.isfile(self.Odoo.datajson):
+                os.system('sudo rm ' + self.Odoo.datajson)
+            self.odoo_config()
         routes.stop_server()
-
+        self.Disp.display_msg('odoo_success')
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
         self.back_to_begin_option()
 
     def toggle_sync(self):
