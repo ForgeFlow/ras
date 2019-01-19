@@ -123,7 +123,7 @@ class Tasks:
         text   =  'Browse to'+'\n'+             \
                   self.get_ip() +':3000\n'+   \
                   'to introduce new'+'\n'+      \
-                  'odoo parameters'
+                  'Odoo parameters'
 
         while not os.path.isfile(self.Odoo.datajson):
             self.Disp.display_msg_raw( origin, size, text)

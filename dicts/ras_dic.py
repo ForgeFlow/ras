@@ -88,7 +88,7 @@ messages_dic = {
                 [ (22,1) , 20,
                   'Clocking'+'\n'+
                   'to'+'\n'+
-                  'ODOO'          ],
+                  'Odoo'          ],
 
     'ContactAdm':
                 [ (1,1) , 20,
@@ -114,21 +114,21 @@ messages_dic = {
     'comm_failed':
                [ (9,0) , 16,
                   'Communication'+'\n'+
-                  'with ODOO' +'\n'+
+                  'with Odoo' +'\n'+
                   'FAILED'  ],
 
 
     'odoo_failed':
                [ (0,0) , 14,
                   'Communication'+'\n'+
-                  'with ODOO FAILED,' +'\n'+
+                  'with Odoo FAILED,' +'\n'+
                   'please check'+'\n'+
                   'the parameters'   ],
 
     'odoo_success':
                [ (12,0) , 14,
                   'Communication'+'\n'+
-                  'with ODOO' +'\n'+
+                  'with Odoo' +'\n'+
                   'established'  ],
 
     'configure_wifi':
@@ -200,7 +200,7 @@ messages_dic = {
     'reset_odoo':
                 [ (7,5) , 16,
                   'press OK to'+'\n'+
-                  'RESET the odoo'+'\n'+
+                  'RESET the Odoo'+'\n'+
                   'parameters'    ],
 
     'toggle_sync':
