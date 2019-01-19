@@ -3,9 +3,8 @@ import time, os, shelve, subprocess, threading
 from . import Clocking
 from dicts.ras_dic import ask_twice, SSID_reset
 from urllib.request import urlopen
-from lib import app
+
 from . import routes
-import _thread
 
 class Tasks:
 
@@ -18,13 +17,60 @@ class Tasks:
         self.Buzz       = Hardware[0] # Passive Buzzer
         self.Disp       = Hardware[1] # Display
         self.Reader     = Hardware[2] # Card Reader
+        self.B_Down      = Hardware[3] # Button Down
+        self.B_OK        = Hardware[4] # Button OK
+
+
         self.Clock      = Clocking.Clocking( Odoo, Hardware )
         self.workdir    = Odoo.workdir
         self.ask_twice  = ask_twice #'are you sure?' upon selection
         self.get_ip     = routes.get_ip
+# Menu
+        self.begin_option = 0 # the Terminal begins with this option
+        self.option       = self.begin_option
+        self.tasks_menu = [
+               self.clocking,
+               self.showRFID,
+               self.update_firmware,
+               self.reset_wifi,
+               self.reset_odoo,
+               self.toggle_sync,
+               self.rebooting    ]
+# The Tasks appear in the Menu in the same order as here.
 
-    def shutdown():
-        raise RuntimeError('Server going down')
+        self.optionmax    = len(self.tasks_menu) - 1
+        self.option_name  = self.tasks_menu[self.option].__name__
+
+    def selected(self):
+        self.Buzz.Play('OK')
+        self.B_Down.poweroff() # switch off Buttons
+        self.B_OK.poweroff()   # to keep the electronics cool
+
+        self.tasks_menu[self.option]()
+
+        self.B_Down.poweron() # switch the Buttons back on
+        self.B_OK.poweron()   # to detect what the user wants
+        self.B_Down.pressed = False # avoid false positives
+        self.B_OK.pressed   = False
+        self.Buzz.Play('back_to_menu')
+
+   def down(self):
+       self.Buzz.Play('down')
+       time.sleep(0.4) # allow time to take the finger
+                       # away from the button
+
+       self.option += 1
+       if self.option > self.optionmax:
+           self.option = 0
+
+       self.option_name = self.tasks_menu[self.option].__name__
+#___________________________________
+
+    def back_to_begin_option():
+        self.option = self.begin_option
+        self.selected()
+#_______________________________
+
 
     def clocking(self):
         self.Clock.clocking()
@@ -41,6 +87,7 @@ class Tasks:
         self.card = False # Reset the value of the card,
                         # in order to allow its value to be changed
                         # (avoid closed loop)
+        self.back_to_begin_option()
 
     def update_firmware( self):
 
@@ -66,6 +113,7 @@ class Tasks:
         os.system('sudo systemctl restart ras-portal.service')
         self.Buzz.Play('back_to_menu')
         self.Disp.clear_display()
+        self.back_to_begin_option()
 
     def odoo_config(self):
         origin = (0,0)
@@ -94,29 +142,23 @@ class Tasks:
         self.Buzz.Play('back_to_menu')
         time.sleep(2)
         self.Disp.clear_display()
-        #self.reboot = True # TODO you don't need to reboot(?)
-        self.odoo_configuration = False  # signaling the thread is finished
 
 
     def reset_odoo(self):
         if os.path.isfile(self.Odoo.datajson):
             os.system('sudo rm ' + self.Odoo.datajson)
 
-        self.odoo_configuration = True
+        if not self.wifi_active(): # make sure that the Terminal is
+        self.reset_wifi()          # connected to a WiFi
 
 
-        app.secret_key = os.urandom(12)
-        _thread.start_new_thread(app.run(host=str(self.get_ip()), port=3000, debug=False),())
-
-        #thread.start()
+        routes.start_server()
 
         self.odoo_config()
-        #thread2 = threading.Thread(target = odoo_conf)
 
-        #while self.odoo_configuration:
-         #   time.sleep(0.3)
+        routes.stop_server()
 
-        #thread2.join()
+        self.back_to_begin_option()
 
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
@@ -130,6 +172,8 @@ class Tasks:
        else:
            self.Disp.display_msg('async')
        time.sleep(1.5)
+
+       self.back_to_begin_option()
 
 
     def rebooting(self):

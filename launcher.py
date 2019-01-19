@@ -10,7 +10,7 @@ from dicts.ras_dic import WORK_DIR, PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 
 # Software Tasks imports
-from lib import Odooxlm, Menu, Tasks
+from lib import Odooxlm, Tasks
 
 
 # Creating Instances for the HARDWARE COMPONENTS
@@ -35,16 +35,6 @@ Odoo     = Odooxlm.Odooxlm()
 
 Tasks = Tasks.Tasks( Odoo, Hardware )
 
-tasks_menu = [ Tasks.clocking,
-               Tasks.showRFID,
-               Tasks.update_firmware,
-               Tasks.reset_wifi,
-               Tasks.reset_odoo,
-               Tasks.toggle_sync,
-               Tasks.rebooting    ]
-# The Tasks appear in the Menu in the same order as here.
-
-Menu     = Menu.Menu( Tasks, tasks_menu, Hardware)
 # The Menu is shown when the Admin Card is swiped.
 # It allows to switch between the different Tasks available
 
@@ -66,7 +56,7 @@ def ask_twice():
 
     if B_OK.pressed:    # OK pressed for a second time
 
-        Menu.selected() # The selected Task is run.
+        Tasks.selected() # The selected Task is run.
                         # When the Admin Card is swiped
                         # the Program returns here again.
     else:
@@ -90,7 +80,7 @@ def main_loop():
     if not Odoo.uid:        # make sure that we have
         Tasks.reset_odoo()  # access to an odoo db
 
-    Menu.selected() # when the terminal is switched on it goes to
+    Tasks.selected() # when the terminal is switched on it goes to
                     # the predefined Task
 
     while not ( Tasks.reboot == True ):
@@ -98,12 +88,12 @@ def main_loop():
         Disp.display_msg( Menu.option_name )
 
         if B_OK.pressed:
-            if (Menu.option_name in Tasks.ask_twice):
+            if (Tasks.option_name in Tasks.ask_twice):
                 ask_twice()
             else:
-                Menu.selected()
+                Tasks.selected()
         elif B_Down.pressed:
-            Menu.down()
+            Tasks.down()
 
         B_Down.scanning() # If no Button was Pressed
         B_OK.scanning()   # continue scanning
