@@ -59,7 +59,7 @@ class Display():
         time.sleep(2)
         self.display_msg('welcome')
         time.sleep(2)
-
+        self.clear_display()
 #        self.term   = terminal( self.device, self.font )
 #        self.term.println("Terminal mode")
 #        self.term.println("   demo")

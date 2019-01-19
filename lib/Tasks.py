@@ -3,7 +3,9 @@ import time, os, shelve, subprocess, threading
 from . import Clocking
 from dicts.ras_dic import ask_twice, SSID_reset
 from urllib.request import urlopen
-import config_server
+from lib import app
+from . import routes
+import _thread
 
 class Tasks:
 
@@ -19,8 +21,10 @@ class Tasks:
         self.Clock      = Clocking.Clocking( Odoo, Hardware )
         self.workdir    = Odoo.workdir
         self.ask_twice  = ask_twice #'are you sure?' upon selection
-        self.get_ip     = config_server.get_ip
-        self.server_up  = config_server.server_up
+        self.get_ip     = routes.get_ip
+
+    def shutdown():
+        raise RuntimeError('Server going down')
 
     def clocking(self):
         self.Clock.clocking()
@@ -63,21 +67,56 @@ class Tasks:
         self.Buzz.Play('back_to_menu')
         self.Disp.clear_display()
 
+    def odoo_config(self):
+        origin = (0,0)
+        size   = 14
+        text   =  'Browse to'+'\n'+             \
+                  self.get_ip() +':3000\n'+   \
+                  'to introduce new'+'\n'+      \
+                  'odoo parameters'
+
+        self.Odoo.uid = False
+
+        while not self.Odoo.uid:
+            while not os.path.isfile(self.Odoo.datajson):
+                self.Disp.display_msg_raw( origin, size, text)
+                self.card = self.Reader.scan_card()
+                if self.card:
+                    self.Disp.show_card(self.card)
+                    self.Buzz.Play('cardswiped')
+                    time.sleep(2)
+            self.Odoo.set_params()
+            if not self.Odoo.uid:
+                self.Disp.display_msg('odoo_failed')
+
+        self.Disp.display_msg('odoo_success')
+
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
+        self.Disp.clear_display()
+        #self.reboot = True # TODO you don't need to reboot(?)
+        self.odoo_configuration = False  # signaling the thread is finished
+
+
     def reset_odoo(self):
         if os.path.isfile(self.Odoo.datajson):
             os.system('sudo rm ' + self.Odoo.datajson)
 
         self.odoo_configuration = True
-        try:
-            server_thread = threading.Thread(target=self.server_up())
-            odoo_thread   = threading.Thread(target=self.odoo_config())
-        except:
-            print("Error: unable to start thread")
-        finally:
-            server_thread.start()
-            odoo_thread.start()
-        while self.odoo_configuration:
-            pass
+
+
+        app.secret_key = os.urandom(12)
+        _thread.start_new_thread(app.run(host=str(self.get_ip()), port=3000, debug=False),())
+
+        #thread.start()
+
+        self.odoo_config()
+        #thread2 = threading.Thread(target = odoo_conf)
+
+        #while self.odoo_configuration:
+         #   time.sleep(0.3)
+
+        #thread2.join()
 
     def toggle_sync(self):
        file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
@@ -122,33 +161,4 @@ class Tasks:
         except:
             return False
 
-    def odoo_config(self)
-        origin = (0,0)
-        size   = 14
-        text   =  'Browse to'+'\n'+             \
-                  self.get_ip() +':3000\n'+   \
-                  'to introduce new'+'\n'+      \
-                  'odoo parameters'
-
-        self.Odoo.uid = False
-
-        while not self.Odoo.uid:
-            while not os.path.isfile(self.Odoo.datajson):
-                self.Disp.display_msg_raw( origin, size, text)
-                self.card = self.Reader.scan_card()
-                if self.card:
-                    self.Disp.show_card(self.card)
-                    self.Buzz.Play('cardswiped')
-                    time.sleep(2)
-            self.Odoo.set_params()
-            if not self.Odoo.uid:
-                self.Disp.display_msg('odoo_failed')
-
-        self.Disp.display_msg('odoo_success')
-
-        self.Buzz.Play('back_to_menu')
-        time.sleep(2)
-        self.Disp.clear_display()
-        #self.reboot = True # TODO you don't need to reboot(?)
-        self.odoo_configuration = False  # signaling the thread is finished
 
