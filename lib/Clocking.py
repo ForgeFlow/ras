@@ -181,12 +181,14 @@ class Clocking:
         # and asynchronous mode.
 
         count =0
-        count_max = 600
+        count_max = 300
         # iterations that will be waited to check if an asynchronous dump of data can be made
         # form the local RPi queue to Odoo
 
         wifi_m   = self.wifi_signal_msg() # get wifi strength signal
         odoo_m   = self.odoo_msg()        # get odoo connection msg
+
+        print (time.strftime('%X %x %Z'))
 
         while not (self.card == self.Odoo.adm):
 
@@ -199,6 +201,8 @@ class Clocking:
             if count>count_max: # periodically tests
                                 #if there is data in the queue
                                 #that can be uploaded to the Odoo Database
+
+               print (time.strftime('%X %x %Z'))
                wifi_m   = self.wifi_signal_msg()
                odoo_m   = self.odoo_msg()
                count=0
