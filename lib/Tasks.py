@@ -84,10 +84,8 @@ class Tasks:
         if self.can_connect('https://github.com'):
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
-            # os.system('sudo git fetch origin stable')
-            # os.system('sudo git reset --hard origin/stable')
-            os.system('sudo git fetch origin')
-            os.system('sudo git reset --hard origin')
+            os.system('sudo git fetch origin stable')
+            os.system('sudo git reset --hard origin/stable')
             self.Buzz.Play('OK')
             time.sleep(0.5)
             self.reboot = True

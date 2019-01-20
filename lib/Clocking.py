@@ -201,7 +201,7 @@ class Clocking:
                                 #if there is data in the queue
                                 #that can be uploaded to the Odoo Database
 
-               #print (time.strftime('%X %x %Z'))
+               print (time.strftime('%X %x %Z'))
                # use this print to monitor how long the cycles are
                # measured duration of every cycle (Luis)
                # 230ms per cycle or 4,3 cycles per second = 4,3 Hz
