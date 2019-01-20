@@ -181,14 +181,13 @@ class Clocking:
         # and asynchronous mode.
 
         count =0
-        count_max = 300
+        count_max = 250 # this corresponds roughly to 60 seconds
         # iterations that will be waited to check if an asynchronous dump of data can be made
         # form the local RPi queue to Odoo
 
         wifi_m   = self.wifi_signal_msg() # get wifi strength signal
         odoo_m   = self.odoo_msg()        # get odoo connection msg
 
-        print (time.strftime('%X %x %Z'))
 
         while not (self.card == self.Odoo.adm):
 
@@ -202,7 +201,11 @@ class Clocking:
                                 #if there is data in the queue
                                 #that can be uploaded to the Odoo Database
 
-               print (time.strftime('%X %x %Z'))
+               #print (time.strftime('%X %x %Z'))
+               # use this print to monitor how long the cycles are
+               # measured duration of every cycle (Luis)
+               # 230ms per cycle or 4,3 cycles per second = 4,3 Hz
+
                wifi_m   = self.wifi_signal_msg()
                odoo_m   = self.odoo_msg()
                count=0
@@ -218,10 +221,11 @@ class Clocking:
                # store the time when the card logging process begin
 
                if self.sync:
-
-                   self.clock_sync()  # synchronous: to odoo db
+                   self.clock_sync()  # synchronous: when odoo not
+                                      # connected, clocking not possible
                else:
-                   self.clock_async() # asynchronous: to local RPi file
+                   self.clock_async() # asynchronous: when odoo not
+                                      # connected, store to local RPi file
 
                self.Disp.display_msg(self.msg) # clocking message
                self.Buzz.Play(self.msg)         # clocking acoustic feedback
