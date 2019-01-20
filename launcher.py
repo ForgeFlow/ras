@@ -66,7 +66,7 @@ def main_loop():
     Disp.display_msg('shut_down')
     time.sleep(1.5)
     Disp.clear_display()
-#    os.system('sudo reboot')
+    os.system('sudo reboot')
 
 
 main_loop()
