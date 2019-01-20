@@ -12,21 +12,25 @@ class Display():
         self.img_path = WORK_DIR+'images/'
         self.device = get_device(('-d',display_driver))
 
-    def _display_time(self):
+    def _display_time(self, wifi_quality,odoo_m):
         with canvas(self.device) as draw:
             d_font = ImageFont.truetype(self.font_ttf, 30)
             hour = time.strftime("%H:%M", time.localtime())
             num_ones = hour.count('1')
             if num_ones == 0:
-                draw.text((23, 20), hour, font=d_font, fill="white")
+                draw.text((23, 19), hour, font=d_font, fill="white")
             elif num_ones == 1:
-                draw.text((25, 20), hour, font=d_font, fill="white")
+                draw.text((25, 19), hour, font=d_font, fill="white")
             elif num_ones == 2:
-                draw.text((28, 20), hour, font=d_font, fill="white")
+                draw.text((28, 19), hour, font=d_font, fill="white")
             elif num_ones == 3:
-                draw.text((31, 20), hour, font=d_font, fill="white")
+                draw.text((31, 19), hour, font=d_font, fill="white")
             else:
-                draw.text((34, 20), hour, font=d_font, fill="white")
+                draw.text((34, 19), hour, font=d_font, fill="white")
+            d_font = ImageFont.truetype(self.font_ttf, 14)
+            draw.text((0,0), wifi_quality, font=d_font, fill="white")
+            d_font = ImageFont.truetype(self.font_ttf, 14)
+            draw.text((0,52), odoo_m, font=d_font, fill="white")
 
     def show_card(self, card_id):
         c_font = ImageFont.truetype(self.font_ttf, 22)

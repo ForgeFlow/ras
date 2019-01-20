@@ -92,9 +92,7 @@ class Odooxlm():
             return False
 
     def can_connect(self, url):
-        # Checks if it can connect tothe specified  url
-        # returns True if it can connect
-        # and false if it can not connect
+        # returns True if it can connect to url
         try:
             response = urlopen(url, timeout=10)
             return True

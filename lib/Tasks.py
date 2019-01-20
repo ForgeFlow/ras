@@ -1,4 +1,4 @@
-import time, os, shelve, subprocess, threading
+import time, os, shelve
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, SSID_reset
 from urllib.request import urlopen
@@ -19,6 +19,8 @@ class Tasks:
         self.workdir    = Odoo.workdir
         self.ask_twice  = ask_twice #'are you sure?' upon selection
         self.get_ip     = routes.get_ip
+        self.can_connect  = Odoo.can_connect
+        self.wifi_active  = self.Clock.wifi_active
 
         # Menu vars
         self.begin_option = 0 # the Terminal begins with this option
@@ -157,22 +159,5 @@ class Tasks:
         self.reboot = True
         self.Disp.clear_display()
 #_________________________________________________________
-
-    def wifi_active(self):
-        iwconfig_out = subprocess.check_output(
-            'iwconfig wlan0', shell=True).decode('utf-8')
-        if "Access Point: Not-Associated" in iwconfig_out:
-            wifi_active = False
-        else:
-            wifi_active = True
-        return wifi_active
-
-    def can_connect(self, url):
-        # returns True if it can connect to url
-        try:
-            response = urlopen(url, timeout=10)
-            return True
-        except:
-            return False
 
 

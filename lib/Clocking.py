@@ -1,4 +1,4 @@
-import time, os, shelve
+import time, os, shelve, subprocess
 
 class Clocking:
 
@@ -47,8 +47,59 @@ class Clocking:
        db.close()
 
        self.can_connect = Odoo.can_connect
+#___________________
 
 
+    def wifi_active(self):
+        iwconfig_out = subprocess.check_output(
+            'iwconfig wlan0', shell=True).decode('utf-8')
+        if "Access Point: Not-Associated" in iwconfig_out:
+            wifi_active = False
+        else:
+            wifi_active = True
+        return wifi_active
+
+    def get_status(self):
+        iwresult = subprocess.check_output(
+            'iwconfig wlan0', shell=True).decode('utf-8')
+        resultdict = {}
+        for iwresult in iwresult.split('  '):
+            if iwresult:
+                if iwresult.find(':') > 0:
+                    datumname = iwresult.strip().split(':')[0]
+                    datum = iwresult.strip().\
+                        split(':')[1].split(' ')[0].split('/')[0].\
+                        replace('"','')
+                    resultdict[datumname] = datum
+                elif iwresult.find('=') > 0:
+                    datumname = iwresult.strip().split('=')[0]
+                    datum = iwresult.strip().\
+                        split('=')[1].split(' ')[0].split('/')[0].\
+                        replace('"','')
+                    resultdict[datumname] = datum
+        return resultdict
+
+    def wifi_signal_msg(self):
+        if not self.wifi_active():
+            msg = 'No WiFi signal'
+        else:
+            strength = -int(self.get_status()['Signal level']) #in dBm
+            if strength>=   75:
+                msg = '         WiFi: poor'
+            elif strength>= 65:
+                msg = '         WiFi: fair'
+            elif strength>= 40:
+                msg = '         WiFi: good'
+            else:
+                msg = '    WiFi: very good'
+        return msg
+
+    def odoo_msg(self):
+        if self.Odoo._get_user_id():
+            msg = '   Odoo: connected'
+        else:
+            msg = 'Odoo:not connected'
+        return msg
 
 # FUNCTIONS FOR SYNCHRONOUS MODE
 
@@ -130,20 +181,26 @@ class Clocking:
         # and asynchronous mode.
 
         count =0
-        count_max = 300
+        count_max = 600
         # iterations that will be waited to check if an asynchronous dump of data can be made
         # form the local RPi queue to Odoo
 
-        while not (self.card == self.Odoo.adm): # continue only if the swipped Card is not the Admin Card
+        wifi_m   = self.wifi_signal_msg() # get wifi strength signal
+        odoo_m   = self.odoo_msg()        # get odoo connection msg
 
-            self.Disp._display_time() # Refresh the Display to show the current time
-            self.card = self.Reader.scan_card() # detect and store the UID if an RFID  card is swipped
+        while not (self.card == self.Odoo.adm):
+
+            self.Disp._display_time(wifi_m, odoo_m)
+            self.card = self.Reader.scan_card() # detect and store the UID
+                                                # if an RFID  card is swipped
 
             count=count+1
 
             if count>count_max: # periodically tests
                                 #if there is data in the queue
                                 #that can be uploaded to the Odoo Database
+               wifi_m   = self.wifi_signal_msg()
+               odoo_m   = self.odoo_msg()
                count=0
                if (not self.sync) and (self.stored>0):
                    if self.can_connect(self.Odoo.url_template):
