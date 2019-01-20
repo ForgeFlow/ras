@@ -106,16 +106,17 @@ class Clocking:
     def clock_sync(self):
 
         if self.can_connect(self.Odoo.url_template):
-        # when Odoo Connection existing Store Clocking directly on odoo database
+            # when Odoo connected--> Store Clocking
+            # directly on odoo database
             self.Disp.display_msg('connecting')
-           # Inform of the Beginning of the Connection with Odo
             res = self.Odoo.check_attendance(self.card)
             if res:
                self.msg = res['action']
             else:
                self.msg = 'comm_failed'
         else:
-            self.msg = 'ContactAdm' # No Odoo Connection: Contact Your Admin
+            self.msg = 'ContactAdm'
+            # No Odoo Connection: Contact Your Admin
 
 # FUNCTIONS FOR ASYNCHRONOUS MODE
 
@@ -161,14 +162,13 @@ class Clocking:
     def clock_async(self):
 
        if self.can_connect(self.Odoo.url_template):
-       # when Odoo Connection existing Store Clocking directly on odoo database
+       # when Odoo Connection existing Store
+       # Clocking directly on odoo database
            self.Disp.display_msg('connecting')
            self.store_odoo_async()
        else:
            self.store_locally_async()  # No Odoo Connection:Store Clocking
                                        # on Local File
-
-
 
 # COMMON FUNCTIONS fOR SYNC and ASYNC
 
@@ -181,7 +181,7 @@ class Clocking:
         # and asynchronous mode.
 
         count =0
-        count_max = 250 # this corresponds roughly to 60 seconds
+        count_max = 265 # this corresponds roughly to 60 seconds
         # iterations that will be waited to check if an asynchronous dump of data can be made
         # form the local RPi queue to Odoo
 
@@ -201,10 +201,10 @@ class Clocking:
                                 #if there is data in the queue
                                 #that can be uploaded to the Odoo Database
 
-               print (time.strftime('%X %x %Z'))
-               # use this print to monitor how long the cycles are
+               # print (time.strftime('%X %x %Z'))
+               # uncomment this print to monitor how long the cycles are
                # measured duration of every cycle (Luis)
-               # 230ms per cycle or 4,3 cycles per second = 4,3 Hz
+               # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
 
                wifi_m   = self.wifi_signal_msg()
                odoo_m   = self.odoo_msg()
