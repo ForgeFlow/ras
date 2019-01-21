@@ -1,86 +1,91 @@
-import time, os, shelve
+import time
+import os
+import shelve
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, SSID_reset
-from urllib.request import urlopen
+
 
 class Tasks:
     def __init__(self, Odoo, Hardware):
-        self.card       = False  # currently swipped card code
-        self.reboot     = False  # Flag to signal the main Loop
-                                 # rebooting was chosen
-        self.Odoo       = Odoo
-        self.Buzz       = Hardware[0] # Passive Buzzer
-        self.Disp       = Hardware[1] # Display
-        self.Reader     = Hardware[2] # Card Reader
-        self.B_Down     = Hardware[3] # Button Down
-        self.B_OK       = Hardware[4] # Button OK
+        self.card = False  # currently swipped card code
+        self.reboot = False  # Flag to signal the main Loop
+        # rebooting was chosen
+        self.Odoo = Odoo
+        self.Buzz = Hardware[0]  # Passive Buzzer
+        self.Disp = Hardware[1]  # Display
+        self.Reader = Hardware[2]  # Card Reader
+        self.B_Down = Hardware[3]  # Button Down
+        self.B_OK = Hardware[4]  # Button OK
 
-        self.Clock      = Clocking.Clocking( Odoo, Hardware )
-        self.workdir    = Odoo.workdir
-        self.ask_twice  = ask_twice #'are you sure?' upon selection
-        self.get_ip     = routes.get_ip
-        self.can_connect  = Odoo.can_connect
-        self.wifi_active  = self.Clock.wifi_active
+        self.Clock = Clocking.Clocking(Odoo, Hardware)
+        self.workdir = Odoo.workdir
+        self.ask_twice = ask_twice  # 'are you sure?' upon selection
+        self.get_ip = routes.get_ip
+        self.can_connect = Odoo.can_connect
+        self.wifi_active = self.Clock.wifi_active
 
         # Menu vars
-        self.begin_option = 0 # the Terminal begins with this option
-        self.option       = self.begin_option
-        self.tasks_menu   = [   # The Tasks appear in the Menu
-               self.clocking,   # in the same order as here.
-               self.showRFID,
-               self.update_firmware,
-               self.reset_wifi,
-               self.reset_odoo,
-#               self.toggle_sync,    # uncomment when implemented
-               self.rebooting    ]
+        self.begin_option = 0  # the Terminal begins with this option
+        self.option = self.begin_option
+        self.tasks_menu = [  # The Tasks appear in the Menu
+            self.clocking,  # in the same order as here.
+            self.showRFID,
+            self.update_firmware,
+            self.reset_wifi,
+            self.reset_odoo,
+            #               self.toggle_sync,    # uncomment when implemented
+            self.rebooting]
 
-        self.optionmax    = len(self.tasks_menu) - 1
-#__________________________________
+        self.optionmax = len(self.tasks_menu) - 1
+
+    # __________________________________
     def selected(self):
         self.Buzz.Play('OK')
-        self.B_Down.poweroff() # switch off Buttons
-        self.B_OK.poweroff()   # to keep the electronics cool
+        self.B_Down.poweroff()  # switch off Buttons
+        self.B_OK.poweroff()  # to keep the electronics cool
 
         self.tasks_menu[self.option]()
 
-        self.B_Down.poweron() # switch the Buttons back on
-        self.B_OK.poweron()   # to detect what the user wants
-        self.B_Down.pressed = False # avoid false positives
-        self.B_OK.pressed   = False
+        self.B_Down.poweron()  # switch the Buttons back on
+        self.B_OK.poweron()  # to detect what the user wants
+        self.B_Down.pressed = False  # avoid false positives
+        self.B_OK.pressed = False
         self.Buzz.Play('back_to_menu')
 
     def down(self):
         self.Buzz.Play('down')
-        time.sleep(0.4) # allow time to take the finger
-                       # away from the button
+        time.sleep(0.4)  # allow time to take the finger
+        # away from the button
         self.option += 1
         if self.option > self.optionmax:
             self.option = 0
 
     def option_name(self):
         return self.tasks_menu[self.option].__name__
-#___________________________________
+
+    # ___________________________________
     def back_to_begin_option(self):
         self.Disp.clear_display()
         self.option = self.begin_option
         self.selected()
         self.Disp.clear_display()
-#_______________________________
+
+    # _______________________________
 
     def clocking(self):
         self.Clock.clocking()
 
-    def showRFID( self):
+    def showRFID(self):
         self.Disp.display_msg('swipecard')
         while not (self.card == self.Odoo.adm):
             self.card = self.Reader.scan_card()
-            if self.card and not(self.card == self.Odoo.adm):
+            if self.card and not (self.card == self.Odoo.adm):
                 self.Disp.show_card(self.card)
                 self.Buzz.Play('cardswiped')
-        self.card = False # avoid closed loop
+        self.card = False  # avoid closed loop
         self.back_to_begin_option()
 
-    def update_firmware( self):
+    def update_firmware(self):
         if self.can_connect('https://github.com'):
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
@@ -97,20 +102,20 @@ class Tasks:
 
     def reset_wifi(self):
         self.Disp.display_msg('configure_wifi')
-        os.system('sudo wifi-connect --portal-ssid '+ SSID_reset)
+        os.system('sudo wifi-connect --portal-ssid ' + SSID_reset)
         os.system('sudo systemctl restart ras-portal.service')
         self.Buzz.Play('back_to_menu')
         self.back_to_begin_option()
 
     def odoo_config(self):
-        origin = (0,0)
-        size   = 14
-        text   =  'Browse to'+'\n'+             \
-                  self.get_ip() +':3000\n'+   \
-                  'to introduce new'+'\n'+      \
-                  'Odoo parameters'
+        origin = (0, 0)
+        size = 14
+        text = 'Browse to' + '\n' + \
+               self.get_ip() + ':3000\n' + \
+               'to introduce new' + '\n' + \
+               'Odoo parameters'
         while not os.path.isfile(self.Odoo.datajson):
-            self.Disp.display_msg_raw( origin, size, text)
+            self.Disp.display_msg_raw(origin, size, text)
             self.card = self.Reader.scan_card()
             if self.card:
                 self.Disp.show_card(self.card)
@@ -125,8 +130,8 @@ class Tasks:
 
     def reset_odoo(self):
         self.Odoo.uid = False
-        if not self.wifi_active(): # is the Terminal
-            self.reset_wifi()      # connected to a WiFi
+        if not self.wifi_active():  # is the Terminal
+            self.reset_wifi()  # connected to a WiFi
         routes.start_server()
         while not self.Odoo.uid:
             if os.path.isfile(self.Odoo.datajson):
@@ -139,23 +144,21 @@ class Tasks:
         self.back_to_begin_option()
 
     def toggle_sync(self):
-       file_sync_flag = self.Odoo.workdir+'dicts/sync_flag'
-       fs = shelve.open(file_sync_flag)
-       flag = fs['sync_flag']
-       fs['sync_flag'] = not flag
-       self.Clock.sync = not flag
-       fs.close()
-       if self.Clock.sync:
-           self.Disp.display_msg('sync')
-       else:
-           self.Disp.display_msg('async')
-       time.sleep(1.5)
-       self.back_to_begin_option()
+        file_sync_flag = self.Odoo.workdir + 'dicts/sync_flag'
+        fs = shelve.open(file_sync_flag)
+        flag = fs['sync_flag']
+        fs['sync_flag'] = not flag
+        self.Clock.sync = not flag
+        fs.close()
+        if self.Clock.sync:
+            self.Disp.display_msg('sync')
+        else:
+            self.Disp.display_msg('async')
+        time.sleep(1.5)
+        self.back_to_begin_option()
 
     def rebooting(self):
         time.sleep(1)
         self.reboot = True
         self.Disp.clear_display()
-#_________________________________________________________
-
-
+# _________________________________________________________

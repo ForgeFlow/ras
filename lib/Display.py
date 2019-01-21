@@ -1,18 +1,19 @@
-import os, time
+import time
+
 from PIL import Image, ImageFont
 from luma.core.render import canvas
-from luma.core.virtual import terminal
 from .demo_opts import get_device
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
-class Display():
+
+class Display:
 
     def __init__(self):
-        self.font_ttf = WORK_DIR+'fonts/Orkney.ttf'
-        self.img_path = WORK_DIR+'images/'
-        self.device = get_device(('-d',display_driver))
+        self.font_ttf = WORK_DIR + 'fonts/Orkney.ttf'
+        self.img_path = WORK_DIR + 'images/'
+        self.device = get_device(('-d', display_driver))
 
-    def _display_time(self, wifi_quality,odoo_m):
+    def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
             d_font = ImageFont.truetype(self.font_ttf, 30)
             hour = time.strftime("%H:%M", time.localtime())
@@ -28,9 +29,9 @@ class Display():
             else:
                 draw.text((34, 19), hour, font=d_font, fill="white")
             d_font = ImageFont.truetype(self.font_ttf, 14)
-            draw.text((0,0), wifi_quality, font=d_font, fill="white")
+            draw.text((0, 0), wifi_quality, font=d_font, fill="white")
             d_font = ImageFont.truetype(self.font_ttf, 14)
-            draw.text((0,52), odoo_m, font=d_font, fill="white")
+            draw.text((0, 52), odoo_m, font=d_font, fill="white")
 
     def show_card(self, card_id):
         c_font = ImageFont.truetype(self.font_ttf, 22)
@@ -41,7 +42,7 @@ class Display():
                 draw.text((15, 20), card_id, font=c_font, fill="white")
 
     def _welcome_logo(self):
-        logo = Image.open(self.img_path+'eficent.png').convert("RGBA")
+        logo = Image.open(self.img_path + 'eficent.png').convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
         background = Image.new("RGBA", self.device.size, "black")
@@ -59,21 +60,19 @@ class Display():
         self.clear_display()
 
     def display_msg_raw(self, origin, size, text):
-        self.font   = ImageFont.truetype(self.font_ttf,size)
+        font = ImageFont.truetype(self.font_ttf, size)
         with canvas(self.device) as draw:
-            draw.multiline_text(origin,text,
+            draw.multiline_text(origin, text,
                                 fill="white",
-                                font=self.font,
+                                font=font,
                                 align='center')
 
     def display_msg(self, param):
         origin = messages_dic[param][0]
-        size   = messages_dic[param][1]
-        text   = messages_dic[param][2]
-        self.display_msg_raw( origin, size, text)
+        size = messages_dic[param][1]
+        text = messages_dic[param][2]
+        self.display_msg_raw(origin, size, text)
 
     def clear_display(self):
         with canvas(self.device) as draw:
-            draw.multiline_text((0,0),' ') # display shows nothing (blank)
-
-
+            draw.multiline_text((0, 0), ' ')  # display shows nothing (blank)
