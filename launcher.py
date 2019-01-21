@@ -2,7 +2,7 @@
 import os, sys, time
 from dicts.ras_dic import WORK_DIR, PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
-from lib import Odooxlm, Tasks
+from lib import OdooXMLrpc, Tasks
 
 Buz      = PasBuz.PasBuz( PinsBuzzer )
 Disp     = Display.Display()
@@ -11,7 +11,7 @@ B_Down   = Button.Button( PinsDown )
 B_OK     = Button.Button( PinsOK )
 Hardware = [ Buz, Disp, Reader, B_Down, B_OK]
 
-Odoo     = Odooxlm.Odooxlm() # communicate via xlm
+Odoo     = OdooXMLrpc.OdooXMLrpc() # communicate via xlm
 Tasks = Tasks.Tasks( Odoo, Hardware )
 
 def ask_twice():

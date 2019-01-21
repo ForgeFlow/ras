@@ -6,7 +6,7 @@ from dicts.ras_dic import WORK_DIR
 import xmlrpc.client as xmlrpclib
 from urllib.request import urlopen
 
-class Odooxlm():
+class OdooXMLrpc():
 
     def __init__(self):
 
