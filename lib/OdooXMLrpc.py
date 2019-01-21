@@ -78,7 +78,11 @@ class OdooXMLrpc():
             if user_id:
                 return user_id
             return False
-        except:
+        except ConnectionRefusedError:
+            return False
+        except Exception as e:
+            print('_get_user_id error: '+str(e))
+            raise
             return False
 
     def check_attendance(self, card):
@@ -88,7 +92,8 @@ class OdooXMLrpc():
                 self.db, self.uid, self.pswd,
                 "hr.employee", "register_attendance", card)
             return res
-        except Exception as e:
+        except Exception:
+            raise
             return False
 
     def can_connect(self, url):
@@ -96,5 +101,6 @@ class OdooXMLrpc():
         try:
             response = urlopen(url, timeout=10)
             return True
-        except:
+        except Exception:
+            raise
             return False

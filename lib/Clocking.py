@@ -156,7 +156,8 @@ class Clocking:
                 self.stored = self.stored - 1
                 print(self.stored, key, '=>\n ', db[key])
                 del db[key]
-            except:
+            except Exception:
+                raise
                 break
         db.close()
 
