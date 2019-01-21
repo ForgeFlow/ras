@@ -1,1 +1,0 @@
-# server functionality moved away
