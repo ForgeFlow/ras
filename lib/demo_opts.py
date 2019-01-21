@@ -3,6 +3,7 @@ import sys
 
 from luma.core import cmdline, error
 
+
 # logging
 logging.basicConfig(
     level=logging.DEBUG,

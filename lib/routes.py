@@ -1,4 +1,7 @@
-import json, os, subprocess
+import json
+import os
+import subprocess
+import logging
 
 from collections import OrderedDict
 
@@ -11,8 +14,10 @@ from werkzeug.serving import make_server
 
 import threading
 
+_logger = logging.getLogger(__name__)
 
 def get_ip():
+    _logger.debug('Getting IP')
     command = "hostname -I | awk '{ print $1}' "
 
     ip_address = subprocess.check_output(
@@ -28,11 +33,14 @@ class ServerThread(threading.Thread):
         self.srv = make_server(str(get_ip()), 3000, app)
         self.ctx = app.app_context()
         self.ctx.push()
+        _logger.debug('ServerThread Class Initialized')
 
     def run(self):
+        _logger.debug('Serve forever')
         self.srv.serve_forever()
 
     def shutdown(self):
+        _logger.debug('Shutdown')
         self.srv.shutdown()
 
 

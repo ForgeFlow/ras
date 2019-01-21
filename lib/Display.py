@@ -1,4 +1,5 @@
 import time
+import logging
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
@@ -6,12 +7,15 @@ from .demo_opts import get_device
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
 
+_logger = logging.getLogger(__name__)
+
 class Display:
 
     def __init__(self):
         self.font_ttf = WORK_DIR + 'fonts/Orkney.ttf'
         self.img_path = WORK_DIR + 'images/'
         self.device = get_device(('-d', display_driver))
+        _logger.debug('Display Class Initialized')
 
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
@@ -72,7 +76,9 @@ class Display:
         size = messages_dic[param][1]
         text = messages_dic[param][2]
         self.display_msg_raw(origin, size, text)
+        _logger.debug('Displaying message: '+text)
 
     def clear_display(self):
         with canvas(self.device) as draw:
             draw.multiline_text((0, 0), ' ')  # display shows nothing (blank)
+            _logger.debug('Clear display')

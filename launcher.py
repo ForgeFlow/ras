@@ -48,12 +48,15 @@ def main_loop():
     # can be selected using the OK and Down Buttons.
 
     Disp.initial_display()
-    if not Tasks.wifi_active():  # make sure that the Terminal is
-        Tasks.reset_wifi()  # connected to a WiFi
-    if not Odoo.uid:  # make sure that we have
+    # if not Tasks.wifi_active():  # make sure that the Terminal is
+    #     Tasks.reset_wifi()  # connected to a WiFi
+    if not Odoo.uid and not Odoo.adm:  # make sure that we have
         Tasks.reset_odoo()  # access to an odoo db
     Tasks.selected()  # when the terminal is switched on it goes
     # to the predefined Task (begin_option)
+    B_OK.pressed = False  # avoid false positives
+    B_Down.pressed = False
+
     while not Tasks.reboot:
         Disp.display_msg(Tasks.option_name())
         if B_OK.pressed:
