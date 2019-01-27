@@ -98,8 +98,8 @@ class Tasks:
             _logger.debug('Updating Firmware')
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
-            os.system('sudo git fetch origin stable')
-            os.system('sudo git reset --hard origin/stable')
+            os.system('sudo git fetch origin performing')
+            os.system('sudo git reset --hard origin/performing')
             self.Buzz.Play('OK')
             time.sleep(0.5)
             self.reboot = True
