@@ -1,6 +1,9 @@
 import time
 import shelve
 import subprocess
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class Clocking:
@@ -50,6 +53,7 @@ class Clocking:
         db.close()
 
         self.can_connect = odoo.can_connect
+        _logger.debug('Clocking Class Initialized')
 
     # ___________________
 
@@ -60,6 +64,7 @@ class Clocking:
             wifi_active = False
         else:
             wifi_active = True
+        _logger.warn('Wifi Active is %s' % wifi_active)
         return wifi_active
 
     def get_status(self):
@@ -95,6 +100,7 @@ class Clocking:
                 msg = '         WiFi: good'
             else:
                 msg = '    WiFi: very good'
+            _logger.debug(msg)
         return msg
 
     def odoo_msg(self):
@@ -102,6 +108,7 @@ class Clocking:
             msg = '   Odoo: connected'
         else:
             msg = 'Odoo:not connected'
+        _logger.debug(msg)
         return msg
 
     # FUNCTIONS FOR SYNCHRONOUS MODE
@@ -119,6 +126,7 @@ class Clocking:
                 self.msg = 'comm_failed'
         else:
             self.msg = 'ContactAdm'
+            _logger.debug('Clocking sync returns: %s' % self.msg)
             # No Odoo Connection: Contact Your Admin
 
     # FUNCTIONS FOR ASYNCHRONOUS MODE
@@ -136,6 +144,7 @@ class Clocking:
         else:
             if res['action'] == 'FALSE':
                 self.msg = 'FALSE'  # Only can show if it is not authorized
+        _logger.debug('Store Odoo async returns: %s' % self.msg)
 
     def store_locally_async(self):
         self.msg = 'Local'
@@ -156,8 +165,8 @@ class Clocking:
                 self.stored = self.stored - 1
                 print(self.stored, key, '=>\n ', db[key])
                 del db[key]
-            except Exception:
-                raise
+            except Exception as e:
+                _logger.exception(e)
                 break
         db.close()
 
@@ -173,7 +182,7 @@ class Clocking:
         else:
             self.store_locally_async()  # No Odoo Connection:Store Clocking
             # on Local File
-
+        _logger.debug('Clocking sync returning)
     # COMMON FUNCTIONS fOR SYNC and ASYNC
 
     def clocking(self):
@@ -183,6 +192,8 @@ class Clocking:
         # There are two modes of operation possible and switchable
         # through an instance flag: synchronous mode (standard)
         # and asynchronous mode.
+        
+        _logger.debug('Clocking')
 
         count = 0
         count_max = 265  # this corresponds roughly to 60 seconds

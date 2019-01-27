@@ -1,12 +1,15 @@
 import os
 import time
 import json
+import logging
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
 
 import xmlrpc.client as xmlrpclib
 from urllib.request import urlopen
+
+_logger = logging.getLogger(__name__)
 
 
 class OdooXMLrpc():
@@ -16,8 +19,10 @@ class OdooXMLrpc():
         self.workdir = WORK_DIR
         self.datajson = self.workdir + 'dicts/data.json'
         self.set_params()
+        _logger.debug('Odoo XMLrpc Class Initialized')
 
     def set_params(self):
+        _logger.debug('Params config is %s ' % os.path.isfile(self.datajson))
         if os.path.isfile(self.datajson):
             j_file = open(self.datajson)
             self.j_data = json.load(j_file)
@@ -68,7 +73,11 @@ class OdooXMLrpc():
             self.uid = False
 
     def _get_object_facade(self, url):
-        object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
+        try:
+            object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
+        except Exception as e:
+            _logger.exception(e)
+            raise e 
         return object_facade
 
     def _get_user_id(self):
@@ -79,10 +88,10 @@ class OdooXMLrpc():
                 return user_id
             return False
         except ConnectionRefusedError:
+            _logger.debug(ConnectionRefusedError)
             return False
         except Exception as e:
-            print('_get_user_id error: '+str(e))
-            raise
+            _logger.exception(e)
             return False
 
     def check_attendance(self, card):
@@ -92,8 +101,8 @@ class OdooXMLrpc():
                 self.db, self.uid, self.pswd,
                 "hr.employee", "register_attendance", card)
             return res
-        except Exception:
-            raise
+        except Exception as e:
+            _logger.exception(e)
             return False
 
     def can_connect(self, url):
@@ -101,6 +110,6 @@ class OdooXMLrpc():
         try:
             response = urlopen(url, timeout=10)
             return True
-        except Exception:
-            raise
+        except Exception as e:
+            _logger.exception(e)
             return False

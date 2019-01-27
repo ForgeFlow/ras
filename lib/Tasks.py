@@ -1,8 +1,11 @@
 import time
 import os
 import shelve
+import logging
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, SSID_reset
+
+_logger = logging.getLogger(__name__)
 
 
 class Tasks:
@@ -37,6 +40,7 @@ class Tasks:
             self.rebooting]
 
         self.optionmax = len(self.tasks_menu) - 1
+        _logger.debug('Tasks Class Initialized')
 
     # __________________________________
     def selected(self):
@@ -51,6 +55,7 @@ class Tasks:
         self.B_Down.pressed = False  # avoid false positives
         self.B_OK.pressed = False
         self.Buzz.Play('back_to_menu')
+        _logger.debug('Button Selected')
 
     def down(self):
         self.Buzz.Play('down')
@@ -59,6 +64,7 @@ class Tasks:
         self.option += 1
         if self.option > self.optionmax:
             self.option = 0
+        _logger.debug('Button Down')
 
     def option_name(self):
         return self.tasks_menu[self.option].__name__
@@ -69,6 +75,7 @@ class Tasks:
         self.option = self.begin_option
         self.selected()
         self.Disp.clear_display()
+        _logger.debug('Back to begin option')
 
     # _______________________________
 
@@ -76,6 +83,7 @@ class Tasks:
         self.Clock.clocking()
 
     def showRFID(self):
+        _logger.debug('Show RFID reader')
         self.Disp.display_msg('swipecard')
         while not (self.card == self.Odoo.adm):
             self.card = self.Reader.scan_card()
@@ -87,6 +95,7 @@ class Tasks:
 
     def update_firmware(self):
         if self.can_connect('https://github.com'):
+            _logger.debug('Updating Firmware')
             self.Disp.display_msg('update')
             os.chdir(self.workdir)
             os.system('sudo git fetch origin stable')
@@ -95,12 +104,14 @@ class Tasks:
             time.sleep(0.5)
             self.reboot = True
         else:
+            _logger.warn('Unable to Update Firmware')
             self.Buzz.Play('FALSE')
             self.Disp.display_msg('ERRUpdate')
             time.sleep(1.5)
         self.Disp.clear_display()
 
     def reset_wifi(self):
+        _logger.debug('Reset WI-FI')
         self.Disp.display_msg('configure_wifi')
         os.system('sudo wifi-connect --portal-ssid ' + SSID_reset)
         os.system('sudo systemctl restart ras-portal.service')
@@ -108,6 +119,7 @@ class Tasks:
         self.back_to_begin_option()
 
     def odoo_config(self):
+        _logger.debug('Configure Odoo on Flask app')
         origin = (0, 0)
         size = 14
         text = 'Browse to' + '\n' + \
@@ -129,6 +141,7 @@ class Tasks:
             self.Disp.clear_display()
 
     def reset_odoo(self):
+        _logger.debug('Reset Odoo credentials')
         self.Odoo.uid = False
         if not self.wifi_active():  # is the Terminal
             self.reset_wifi()  # connected to a WiFi
@@ -144,6 +157,7 @@ class Tasks:
         self.back_to_begin_option()
 
     def toggle_sync(self):
+        _logger.warn('Toggle Sync')
         file_sync_flag = self.Odoo.workdir + 'dicts/sync_flag'
         fs = shelve.open(file_sync_flag)
         flag = fs['sync_flag']
@@ -158,6 +172,7 @@ class Tasks:
         self.back_to_begin_option()
 
     def rebooting(self):
+        _logger.debug('Rebooting')
         time.sleep(1)
         self.reboot = True
         self.Disp.clear_display()

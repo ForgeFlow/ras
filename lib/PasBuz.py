@@ -1,9 +1,12 @@
 #! /usr/bin/python3.5
 # This file defines a class to use a Passive Buzzer Module
 import time
+import logging
 import RPi.GPIO as GPIO
 
 from dicts.buzzer_dic import dic  # dic with melodies
+
+_logger = logging.getLogger(__name__)
 
 GPIO.setwarnings(False)
 
@@ -13,8 +16,10 @@ class PasBuz:
     def __init__(self, pins):
         self.PinBuz = pins[0]  # signal Pin
         self.PinPower = pins[1]
+        _logger.debug('PasBuz Class Initialized')
 
     def Play(self, msg):
+        _logger.debug('Playing PasBuz')
         self.InitBuz()
         data = dic[msg]
 
