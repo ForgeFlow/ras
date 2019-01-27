@@ -182,7 +182,7 @@ class Clocking:
         else:
             self.store_locally_async()  # No Odoo Connection:Store Clocking
             # on Local File
-        _logger.debug('Clocking sync returning)
+        _logger.debug('Clocking sync returning')
     # COMMON FUNCTIONS fOR SYNC and ASYNC
 
     def clocking(self):
@@ -192,7 +192,7 @@ class Clocking:
         # There are two modes of operation possible and switchable
         # through an instance flag: synchronous mode (standard)
         # and asynchronous mode.
-        
+
         _logger.debug('Clocking')
 
         count = 0
