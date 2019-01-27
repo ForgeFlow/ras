@@ -228,7 +228,7 @@ class Clocking:
                         self.recover_queue()  # if needed and possible
                         # the data in the queue is uploaded
 
-            if self.card and not (self.card == self.Odoo.adm):
+            if self.card and not (self.card.lower() == self.Odoo.adm.lower()):
 
                 begin_card_logging = time.perf_counter()
                 # store the time when the card logging process begin
