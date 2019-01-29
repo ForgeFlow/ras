@@ -407,9 +407,12 @@ def main():
 def m_functionality():
     _logger.debug("Starting up RAS")
     try:
-        OLED1106.initial_display()
-        main()
-        OLED1106.shut_down()
+        while not is_wifi_active() or not can_connect("https://github.com"):
+            configure_ap_mode()
+            time.sleep(5)
+        OLED1106.screen_drawing("update")
+        os.system("sudo sh /home/pi/ras/update.sh")
+        update_firmware()
         GPIO.cleanup()
     except KeyboardInterrupt:
         _logger.debug("KeyboardInterrupt")

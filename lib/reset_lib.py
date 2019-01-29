@@ -40,8 +40,8 @@ def reset_params():
 
 def update_repo():
     os.chdir('/home/pi/ras')
-    os.system("sudo git fetch origin stable")
-    os.system('sudo git reset --hard origin/stable')
+    os.system("sudo git fetch origin v1.2-release")
+    os.system('sudo git reset --hard origin/v1.2-release')
 
 def reboot():
     print("rebooting")
