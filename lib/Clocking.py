@@ -100,7 +100,7 @@ class Clocking:
                 msg = '         WiFi: good'
             else:
                 msg = '    WiFi: very good'
-            _logger.debug(msg)
+        _logger.debug(msg)
         return msg
 
     def odoo_msg(self):
@@ -126,7 +126,7 @@ class Clocking:
                 self.msg = 'comm_failed'
         else:
             self.msg = 'ContactAdm'
-            _logger.debug('Clocking sync returns: %s' % self.msg)
+        _logger.debug('Clocking sync returns: %s' % self.msg)
             # No Odoo Connection: Contact Your Admin
 
     # FUNCTIONS FOR ASYNCHRONOUS MODE
@@ -242,6 +242,9 @@ class Clocking:
 
                 self.Disp.display_msg(self.msg)  # clocking message
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
+
+                wifi_m = self.wifi_signal_msg() # after every card
+                odoo_m = self.odoo_msg() # reading show actual status
 
                 rest_time = self.card_logging_time_min - \
                     (time.perf_counter() - begin_card_logging)

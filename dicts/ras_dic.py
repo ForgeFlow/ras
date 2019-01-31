@@ -109,9 +109,9 @@ messages_dic = {
 
     'comm_failed':
         [(9, 0), 16,
-         'Communication' + '\n' +
-         'with Odoo' + '\n' +
-         'FAILED'],
+         'Error while' + '\n' +
+         'communicating' + '\n' +
+         'with Odoo'],
 
     'odoo_failed':
         [(0, 0), 14,
