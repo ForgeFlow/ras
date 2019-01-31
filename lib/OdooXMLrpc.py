@@ -81,12 +81,12 @@ class OdooXMLrpc():
             object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
         except Exception as e:
             _logger.exception(e)
-            raise e 
+            raise e
         return object_facade
 
     def _get_user_id(self):
-        login_facade = self._get_object_facade('/xmlrpc/common')
         try:
+            login_facade = self._get_object_facade('/xmlrpc/common')
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
                 return user_id
