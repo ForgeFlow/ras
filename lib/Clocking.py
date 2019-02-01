@@ -119,10 +119,16 @@ class Clocking:
             # when Odoo connected--> Store Clocking
             # directly on odoo database
             self.Disp.display_msg('connecting')
-            res = self.Odoo.check_attendance(self.card)
-            if res:
-                self.msg = res['action']
-            else:
+            try:
+                res = self.Odoo.check_attendance(self.card)
+                if res:
+                    self.msg = res['action']
+                else:
+                    self.msg = 'comm_failed'
+            except Exception:
+                # Reset parameters for Odoo connection because fails 
+                # when start and odoo is not running
+                self.Odoo.set_params()
                 self.msg = 'comm_failed'
         else:
             self.msg = 'ContactAdm'

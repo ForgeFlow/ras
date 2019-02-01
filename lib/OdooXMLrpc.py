@@ -76,6 +76,7 @@ class OdooXMLrpc():
 
             self.uid = self._get_user_id()
 
+
     def _get_object_facade(self, url):
         try:
             object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
@@ -117,3 +118,6 @@ class OdooXMLrpc():
         except Exception as e:
             _logger.exception(e)
             return False
+
+    def reset(self):
+        pass

@@ -50,9 +50,9 @@ messages_dic = {
 
     'welcome':
         [(1, 1), 15,
-         'Welcome' + '\n' +
-         'to the RFID' + '\n' +
-         'attendance system'],
+         'Welcome to the' + '\n' +
+         'RFID attendance' + '\n' +
+         'system'],
 
     'wait':
         [(1, 1), 20,
@@ -61,7 +61,7 @@ messages_dic = {
          ' '],
 
     'check_in':
-        [(1, 1), 18,
+        [(3, 1), 18,
          ' ' + '\n' +
          'CHECKED IN' + '\n' +
          ' '],
@@ -90,7 +90,7 @@ messages_dic = {
          'Odoo'],
 
     'ContactAdm':
-        [(1, 1), 20,
+        [(4, 1), 20,
          'Contact' + '\n' +
          'your' + '\n' +
          'ADMIN'],
