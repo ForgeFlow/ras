@@ -115,6 +115,9 @@ class Clocking:
 
     def clock_sync(self):
 
+        if not self.Odoo.uid:
+            self.Odoo.set_params() # be sure that always uid is set to
+                                   # the last Odoo status (if connected)
         if self.can_connect(self.Odoo.url_template):
             # when Odoo connected--> Store Clocking
             # directly on odoo database
