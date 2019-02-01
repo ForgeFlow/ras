@@ -105,9 +105,9 @@ class Clocking:
 
     def odoo_msg(self):
         if self.Odoo._get_user_id():
-            msg = '   Odoo: connected'
+            msg = '   Odoo OK'
         else:
-            msg = 'Odoo:not connected'
+            msg = 'NO Odoo connected'
         _logger.debug(msg)
         return msg
 
