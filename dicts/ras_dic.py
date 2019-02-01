@@ -90,7 +90,7 @@ messages_dic = {
          'Odoo'],
 
     'ContactAdm':
-        [(4, 1), 20,
+        [(26, 1), 20,
          'Contact' + '\n' +
          'your' + '\n' +
          'ADMIN'],
@@ -203,6 +203,12 @@ messages_dic = {
          'press OK to' + '\n' +
          'to toggle the' + '\n' +
          'sync mode'],
+
+    'show_version':
+        [(7, 5), 16,
+         'press OK to see' + '\n' +
+         'the firmware' + '\n' +
+         'VERSION'],
 
     'rebooting':
         [(22, 1), 20,

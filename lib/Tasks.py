@@ -37,6 +37,7 @@ class Tasks:
             self.reset_wifi,
             self.reset_odoo,
             #               self.toggle_sync,    # uncomment when implemented
+            self.show_version,
             self.rebooting]
 
         self.optionmax = len(self.tasks_menu) - 1
@@ -170,6 +171,13 @@ class Tasks:
             self.Disp.display_msg('async')
         time.sleep(1.5)
         self.back_to_begin_option()
+
+    def show_version(self):
+        origin = (34, 20)
+        size = 24
+        text = 'v1.2'
+        self.Disp.display_msg_raw(origin, size, text)
+        time.sleep(1)
 
     def rebooting(self):
         _logger.debug('Rebooting')
