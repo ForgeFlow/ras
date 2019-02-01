@@ -23,11 +23,28 @@ class OdooXMLrpc():
 
     def set_params(self):
         _logger.debug('Params config is %s ' % os.path.isfile(self.datajson))
-        if os.path.isfile(self.datajson):
+        try:
             j_file = open(self.datajson)
             self.j_data = json.load(j_file)
             j_file.close()
-
+        except Exception as e:
+            _logger.exception(e)
+            if os.path.isfile(self.datajson):
+                os.system('sudo rm ' + self.datajson)
+            # be sure that there is no data.json file
+            # if the data.json can not be loaded
+            self.j_data = False
+            self.db = False
+            self.user = False
+            self.pswd = False
+            self.host = False
+            self.port = False
+            self.adm = False
+            self.tz = False
+            self.https_on = False
+            self.url_template = False
+            self.uid = False
+        else:
             self.db = self.j_data["db"][0]
             self.user = self.j_data["user_name"][0]
             self.pswd = self.j_data["user_password"][0]
@@ -59,30 +76,17 @@ class OdooXMLrpc():
 
             self.uid = self._get_user_id()
 
-        else:
-            self.j_data = False
-            self.db = False
-            self.user = False
-            self.pswd = False
-            self.host = False
-            self.port = False
-            self.adm = False
-            self.tz = False
-            self.https_on = False
-            self.url_template = False
-            self.uid = False
-
     def _get_object_facade(self, url):
         try:
             object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
         except Exception as e:
             _logger.exception(e)
-            raise e 
+            raise e
         return object_facade
 
     def _get_user_id(self):
-        login_facade = self._get_object_facade('/xmlrpc/common')
         try:
+            login_facade = self._get_object_facade('/xmlrpc/common')
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
                 return user_id

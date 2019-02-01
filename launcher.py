@@ -54,6 +54,9 @@ def main_loop():
         Tasks.reset_odoo()  # access to an odoo db
     Tasks.selected()  # when the terminal is switched on it goes
     # to the predefined Task (begin_option)
+    B_OK.pressed = False  # avoid false positives
+    B_Down.pressed = False
+
     while not Tasks.reboot:
         Disp.display_msg(Tasks.option_name())
         if B_OK.pressed:
