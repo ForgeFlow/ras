@@ -50,7 +50,7 @@ def main_loop():
     Disp.initial_display()
     # if not Tasks.wifi_active():  # make sure that the Terminal is
     #     Tasks.reset_wifi()  # connected to a WiFi
-    if not Odoo.uid and not Odoo.adm:  # make sure that we have
+    if not Odoo.user:  # make sure that we have
         Tasks.reset_odoo()  # access to an odoo db
     Tasks.selected()  # when the terminal is switched on it goes
     # to the predefined Task (begin_option)
