@@ -1,7 +1,4 @@
-import os
-import time
-import json
-import logging
+import os, time, json, logging
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
@@ -11,11 +8,9 @@ from urllib.request import urlopen
 
 _logger = logging.getLogger(__name__)
 
-
 class OdooXMLrpc():
 
     def __init__(self):
-
         self.workdir = WORK_DIR
         self.datajson = self.workdir + 'dicts/data.json'
         self.set_params()
@@ -81,6 +76,7 @@ class OdooXMLrpc():
             object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
         except Exception as e:
             _logger.exception(e)
+            object_facade = False
             raise e
         return object_facade
 

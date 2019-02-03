@@ -163,7 +163,7 @@ messages_dic = {
          'FIRMWARE'],
 
     'swipecard':
-        [(17, 1), 20,
+        [(14, 1), 20,
          'Please' + '\n' +
          'swipe' + '\n' +
          'your CARD'],

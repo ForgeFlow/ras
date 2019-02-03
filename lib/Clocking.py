@@ -89,25 +89,35 @@ class Clocking:
 
     def wifi_signal_msg(self):
         if not self.wifi_active():
-            msg = 'No WiFi signal'
+            msg = '    No WiFi signal'
+            self.wifi = False
         else:
             strength = -int(self.get_status()['Signal level'])  # in dBm
-            if strength >= 75:
+            if strength >= 79:
+                msg = '    WiFi: very poor'
+                self.wifi = False
+            elif strength >= 75:
                 msg = '         WiFi: poor'
+                self.wifi = True
             elif strength >= 65:
                 msg = '         WiFi: fair'
+                self.wifi = True
             elif strength >= 40:
                 msg = '         WiFi: good'
+                self.wifi = True
             else:
                 msg = '    WiFi: very good'
+                self.wifi = True
         _logger.debug(msg)
         return msg
 
     def odoo_msg(self):
         if self.Odoo._get_user_id():
             msg = '           Odoo OK'
+            self.odoo_conn = True
         else:
             msg = 'NO Odoo connected'
+            self.odoo_conn = False
         _logger.debug(msg)
         return msg
 
@@ -129,7 +139,7 @@ class Clocking:
                 else:
                     self.msg = 'comm_failed'
             except Exception:
-                # Reset parameters for Odoo connection because fails 
+                # Reset parameters for Odoo connection because fails
                 # when start and odoo is not running
                 self.Odoo.set_params()
                 self.msg = 'comm_failed'
@@ -210,7 +220,12 @@ class Clocking:
         # data can be made form the local RPi queue to Odoo
 
         wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-        odoo_m = self.odoo_msg()  # get odoo connection msg
+
+        if not self.wifi:
+            odoo_m = 'NO Odoo connected'
+            self.odoo_conn = False
+        else:
+            odoo_m = self.odoo_msg()  # get odoo connection msg
 
         while not (self.card == self.Odoo.adm):
 
@@ -230,7 +245,12 @@ class Clocking:
                 # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
 
                 wifi_m = self.wifi_signal_msg()
-                odoo_m = self.odoo_msg()
+                if not self.wifi:
+                    odoo_m = 'NO Odoo connected'
+                    self.odoo_conn = False
+                else:
+                    odoo_m = self.odoo_msg()  # get odoo connection msg
+
                 count = 0
                 if (not self.sync) and (self.stored > 0):
                     if self.can_connect(self.Odoo.url_template):
@@ -241,19 +261,23 @@ class Clocking:
 
                 begin_card_logging = time.perf_counter()
                 # store the time when the card logging process begin
+                wifi_m = self.wifi_signal_msg()
 
                 if self.sync:
-                    self.clock_sync()  # synchronous: when odoo not
-                    # connected, clocking not possible
-                else:
+                    if not self.wifi:
+                        self.msg = 'ContactAdm'
+                    else:
+                        self.clock_sync()  # synchronous: when odoo not
+                                           # connected, clocking not possible
+                        odoo_m = self.odoo_msg() # show actual status
+
+                if not self.sync:
                     self.clock_async()  # asynchronous: when odoo not
                     # connected, store to local RPi file
+                    odoo_m = self.odoo_msg() # show actual status
 
                 self.Disp.display_msg(self.msg)  # clocking message
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
-
-                wifi_m = self.wifi_signal_msg() # after every card
-                odoo_m = self.odoo_msg() # reading show actual status
 
                 rest_time = self.card_logging_time_min - \
                     (time.perf_counter() - begin_card_logging)
