@@ -108,19 +108,21 @@ class Tasks:
                 self.Buzz.Play('OK')
                 time.sleep(0.5)
                 self.reboot = True
+                print ('self reboot =  '+ str(self.reboot))
             else:
                 _logger.warn('Unable to Update Firmware')
                 self.Buzz.Play('FALSE')
                 self.Disp.display_msg('ERRUpdate')
-                time.sleep(1.5)
+                time.sleep(2)
                 self.Disp.clear_display()
+                self.back_to_begin_option()
         else:
             self.Disp.display_msg('no_wifi')
             self.Buzz.Play('FALSE')
             time.sleep(0.5)
-        self.Buzz.Play('back_to_menu')
-        time.sleep(2)
-        self.back_to_begin_option()
+            self.Buzz.Play('back_to_menu')
+            time.sleep(2)
+            self.back_to_begin_option()
 
 
     def reset_wifi(self):
