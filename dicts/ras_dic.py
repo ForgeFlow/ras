@@ -49,7 +49,7 @@ messages_dic = {
          ' '],
 
     'welcome':
-        [(1, 1), 15,
+        [(5, 10), 15,
          'Welcome to the' + '\n' +
          'RFID attendance' + '\n' +
          'system'],
@@ -61,21 +61,20 @@ messages_dic = {
          ' '],
 
     'check_in':
-        [(3, 1), 18,
+        [(10, 5), 18,
          ' ' + '\n' +
          'CHECKED IN' + '\n' +
          ' '],
 
     'check_out':
-        [(1, 1), 18,
+        [(1, 5), 18,
          ' ' + '\n' +
          'CHECKED OUT' + '\n' +
          ' '],
     'FALSE':
-        [(1, 1), 20,
+        [(1, 16), 20,
          'NOT' + '\n' +
-         'AUTHORIZED' + '\n' +
-         ' '],
+         'AUTHORIZED' ],
 
     'Local':
         [(1, 1), 20,
@@ -119,6 +118,12 @@ messages_dic = {
          'with Odoo FAILED,' + '\n' +
          'please check' + '\n' +
          'the parameters'],
+
+   'no_wifi':
+        [(26, 1), 20,
+         'No' + '\n' +
+         'WiFi' + '\n' +
+         'Signal'],
 
     'odoo_success':
         [(12, 0), 14,
@@ -169,19 +174,19 @@ messages_dic = {
          'your CARD'],
 
     'clocking':
-        [(18, 1), 18,
+        [(18, 5), 18,
          'press OK' + '\n' +
          'to begin' + '\n' +
          'CLOCKING'],
 
     'showRFID':
-        [(18, 1), 18,
+        [(18, 5), 18,
          'press OK' + '\n' +
          'to read' + '\n' +
          'RFID codes'],
 
     'update_firmware':
-        [(8, 1), 18,
+        [(8, 5), 18,
          'press OK' + '\n' +
          'to UPDATE' + '\n' +
          'the firmware'],
