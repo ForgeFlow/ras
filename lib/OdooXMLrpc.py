@@ -28,48 +28,48 @@ class OdooXMLrpc():
                 os.system('sudo rm ' + self.datajson)
                 # be sure that there is no data.json file
                 # if the data.json can not be loaded
-                self.j_data = False
-                self.db = False
-                self.user = False
-                self.pswd = False
-                self.host = False
-                self.port = False
-                self.adm = False
-                self.tz = False
+            self.j_data = False
+            self.db = False
+            self.user = False
+            self.pswd = False
+            self.host = False
+            self.port = False
+            self.adm = False
+            self.tz = False
+            self.https_on = False
+            self.url_template = False
+            self.uid = False
+        else:
+            self.db = self.j_data["db"][0]
+            self.user = self.j_data["user_name"][0]
+            self.pswd = self.j_data["user_password"][0]
+            self.host = self.j_data["odoo_host"][0]
+            self.port = self.j_data["odoo_port"][0]
+
+            self.adm = self.j_data["admin_id"][0]
+            self.tz = self.j_data["timezone"][0]
+
+            os.environ['TZ'] = tz_dic.tz_dic[self.tz]
+            time.tzset()
+
+            if "https" not in self.j_data:
                 self.https_on = False
-                self.url_template = False
-                self.uid = False
             else:
-                self.db = self.j_data["db"][0]
-                self.user = self.j_data["user_name"][0]
-                self.pswd = self.j_data["user_password"][0]
-                self.host = self.j_data["odoo_host"][0]
-                self.port = self.j_data["odoo_port"][0]
+                self.https_on = True
 
-                self.adm = self.j_data["admin_id"][0]
-                self.tz = self.j_data["timezone"][0]
+            # TODO Analyze case HTTPS and port diferent from 443
 
-                os.environ['TZ'] = tz_dic.tz_dic[self.tz]
-                time.tzset()
-
-                if "https" not in self.j_data:
-                    self.https_on = False
-                else:
-                    self.https_on = True
-
-                # TODO Analyze case HTTPS and port diferent from 443
-
-                if self.https_on:
-                    if self.port:
-                        self.url_template = ("https://%s:%s" %
-                                            (self.host, self.port))
-                    else:
-                        self.url_template = ("https://%s" % self.host)
-                else:
-                    self.url_template = ("http://%s:%s" %
+            if self.https_on:
+                if self.port:
+                    self.url_template = ("https://%s:%s" %
                                         (self.host, self.port))
+                else:
+                    self.url_template = ("https://%s" % self.host)
+            else:
+                self.url_template = ("http://%s:%s" %
+                                    (self.host, self.port))
 
-                self.uid = self._get_user_id()
+            self.uid = self._get_user_id()
 
     def _get_object_facade(self, url):
         try:
