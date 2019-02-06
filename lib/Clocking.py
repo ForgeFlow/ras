@@ -116,13 +116,14 @@ class Clocking:
     def wifi_stable(self):
         msg = self.wifi_signal_msg()
         return self.wifi
+
     def odoo_msg(self):
-        if self.Odoo._get_user_id():
-            msg = '           Odoo OK'
-            self.odoo_conn = True
-        else:
-            msg = 'NO Odoo connected'
-            self.odoo_conn = False
+        msg = 'NO Odoo connected'
+        self.odoo_conn = False
+        if self.wifi_stable():
+            if self.Odoo._get_user_id():
+                msg = '           Odoo OK'
+                self.odoo_conn = True
         _logger.debug(msg)
         return msg
 
