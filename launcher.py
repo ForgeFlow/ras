@@ -68,6 +68,7 @@ def main_loop():
             Tasks.down()
         B_Down.scanning()  # If no Button was Pressed
         B_OK.scanning()  # continue scanning
+        print ('Tasks.reboot = ' + str(Tasks.reboot))
 
     Disp.display_msg('shut_down')
     time.sleep(1.5)
