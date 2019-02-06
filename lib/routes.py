@@ -54,7 +54,7 @@ def start_server():
 
     @app.route('/')
     def form():
-        print('inside form')
+        _logger.debug('inside form')
         tz_sorted = OrderedDict(sorted(tz_dic.items()))
         if not session.get('logged_in'):
             return render_template('login.html')

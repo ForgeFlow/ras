@@ -187,7 +187,7 @@ class Clocking:
             try:
                 self.Odoo.check_attendance(db[key])
                 self.stored = self.stored - 1
-                print(self.stored, key, '=>\n ', db[key])
+                _logger.debug(self.stored, key, '=>\n ', db[key])
                 del db[key]
             except Exception as e:
                 _logger.exception(e)

@@ -108,7 +108,7 @@ class Tasks:
                 self.Buzz.Play('OK')
                 time.sleep(0.5)
                 self.reboot = True
-                print ('self reboot =  '+ str(self.reboot))
+                _logger.debug('self reboot =  '+ str(self.reboot))
             else:
                 _logger.warn('Unable to Update Firmware')
                 self.Buzz.Play('FALSE')

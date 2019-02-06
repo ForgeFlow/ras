@@ -1,9 +1,13 @@
 #! /usr/bin/python3.5
 import os
 import time
+import logging
+
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
+
+_logger = logging.getLogger(__name__)
 
 Buz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
@@ -68,7 +72,7 @@ def main_loop():
             Tasks.down()
         B_Down.scanning()  # If no Button was Pressed
         B_OK.scanning()  # continue scanning
-        print ('Tasks.reboot = ' + str(Tasks.reboot))
+        _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
 
     Disp.display_msg('shut_down')
     time.sleep(1.5)
