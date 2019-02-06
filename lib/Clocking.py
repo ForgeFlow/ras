@@ -16,6 +16,8 @@ class Clocking:
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
 
+        self.wifi = False
+
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
         # the card logging process
@@ -111,6 +113,9 @@ class Clocking:
         _logger.debug(msg)
         return msg
 
+    def wifi_stable(self):
+        msg = self.wifi_signal_msg()
+        return self.wifi
     def odoo_msg(self):
         if self.Odoo._get_user_id():
             msg = '           Odoo OK'

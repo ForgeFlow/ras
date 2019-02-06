@@ -3,7 +3,7 @@ import os
 import shelve
 import logging
 from . import Clocking, routes
-from dicts.ras_dic import ask_twice, SSID_reset
+from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR
 
 _logger = logging.getLogger(__name__)
 
@@ -21,15 +21,18 @@ class Tasks:
         self.B_OK = Hardware[4]  # Button OK
 
         self.Clock = Clocking.Clocking(Odoo, Hardware)
-        self.workdir = Odoo.workdir
-        self.ask_twice = ask_twice  # 'are you sure?' upon selection
+        self.workdir = WORK_DIR
+        self.ask_twice = ask_twice  # list of tasks to ask
+                                    #'are you sure?' upon selection
         self.get_ip = routes.get_ip
         self.can_connect = Odoo.can_connect
         self.wifi_active = self.Clock.wifi_active
+        self.wifi_stable = self.Clock.wifi_stable
 
         # Menu vars
         self.begin_option = 0  # the Terminal begins with this option
         self.option = self.begin_option
+
         self.tasks_menu = [  # The Tasks appear in the Menu
             self.clocking,  # in the same order as here.
             self.showRFID,
@@ -95,21 +98,30 @@ class Tasks:
         self.back_to_begin_option()
 
     def update_firmware(self):
-        if self.can_connect('https://github.com'):
-            _logger.debug('Updating Firmware')
-            self.Disp.display_msg('update')
-            os.chdir(self.workdir)
-            os.system('sudo git fetch origin performing')
-            os.system('sudo git reset --hard origin/performing')
-            self.Buzz.Play('OK')
-            time.sleep(0.5)
-            self.reboot = True
+        if self.wifi_stable():
+            if self.can_connect('https://github.com'):
+                _logger.debug('Updating Firmware')
+                self.Disp.display_msg('update')
+                os.chdir(self.workdir)
+                os.system('sudo git fetch origin performing')
+                os.system('sudo git reset --hard origin/performing')
+                self.Buzz.Play('OK')
+                time.sleep(0.5)
+                self.reboot = True
+            else:
+                _logger.warn('Unable to Update Firmware')
+                self.Buzz.Play('FALSE')
+                self.Disp.display_msg('ERRUpdate')
+                time.sleep(1.5)
+                self.Disp.clear_display()
         else:
-            _logger.warn('Unable to Update Firmware')
+            self.Disp.display_msg('no_wifi')
             self.Buzz.Play('FALSE')
-            self.Disp.display_msg('ERRUpdate')
-            time.sleep(1.5)
-        self.Disp.clear_display()
+            time.sleep(0.5)
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
+        self.back_to_begin_option()
+
 
     def reset_wifi(self):
         _logger.debug('Reset WI-FI')
@@ -143,19 +155,26 @@ class Tasks:
 
     def reset_odoo(self):
         _logger.debug('Reset Odoo credentials')
-        self.Odoo.uid = False
         if not self.wifi_active():  # is the Terminal
             self.reset_wifi()  # connected to a WiFi
-        routes.start_server()
-        while not self.Odoo.uid:
-            if os.path.isfile(self.Odoo.datajson):
-                os.system('sudo rm ' + self.Odoo.datajson)
-            self.odoo_config()
-        routes.stop_server()
-        self.Disp.display_msg('odoo_success')
+
+        if self.wifi_stable():
+            routes.start_server()
+            self.Odoo.uid = False
+            while not self.Odoo.uid:
+                if os.path.isfile(self.Odoo.datajson):
+                    os.system('sudo rm ' + self.Odoo.datajson)
+                self.odoo_config()
+            routes.stop_server()
+            self.Disp.display_msg('odoo_success')
+            self.Buzz.Play('back_to_menu')
+        else:
+            self.Disp.display_msg('no_wifi')
+            self.Buzz.Play('FALSE')
         self.Buzz.Play('back_to_menu')
         time.sleep(2)
         self.back_to_begin_option()
+
 
     def toggle_sync(self):
         _logger.warn('Toggle Sync')
