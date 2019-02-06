@@ -96,19 +96,19 @@ class Clocking:
         else:
             strength = -int(self.get_status()['Signal level'])  # in dBm
             if strength >= 79:
-                msg = '    WiFi: very poor'
+                msg = ' '*9 + 'WiFi: '+'\u2022'*1+'o'*4
                 self.wifi = False
             elif strength >= 75:
-                msg = '         WiFi: poor'
+                msg = ' '*9 + 'WiFi: '+'\u2022'*2+'o'*3
                 self.wifi = True
             elif strength >= 65:
-                msg = '         WiFi: fair'
+                msg = ' '*9 + 'WiFi: '+'\u2022'*3+'o'*2
                 self.wifi = True
             elif strength >= 40:
-                msg = '         WiFi: good'
+                msg = ' '*9 + 'WiFi: '+'\u2022'*4+'o'*1
                 self.wifi = True
             else:
-                msg = '    WiFi: very good'
+                msg = ' '*9 + 'WiFi: '+'\u2022'*5
                 self.wifi = True
         _logger.debug(msg)
         return msg
