@@ -96,7 +96,25 @@ def start_server():
             return form()
         else:
             return form()
-
+    
+    @app.route('/change', methods=['POST', 'GET'])
+    def change_credentials():
+        if request.method == 'POST':
+            result = request.form
+            dic = result.to_dict(flat=False)
+            print(dic)
+            jsonarray = json.dumps(dic)
+            json_file = open(WORK_DIR + 'dicts/credentials.json')
+            json_data = json.load(json_file)
+            json_file.close()
+            print(json_data['new password'][0])
+            if str(dic['old password'][0]) == json_data['new password'][0] and str(dic['username'][0]) == json_data['username'][0]:
+                with open(WORK_DIR + 'dicts/credentials.json', 'w+') as outfile:
+                    json.dump(dic,outfile)
+                print(jsonarray)
+            else:
+                flash('wrong password!')
+            return form()
 
 def stop_server():
     global server
