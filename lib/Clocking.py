@@ -3,6 +3,8 @@ import shelve
 import subprocess
 import logging
 
+from dicts.ras_dic import NET_INTERFACE
+
 _logger = logging.getLogger(__name__)
 
 
@@ -11,12 +13,18 @@ class Clocking:
     def __init__(self, odoo, hardware):
         self.card = False  # currently swipped card code
 
-        self.Odoo = odoo
-        self.Buzz = hardware[0]  # Passive Buzzer
-        self.Disp = hardware[1]  # Display
-        self.Reader = hardware[2]  # Card Reader
+        self.Odoo          = odoo
+        self.Buzz          = hardware[0]  # Passive Buzzer
+        self.Disp          = hardware[1]  # Display
+        self.Reader        = hardware[2]  # Card Reader
 
-        self.wifi = False
+        self.net_interface = NET_INTERFACE # wlan0 or eth0
+
+        self.wifi             = False
+        self.interface_stable = False # both cases: ethernet and wlan
+        self.interface_msg    = 'Unknown'
+
+        self.odoo_m = 'NO Odoo connected'
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -63,11 +71,24 @@ class Clocking:
         iwconfig_out = subprocess.check_output(
             'iwconfig wlan0', shell=True).decode('utf-8')
         if "Access Point: Not-Associated" in iwconfig_out:
-            wifi_active = False
-            _logger.warn('Wifi Active is %s' % wifi_active)
+            interface_active = False
         else:
-            wifi_active = True
-        return wifi_active
+            interface_active = True
+        _logger.warn('Wifi Active is %s' % interface_active)
+        return interface_active
+
+    def interface_active(self):
+        if self.net_interface == 'wlan0':
+            interface_active = self.wifi_active()
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+                'ifconfig eth0', shell=True).decode('utf-8')
+            if 'UP' in ifconfig_out:
+                interface_active = True
+            else:
+                interface_active = False
+            _logger.warn('Ethernet Active is %s' % interface_active)
+        return interface_active
 
     def get_status(self):
         iwresult = subprocess.check_output(
@@ -98,7 +119,8 @@ class Clocking:
             strength = -int(self.get_status()['Signal level'])  # in dBm
             if strength >= 79:
                 msg = ' '*9 + 'WiFi: '+'\u2022'*1+'o'*4
-                self.wifi = False
+                self.wifi = False # disable wifi usage per Software
+                                  # otherwise unstable communication behaviour
             elif strength >= 75:
                 msg = ' '*9 + 'WiFi: '+'\u2022'*2+'o'*3
                 self.wifi = True
@@ -113,16 +135,43 @@ class Clocking:
                 self.wifi = True
         return msg
 
+    def get_interface_msg(self):
+        if self.net_interface == 'wlan0':
+            self.interface_msg = self.wifi_signal_msg()
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+                'ifconfig eth0', shell=True).decode('utf-8')
+            if 'RUNNING' in ifconfig_out:
+                self.interface_msg = '       Ethernet OK'
+            else:
+                self.interface_msg = '       NO Ethernet'
+
+
     def wifi_stable(self):
         msg = self.wifi_signal_msg()
         return self.wifi
 
-    def odoo_msg(self):
-        msg = 'NO Odoo connected'
-        self.odoo_conn = False
-        if self.wifi_stable():
+    def interface_running(self):
+        if self.net_interface == 'wlan0':
+            msg = self.wifi_signal_msg()
+            self.interface_stable = self.wifi
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+               'ifconfig eth0', shell=True).decode('utf-8')
+            if 'RUNNING' in ifconfig_out:
+                self.interface_stable = True # stable in the case of ethernet
+                                        # means 'running'
+            else:
+                self.interface_stable = False
+        return self.interface_stable
+
+    def get_odoo_msg(self):
+        if not self.interface_running():
+            self.odoo_m = 'NO Odoo connected'
+            self.odoo_conn = False
+        else:
             if self.Odoo._get_user_id():
-                msg = '           Odoo OK'
+                self.odoo_m= '           Odoo OK'
                 self.odoo_conn = True
                 return msg
         _logger.warn(msg)
@@ -228,17 +277,12 @@ class Clocking:
         # iterations that will be waited to check if an asynchronous dump of
         # data can be made form the local RPi queue to Odoo
 
-        wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-
-        if not self.wifi:
-            odoo_m = 'NO Odoo connected'
-            self.odoo_conn = False
-        else:
-            odoo_m = self.odoo_msg()  # get odoo connection msg
+        self.get_odoo_msg() # get odoo connection msg
+        self.get_interface_msg() # get interface connection status
 
         while not (self.card == self.Odoo.adm):
 
-            self.Disp._display_time(wifi_m, odoo_m)
+            self.Disp._display_time(self.interface_msg, self.odoo_m)
             self.card = self.Reader.scan_card()  # detect and store the UID
             # if an RFID  card is swipped
 
@@ -253,12 +297,8 @@ class Clocking:
                 # measured duration of every cycle (Luis)
                 # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
 
-                wifi_m = self.wifi_signal_msg()
-                if not self.wifi:
-                    odoo_m = 'NO Odoo connected'
-                    self.odoo_conn = False
-                else:
-                    odoo_m = self.odoo_msg()  # get odoo connection msg
+                self.get_odoo_msg()  # get odoo connection msg
+                self.get_interface_msg() # get interface connection status
 
                 count = 0
                 if (not self.sync) and (self.stored > 0):
@@ -270,23 +310,22 @@ class Clocking:
 
                 begin_card_logging = time.perf_counter()
                 # store the time when the card logging process begin
-                wifi_m = self.wifi_signal_msg()
 
                 if self.sync:
-                    if not self.wifi:
+                    if not self.interface_running():
                         self.msg = 'ContactAdm'
                     else:
                         self.clock_sync()  # synchronous: when odoo not
                                            # connected, clocking not possible
-                        odoo_m = self.odoo_msg() # show actual status
 
                 if not self.sync:
                     self.clock_async()  # asynchronous: when odoo not
                     # connected, store to local RPi file
-                    odoo_m = self.odoo_msg() # show actual status
 
                 self.Disp.display_msg(self.msg)  # clocking message
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
+                self.get_odoo_msg() # show actual status
+                self.get_interface_msg() # get interface connection status
 
                 rest_time = self.card_logging_time_min - \
                     (time.perf_counter() - begin_card_logging)

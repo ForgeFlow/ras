@@ -25,8 +25,8 @@ class Tasks:
         self.ask_twice = ask_twice  # list of tasks to ask
                                     #'are you sure?' upon selection
         self.get_ip = routes.get_ip
-        self.can_connect = Odoo.can_connect
-        self.wifi_active = self.Clock.wifi_active
+        self.can_connect = Odoo.can_connect # works for wlan and ether
+        self.wifi_active = self.Clock.interface_active # TODO
         self.wifi_stable = self.Clock.wifi_stable
 
         # Menu vars
@@ -103,8 +103,8 @@ class Tasks:
                 _logger.debug('Updating Firmware')
                 self.Disp.display_msg('update')
                 os.chdir(self.workdir)
-                os.system('sudo git fetch origin v1.2-release')
-                os.system('sudo git reset --hard origin/v1.2-release')
+                os.system('sudo git fetch origin iot')
+                os.system('sudo git reset --hard origin/iot')
                 self.Buzz.Play('OK')
                 time.sleep(0.5)
                 self.reboot = True
