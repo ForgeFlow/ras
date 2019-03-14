@@ -146,8 +146,9 @@ class Clocking:
             else:
                 self.interface_msg = '       NO Ethernet'
 
-
     def wifi_stable(self):
+        if self.net_interface == 'eth0':
+            return True
         msg = self.wifi_signal_msg()
         return self.wifi
 
