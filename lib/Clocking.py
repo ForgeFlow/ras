@@ -64,9 +64,9 @@ class Clocking:
             'iwconfig wlan0', shell=True).decode('utf-8')
         if "Access Point: Not-Associated" in iwconfig_out:
             wifi_active = False
+            _logger.warn('Wifi Active is %s' % wifi_active)
         else:
             wifi_active = True
-        _logger.warn('Wifi Active is %s' % wifi_active)
         return wifi_active
 
     def get_status(self):
@@ -93,6 +93,7 @@ class Clocking:
         if not self.wifi_active():
             msg = '    No WiFi signal'
             self.wifi = False
+            _logger.warn(msg)
         else:
             strength = -int(self.get_status()['Signal level'])  # in dBm
             if strength >= 79:
@@ -110,7 +111,6 @@ class Clocking:
             else:
                 msg = ' '*9 + 'WiFi: '+'\u2022'*5
                 self.wifi = True
-        _logger.debug(msg)
         return msg
 
     def wifi_stable(self):
@@ -124,7 +124,8 @@ class Clocking:
             if self.Odoo._get_user_id():
                 msg = '           Odoo OK'
                 self.odoo_conn = True
-        _logger.debug(msg)
+                return msg
+        _logger.warn(msg)
         return msg
 
     # FUNCTIONS FOR SYNCHRONOUS MODE
