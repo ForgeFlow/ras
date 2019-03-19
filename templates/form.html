@@ -31,7 +31,7 @@
       <label for="db">Database:</label>
       <input type="text" id="db" name="db" value="{{ data['db'][0] }}">
       <label for="admin_id">Admin ID:</label>
-      <input type="text" id="admin_id" name="admin_id" value="{{ data['admin_id'][0] }}" placeholder="RFID 8-digit hex e.g. FFFFFFFF">
+      <input type="text" id="admin_id" name="admin_id" value="{{ data['admin_id'][0] }}" placeholder="RFID 8-digit hex e.g. FFFFFFFF" pattern="^([A-Fa-f0-9]{1,16})$">
       <label for="timezone">Country:</label>
       <select name="timezone" form="testform" value="{{ data['timezone'][0] }}">
         {% for tz in tz_dic %}
