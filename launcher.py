@@ -8,6 +8,8 @@ format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
+import traceback
+from io import StringIO
 
 _logger = logging.getLogger(__name__)
 
@@ -52,34 +54,40 @@ def main_loop():
     # In all the Tasks, when the Admin Card is swiped,
     # the program returns to this Loop, where a new Task
     # can be selected using the OK and Down Buttons.
+    try:
 
-    Disp.initial_display()
-    # if not Tasks.wifi_active():  # make sure that the Terminal is
-    #     Tasks.reset_wifi()  # connected to a WiFi
-    if not Odoo.user:  # make sure that we have
-        Tasks.reset_odoo()  # access to an odoo db
-    Tasks.selected()  # when the terminal is switched on it goes
-    # to the predefined Task (begin_option)
-    B_OK.pressed = False  # avoid false positives
-    B_Down.pressed = False
+        Disp.initial_display()
+        # if not Tasks.wifi_active():  # make sure that the Terminal is
+        #     Tasks.reset_wifi()  # connected to a WiFi
+        if not Odoo.user:  # make sure that we have
+            Tasks.reset_odoo()  # access to an odoo db
+        Tasks.selected()  # when the terminal is switched on it goes
+        # to the predefined Task (begin_option)
+        B_OK.pressed = False  # avoid false positives
+        B_Down.pressed = False
 
-    while not Tasks.reboot:
-        Disp.display_msg(Tasks.option_name())
-        if B_OK.pressed:
-            if Tasks.option_name() in Tasks.ask_twice:
-                ask_twice()
-            else:
-                Tasks.selected()
-        elif B_Down.pressed:
-            Tasks.down()
-        B_Down.scanning()  # If no Button was Pressed
-        B_OK.scanning()  # continue scanning
-        _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
+        while not Tasks.reboot:
+            Disp.display_msg(Tasks.option_name())
+            if B_OK.pressed:
+                if Tasks.option_name() in Tasks.ask_twice:
+                    ask_twice()
+                else:
+                    Tasks.selected()
+            elif B_Down.pressed:
+                Tasks.down()
+            B_Down.scanning()  # If no Button was Pressed
+            B_OK.scanning()  # continue scanning
+            _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
 
-    Disp.display_msg('shut_down')
-    time.sleep(1.5)
-    Disp.clear_display()
-    os.system('sudo reboot')
+        Disp.display_msg('shut_down')
+        time.sleep(1.5)
+        Disp.clear_display()
+        os.system('sudo reboot')
+    except Exception as e:
+        buff = StringIO()
+        traceback.print_exc(file=buff)
+        _logger.error(buff.getvalue())
+        raise e
 
 
 class RASFormatter(logging.Formatter):
