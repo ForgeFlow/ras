@@ -145,7 +145,8 @@ class Clocking:
                     self.msg = res['action']
                 else:
                     self.msg = 'comm_failed'
-            except Exception:
+            except Exception as e:
+                _logger.exception(e)
                 # Reset parameters for Odoo connection because fails
                 # when start and odoo is not running
                 self.Odoo.set_params()
