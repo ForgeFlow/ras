@@ -143,6 +143,7 @@ class Clocking:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
                     self.msg = res['action']
+                    _logger.debug(res)
                 else:
                     self.msg = 'comm_failed'
             except Exception as e:
@@ -153,7 +154,7 @@ class Clocking:
                 self.msg = 'comm_failed'
         else:
             self.msg = 'ContactAdm'
-        _logger.debug('Clocking sync returns: %s' % self.msg)
+        _logger.info('Clocking sync returns: %s' % self.msg)
             # No Odoo Connection: Contact Your Admin
 
     # FUNCTIONS FOR ASYNCHRONOUS MODE
