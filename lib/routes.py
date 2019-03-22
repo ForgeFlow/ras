@@ -59,17 +59,9 @@ def start_server():
         if not session.get('logged_in'):
             return render_template('login.html')
         else:
-            if os.path.isfile(WORK_DIR + 'dicts/data.json'):
-                json_file = open(WORK_DIR + 'dicts/data.json')
-                json_data = json.load(json_file)
-                json_file.close()
-                return render_template('form.html', IP=str(get_ip()),
-                                       port=3000,
-                                       data=json_data, tz_dic=tz_sorted)
-            else:
-                return render_template('form.html', IP=str(get_ip()),
-                                       port=3000,
-                                       data=False, tz_dic=tz_sorted)
+            return render_template('form.html', IP=str(get_ip()),
+                                    port=3000,
+                                    tz_dic=tz_sorted)
 
     @app.route('/result', methods=['POST', 'GET'])
     def result():
