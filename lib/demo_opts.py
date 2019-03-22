@@ -3,14 +3,7 @@ import sys
 
 from luma.core import cmdline, error
 
-
-# logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)-15s - %(message)s'
-)
-# ignore PIL debug messages
-logging.getLogger('PIL').setLevel(logging.ERROR)
+_logger = logging.getLogger(__name__)
 
 
 def display_settings(args):
@@ -58,6 +51,7 @@ def get_device(actual_args=None):
     try:
         device = cmdline.create_device(args)
     except error.Error as e:
+        _logger.exception(e)
         parser.error(e)
 
     return device

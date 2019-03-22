@@ -97,9 +97,10 @@ class OdooXMLrpc():
     def check_attendance(self, card):
         try:
             object_facade = self._get_object_facade('/xmlrpc/object')
-            res = object_facade.execute(
-                self.db, self.uid, self.pswd,
-                "hr.employee", "register_attendance", card)
+            if object_facade:
+                res = object_facade.execute(
+                    self.db, self.uid, self.pswd,
+                    "hr.employee", "register_attendance", card)
             return res
         except Exception as e:
             _logger.exception(e)
