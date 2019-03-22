@@ -57,8 +57,6 @@ class OdooXMLrpc():
             else:
                 self.https_on = True
 
-            # TODO Analyze case HTTPS and port diferent from 443
-
             if self.https_on:
                 if self.port:
                     self.url_template = ("https://%s:%s" %
@@ -66,8 +64,11 @@ class OdooXMLrpc():
                 else:
                     self.url_template = ("https://%s" % self.host)
             else:
-                self.url_template = ("http://%s:%s" %
-                                    (self.host, self.port))
+                if self.port:
+                    self.url_template = ("http://%s:%s" %
+                                        (self.host, self.port))
+                else:
+                    self.url_template = ("http://%s" % self.host)
 
             self.uid = self._get_user_id()
 
