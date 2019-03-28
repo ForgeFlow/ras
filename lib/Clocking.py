@@ -20,8 +20,7 @@ class Clocking:
 
         self.wifi = False
 
-        self.last_reboot = '27'
-#datetime.datetime.now().strftime('%d')
+        self.last_reboot = datetime.datetime.now().strftime('%d')
         print ("last reboot - day = "+self.last_reboot)
         self.daily_reboot_time = DAILY_REBOOT_TIME
 

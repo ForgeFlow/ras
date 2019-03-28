@@ -7,7 +7,7 @@ WORK_DIR = '/home/pi/ras/'
 
 # Every Day the Terminal will reboot at this time
 # please format %H:%M (for example "03:33" or "23:55")
-DAILY_REBOOT_TIME = '18:59'
+DAILY_REBOOT_TIME = '03:33'
 
 # SSID when resetting the WiFi
 SSID_reset = '__RAS__'
