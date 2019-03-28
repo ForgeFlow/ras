@@ -1,6 +1,13 @@
+# FIRMWARE Version
+FIRMWARE_VERSION = 'v1.2.2'
+
 # reference to find different files in
 # the memory of the device
 WORK_DIR = '/home/pi/ras/'
+
+# Every Day the Terminal will reboot at this time
+# please format %H:%M (for example "03:33" or "23:55")
+DAILY_REBOOT_TIME = '18:49'
 
 # SSID when resetting the WiFi
 SSID_reset = '__RAS__'

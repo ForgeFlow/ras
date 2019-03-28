@@ -31,7 +31,7 @@ def ask_twice():
     B_OK.pressed = False  # avoid false positives
     B_Down.pressed = False
     time.sleep(0.4)  # allow time to take the finger
-    # away from the button
+                     # away from the button
     while not (B_OK.pressed or B_Down.pressed):  # wait answer
         B_Down.scanning()
         B_OK.scanning()
@@ -39,12 +39,12 @@ def ask_twice():
     if B_OK.pressed:  # OK pressed for a second time
 
         Tasks.selected()  # The selected Task is run.
-        # When the Admin Card is swiped
-        # the Program returns here again.
+                          # When the Admin Card is swiped
+                          # the Program returns here again.
     else:
         Buz.Play('down')
         time.sleep(0.4)  # allow time to take the finger
-        # away from the button
+                         # away from the button
         B_OK.pressed = False  # avoid false positives
         B_Down.pressed = False
 
@@ -57,12 +57,12 @@ def main_loop():
     try:
 
         Disp.initial_display()
-        # if not Tasks.wifi_active():  # make sure that the Terminal is
-        #     Tasks.reset_wifi()  # connected to a WiFi
-        if not Odoo.user:  # make sure that we have
+
+        if not Odoo.user:       # make sure that we have
             Tasks.reset_odoo()  # access to an odoo db
+
         Tasks.selected()  # when the terminal is switched on it goes
-        # to the predefined Task (begin_option)
+                          # to the predefined Task (begin_option)
         B_OK.pressed = False  # avoid false positives
         B_Down.pressed = False
 
@@ -76,13 +76,11 @@ def main_loop():
             elif B_Down.pressed:
                 Tasks.down()
             B_Down.scanning()  # If no Button was Pressed
-            B_OK.scanning()  # continue scanning
+            B_OK.scanning()    # continue scanning
             _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
 
-        Disp.display_msg('shut_down')
-        time.sleep(1.5)
-        Disp.clear_display()
-        os.system('sudo reboot')
+        Tasks.reboot_procedure()
+
     except Exception as e:
         buff = StringIO()
         traceback.print_exc(file=buff)
@@ -91,7 +89,7 @@ def main_loop():
 
 
 class RASFormatter(logging.Formatter):
-    
+
     def format(self, record):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)

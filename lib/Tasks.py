@@ -3,7 +3,7 @@ import os
 import shelve
 import logging
 from . import Clocking, routes
-from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR
+from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR, FIRMWARE_VERSION
 
 _logger = logging.getLogger(__name__)
 
@@ -12,19 +12,21 @@ class Tasks:
     def __init__(self, Odoo, Hardware):
         self.card = False  # currently swipped card code
         self.reboot = False  # Flag to signal the main Loop
-        # rebooting was chosen
-        self.Odoo = Odoo
-        self.Buzz = Hardware[0]  # Passive Buzzer
-        self.Disp = Hardware[1]  # Display
+                             # rebooting was chosen
+        self.Odoo   = Odoo
+        self.Buzz   = Hardware[0]  # Passive Buzzer
+        self.Disp   = Hardware[1]  # Display
         self.Reader = Hardware[2]  # Card Reader
         self.B_Down = Hardware[3]  # Button Down
-        self.B_OK = Hardware[4]  # Button OK
+        self.B_OK   = Hardware[4]  # Button OK
 
-        self.Clock = Clocking.Clocking(Odoo, Hardware)
-        self.workdir = WORK_DIR
-        self.ask_twice = ask_twice  # list of tasks to ask
+        self.Clock            = Clocking.Clocking(Odoo, Hardware)
+        self.reboot_procedure = self.Clock.reboot_procedure
+
+        self.workdir     = WORK_DIR
+        self.ask_twice   = ask_twice  # list of tasks to ask
                                     #'are you sure?' upon selection
-        self.get_ip = routes.get_ip
+        self.get_ip      = routes.get_ip
         self.can_connect = Odoo.can_connect
         self.wifi_active = self.Clock.wifi_active
         self.wifi_stable = self.Clock.wifi_stable
@@ -39,7 +41,6 @@ class Tasks:
             self.update_firmware,
             self.reset_wifi,
             self.reset_odoo,
-            #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
             self.rebooting]
 
@@ -196,7 +197,7 @@ class Tasks:
     def show_version(self):
         origin = (34, 20)
         size = 24
-        text = 'v1.2'
+        text = FIRMWARE_VERSION
         self.Disp.display_msg_raw(origin, size, text)
         time.sleep(1)
 
