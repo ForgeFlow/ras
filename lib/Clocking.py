@@ -2,6 +2,7 @@ import time
 import datetime
 import subprocess
 import logging
+import os
 from dicts.ras_dic import DAILY_REBOOT_TIME
 
 _logger = logging.getLogger(__name__)
