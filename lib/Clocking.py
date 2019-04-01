@@ -21,7 +21,7 @@ class Clocking:
         self.wifi = False
 
         self.last_reboot = datetime.datetime.now().strftime('%d')
-        print ("last reboot - day = "+self.last_reboot)
+        
         self.daily_reboot_time = DAILY_REBOOT_TIME
 
         self.card_logging_time_min = 1.5
@@ -51,9 +51,6 @@ class Clocking:
     def check_daily_reboot(self):
         now   = datetime.datetime.now().strftime('%H:%M')
         today = datetime.datetime.now().strftime('%d')
-        print("now:"+now+" - today: "+today)
-        print("daily reboot time: "+self.daily_reboot_time+\
-              "last reboot day"+self.last_reboot)
         if today != self.last_reboot:
             if now > self.daily_reboot_time:
                 self.reboot_procedure()
@@ -189,7 +186,7 @@ class Clocking:
                 # measured duration of every cycle (Luis)
                 # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
 
-                self.check_daily_reboot()
+                # self.check_daily_reboot()
 
                 wifi_m = self.wifi_signal_msg()
                 if not self.wifi:
