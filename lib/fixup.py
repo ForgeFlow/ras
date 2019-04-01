@@ -13,7 +13,8 @@ def ensure_autostart_after_crash():
 
     with open(file_to_be_updated, 'r') as f:
         lines   = f.readlines()
-        if fixup1 not in lines:
+        print(lines)
+        if fixup1 + end_of_line not in lines:
             f.close()
             with open(file_to_be_updated, 'w') as f:
                 for line in lines:
@@ -28,4 +29,3 @@ def ensure_autostart_after_crash():
             os.system('systemctl restart ras-launcher')
 
 #ensure_autostart_after_crash()
-
