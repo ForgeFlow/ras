@@ -22,7 +22,7 @@ B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
 Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 
-Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
+Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xml
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
 
