@@ -25,5 +25,5 @@ def ensure_autostart_after_crash():
             os.system('systemctl daemon-reload')
             os.system('systemctl restart ras-launcher')
 
-make_service_to_autostart()
+#make_service_to_autostart()
 
