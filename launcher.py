@@ -58,7 +58,7 @@ def main_loop():
     # can be selected using the OK and Down Buttons.
     try:
 
-        fixup.ensure_autostart_after_crash()
+#        fixup.ensure_autostart_after_crash()
 
         Disp.initial_display()
 
