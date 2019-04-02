@@ -8,6 +8,7 @@ format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
+from lib import fixup_watchdog
 import traceback
 from io import StringIO
 
@@ -55,6 +56,8 @@ def main_loop():
     # the program returns to this Loop, where a new Task
     # can be selected using the OK and Down Buttons.
     try:
+
+        fixup_watchdog.ensure_watchdog()
 
         Disp.initial_display()
         # if not Tasks.wifi_active():  # make sure that the Terminal is
