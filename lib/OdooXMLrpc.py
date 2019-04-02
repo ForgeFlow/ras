@@ -1,4 +1,7 @@
-import os, time, json, logging
+import os
+import time
+import json
+import logging
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
@@ -7,6 +10,7 @@ import xmlrpc.client as xmlrpclib
 from urllib.request import urlopen
 
 _logger = logging.getLogger(__name__)
+
 
 class OdooXMLrpc():
 
@@ -60,13 +64,13 @@ class OdooXMLrpc():
             if self.https_on:
                 if self.port:
                     self.url_template = ("https://%s:%s" %
-                                        (self.host, self.port))
+                                         (self.host, self.port))
                 else:
                     self.url_template = ("https://%s" % self.host)
             else:
                 if self.port:
                     self.url_template = ("http://%s:%s" %
-                                        (self.host, self.port))
+                                         (self.host, self.port))
                 else:
                     self.url_template = ("http://%s" % self.host)
 

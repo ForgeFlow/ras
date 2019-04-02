@@ -3,6 +3,7 @@ import os
 import time
 import logging
 import logging.handlers
+
 format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
 
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
@@ -97,12 +98,14 @@ def main_loop():
 
 
 class RASFormatter(logging.Formatter):
-    
+
     def format(self, record):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
-handler = logging.handlers.TimedRotatingFileHandler(filename='/var/log/ras.log', when='D', interval=1, backupCount=30)
+
+handler = logging.handlers.TimedRotatingFileHandler(
+    filename='/var/log/ras.log', when='D', interval=1, backupCount=30)
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
 main_loop()

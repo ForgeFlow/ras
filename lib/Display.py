@@ -9,6 +9,7 @@ from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
 _logger = logging.getLogger(__name__)
 
+
 class Display:
 
     def __init__(self):
@@ -41,7 +42,7 @@ class Display:
         with canvas(self.device) as draw:
             try:
                 draw.text(15, 20, card_id, font=c_font, fill="white")
-            except:
+            except BaseException:
                 draw.text((15, 20), card_id, font=c_font, fill="white")
 
     def _welcome_logo(self):
@@ -75,7 +76,7 @@ class Display:
         size = messages_dic[param][1]
         text = messages_dic[param][2]
         self.display_msg_raw(origin, size, text)
-        _logger.debug('Displaying message: '+text)
+        _logger.debug('Displaying message: ' + text)
 
     def clear_display(self):
         with canvas(self.device) as draw:

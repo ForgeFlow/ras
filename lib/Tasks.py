@@ -23,7 +23,7 @@ class Tasks:
         self.Clock = Clocking.Clocking(Odoo, Hardware)
         self.workdir = WORK_DIR
         self.ask_twice = ask_twice  # list of tasks to ask
-                                    #'are you sure?' upon selection
+        # 'are you sure?' upon selection
         self.get_ip = routes.get_ip
         self.can_connect = Odoo.can_connect
         self.wifi_active = self.Clock.wifi_active
@@ -109,7 +109,7 @@ class Tasks:
                 self.Buzz.Play('OK')
                 time.sleep(0.5)
                 self.reboot = True
-                _logger.debug('self reboot =  '+ str(self.reboot))
+                _logger.debug('self reboot =  ' + str(self.reboot))
             else:
                 _logger.warn('Unable to Update Firmware')
                 self.Buzz.Play('FALSE')
@@ -124,7 +124,6 @@ class Tasks:
             self.Buzz.Play('back_to_menu')
             time.sleep(2)
             self.back_to_begin_option()
-
 
     def reset_wifi(self):
         _logger.debug('Reset WI-FI')
@@ -177,7 +176,6 @@ class Tasks:
         self.Buzz.Play('back_to_menu')
         time.sleep(2)
         self.back_to_begin_option()
-
 
     def toggle_sync(self):
         _logger.warn('Toggle Sync')

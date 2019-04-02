@@ -16,6 +16,7 @@ import threading
 
 _logger = logging.getLogger(__name__)
 
+
 def get_ip():
     _logger.debug('Getting IP')
     command = "hostname -I | awk '{ print $1}' "
@@ -60,8 +61,8 @@ def start_server():
             return render_template('login.html')
         else:
             return render_template('form.html', IP=str(get_ip()),
-                                    port=3000,
-                                    tz_dic=tz_sorted)
+                                   port=3000,
+                                   tz_dic=tz_sorted)
 
     def reset_admin_form():
         _logger.debug('reset admin form')
@@ -121,7 +122,7 @@ def start_server():
             return reset_admin_form()
         else:
             return form()
-    
+
     @app.route('/change', methods=['POST', 'GET'])
     def change_credentials():
         if request.method == 'POST':
@@ -133,13 +134,16 @@ def start_server():
             json_data = json.load(json_file)
             json_file.close()
             print(json_data['new password'][0])
-            if str(dic['old password'][0]) == json_data['new password'][0] and str(dic['username'][0]) == json_data['username'][0]:
-                with open(WORK_DIR + 'dicts/credentials.json', 'w+') as outfile:
-                    json.dump(dic,outfile)
+            if str(dic['old password'][0]) == json_data['new password'][0] \
+                    and str(dic['username'][0]) == json_data['username'][0]:
+                with open(WORK_DIR + 'dicts/credentials.json',
+                          'w+') as outfile:
+                    json.dump(dic, outfile)
                 print(jsonarray)
             else:
                 flash('wrong password!')
             return form()
+
 
 def stop_server():
     global server

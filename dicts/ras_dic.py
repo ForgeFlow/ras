@@ -78,7 +78,7 @@ messages_dic = {
     'FALSE':
         [(1, 16), 20,
          'NOT' + '\n' +
-         'AUTHORIZED' ],
+         'AUTHORIZED'],
 
     'Local':
         [(1, 1), 20,
@@ -123,7 +123,7 @@ messages_dic = {
          'please check' + '\n' +
          'the parameters'],
 
-   'no_wifi':
+    'no_wifi':
         [(26, 1), 20,
          'No' + '\n' +
          'WiFi' + '\n' +
