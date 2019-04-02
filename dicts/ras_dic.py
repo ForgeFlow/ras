@@ -50,180 +50,120 @@ messages_dic = {
 
     'welcome':
         [(5, 10), 15,
-         'Welcome to the' + '\n' +
-         'RFID attendance' + '\n' +
-         'system'],
+         'Welcome to the\nRFID attendance\nsystem'],
 
     'wait':
         [(1, 1), 20,
-         'Please' + '\n' +
-         'wait' + '\n' +
-         ' '],
+         'Please\nwait\n '],
 
     'check_in':
         [(10, 5), 18,
-         ' ' + '\n' +
-         'CHECKED IN' + '\n' +
-         ' '],
+         ' \nCHECKED IN\n '],
 
     'check_out':
         [(1, 5), 18,
-         ' ' + '\n' +
-         'CHECKED OUT' + '\n' +
-         ' '],
+         ' \nCHECKED OUT\n '],
     'FALSE':
         [(1, 16), 20,
-         'NOT' + '\n' +
-         'AUTHORIZED'],
+         'NOT\nAUTHORIZED'],
 
     'Local':
         [(1, 1), 20,
-         'Clocking' + '\n' +
-         'LOCALLY' + '\n' +
-         ' '],
+         'Clocking\nLOCALLY\n '],
 
     'odoo_async':
         [(22, 1), 20,
-         'Clocking' + '\n' +
-         'to' + '\n' +
-         'Odoo'],
+         'Clocking\nto\nOdoo'],
 
     'ContactAdm':
         [(26, 1), 20,
-         'Contact' + '\n' +
-         'your' + '\n' +
-         'ADMIN'],
+         'Contact\nyour\nADMIN'],
 
     'connecting':
         [(1, 1), 20,
-         ' ' + '\n' +
-         'Connecting...' + '\n' +
-         ' '],
+         ' \nConnecting...\n '],
 
     'reading':
         [(1, 1), 20,
-         ' ' + '\n' +
-         'Reading...' + '\n' +
-         ' '],
+         ' \nReading...\n '],
 
     'comm_failed':
         [(9, 0), 16,
-         'Error while' + '\n' +
-         'communicating' + '\n' +
-         'with Odoo'],
+         'Error while\ncommunicating\nwith Odoo'],
 
     'odoo_failed':
         [(0, 0), 14,
-         'Communication' + '\n' +
-         'with Odoo FAILED,' + '\n' +
-         'please check' + '\n' +
-         'the parameters'],
+         'Communication\nwith Odoo FAILED,\n'
+         'please check\nthe parameters'],
 
     'no_wifi':
         [(26, 1), 20,
-         'No' + '\n' +
-         'WiFi' + '\n' +
-         'Signal'],
+         'No\nWiFi\nSignal'],
 
     'odoo_success':
         [(12, 0), 14,
-         'Communication' + '\n' +
-         'with Odoo' + '\n' +
-         'established'],
+         'Communication\nwith Odoo\nestablished'],
 
     'configure_wifi':
         [(12, 0), 14,
-         '1. Connect to AP' + '\n' +
-         SSID_reset + '\n' +
-         '2. Browse to ' + '\n' +
-         '192.168.42.1'],
+         '1. Connect to AP\nSSID_reset\n 2. Browse to \n192.168.42.1'],
 
     'sync':
         [(1, 1), 16,
-         'Clocking' + '\n' +
-         ' ' + '\n' +
-         'SYNCHRONOUS'],
+         'Clocking\n\nSYNCHRONOUS'],
     'async':
         [(1, 1), 14,
-         'Clocking' + '\n' +
-         ' ' + '\n' +
-         'ASYNCHRONOUS'],
+         'Clocking\n\nASYNCHRONOUS'],
 
     'shut_down':
         [(1, 1), 21,
-         ' ' + '\n' +
-         'REBOOTING' + '\n' +
-         ' '],
+         ' \nREBOOTING\n '],
 
     'ERRUpdate':
         [(1, 1), 15,
-         'Unable to update,' + '\n' +
-         'GitHub connection' + '\n' +
-         'refused'],
+         'Unable to update,\nGitHub connection\nrefused'],
 
     'update':
         [(22, 1), 16,
-         'Updating' + '\n' +
-         ' ' + '\n' +
-         'FIRMWARE'],
+         'Updating\n\nFIRMWARE'],
 
     'swipecard':
         [(14, 1), 20,
-         'Please' + '\n' +
-         'swipe' + '\n' +
-         'your CARD'],
+         'Please\nswipe\nyour CARD'],
 
     'clocking':
         [(18, 5), 18,
-         'press OK' + '\n' +
-         'to begin' + '\n' +
-         'CLOCKING'],
+         'press OK\nto begin\nCLOCKING'],
 
     'showRFID':
         [(18, 5), 18,
-         'press OK' + '\n' +
-         'to read' + '\n' +
-         'RFID codes'],
+         'press OK\nto read\nRFID codes'],
 
     'update_firmware':
         [(8, 5), 18,
-         'press OK' + '\n' +
-         'to UPDATE' + '\n' +
-         'the firmware'],
+         'press OK\nto UPDATE\nthe firmware'],
 
     'reset_wifi':
         [(7, 5), 16,
-         'press OK to' + '\n' +
-         'RESET the WiFi' + '\n' +
-         'parameters'],
+         'press OK to\nRESET the WiFi\nparameters'],
 
     'reset_odoo':
         [(7, 5), 16,
-         'press OK to' + '\n' +
-         'RESET the Odoo' + '\n' +
-         'parameters'],
+         'press OK to\nRESET the Odoo\nparameters'],
 
     'toggle_sync':
         [(8, 5), 18,
-         'press OK to' + '\n' +
-         'to toggle the' + '\n' +
-         'sync mode'],
+         'press OK to\nto toggle the\nsync mode'],
 
     'show_version':
         [(7, 5), 16,
-         'press OK to see' + '\n' +
-         'the firmware' + '\n' +
-         'VERSION'],
+         'press OK to see\nthe firmware\nVERSION'],
 
     'rebooting':
         [(22, 1), 20,
-         'press OK' + '\n' +
-         'to' + '\n' +
-         'REBOOT'],
+         'press OK\nto\nREBOOT'],
 
     'sure?':
         [(5, 5), 15,
-         'ARE YOU SURE?' + '\n' +
-         'Press OK again' + '\n' +
-         'if you are sure']
+         'ARE YOU SURE?\nPress OK again\nif you are sure']
 }
