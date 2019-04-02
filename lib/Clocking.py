@@ -97,19 +97,19 @@ class Clocking:
         else:
             strength = -int(self.get_status()['Signal level'])  # in dBm
             if strength >= 79:
-                msg = ' '*9 + 'WiFi: '+'\u2022'*1+'o'*4
+                msg = ' ' * 9 + 'WiFi: ' + '\u2022' * 1 + 'o' * 4
                 self.wifi = False
             elif strength >= 75:
-                msg = ' '*9 + 'WiFi: '+'\u2022'*2+'o'*3
+                msg = ' ' * 9 + 'WiFi: ' + '\u2022' * 2 + 'o' * 3
                 self.wifi = True
             elif strength >= 65:
-                msg = ' '*9 + 'WiFi: '+'\u2022'*3+'o'*2
+                msg = ' ' * 9 + 'WiFi: ' + '\u2022' * 3 + 'o' * 2
                 self.wifi = True
             elif strength >= 40:
-                msg = ' '*9 + 'WiFi: '+'\u2022'*4+'o'*1
+                msg = ' ' * 9 + 'WiFi: ' + '\u2022' * 4 + 'o' * 1
                 self.wifi = True
             else:
-                msg = ' '*9 + 'WiFi: '+'\u2022'*5
+                msg = ' ' * 9 + 'WiFi: ' + '\u2022' * 5
                 self.wifi = True
         return msg
 
@@ -133,8 +133,8 @@ class Clocking:
     def clock_sync(self):
 
         if not self.Odoo.uid:
-            self.Odoo.set_params() # be sure that always uid is set to
-                                   # the last Odoo status (if connected)
+            self.Odoo.set_params()  # be sure that always uid is set to
+            # the last Odoo status (if connected)
         if self.can_connect(self.Odoo.url_template):
             # when Odoo connected--> Store Clocking
             # directly on odoo database
@@ -155,7 +155,7 @@ class Clocking:
         else:
             self.msg = 'ContactAdm'
         _logger.info('Clocking sync returns: %s' % self.msg)
-            # No Odoo Connection: Contact Your Admin
+        # No Odoo Connection: Contact Your Admin
 
     # FUNCTIONS FOR ASYNCHRONOUS MODE
 
@@ -277,13 +277,13 @@ class Clocking:
                         self.msg = 'ContactAdm'
                     else:
                         self.clock_sync()  # synchronous: when odoo not
-                                           # connected, clocking not possible
-                        odoo_m = self.odoo_msg() # show actual status
+                        # connected, clocking not possible
+                        odoo_m = self.odoo_msg()  # show actual status
 
                 if not self.sync:
                     self.clock_async()  # asynchronous: when odoo not
                     # connected, store to local RPi file
-                    odoo_m = self.odoo_msg() # show actual status
+                    odoo_m = self.odoo_msg()  # show actual status
 
                 self.Disp.display_msg(self.msg)  # clocking message
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
