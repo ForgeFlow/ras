@@ -1,3 +1,6 @@
+# FIRMWARE Version
+FIRMWARE_VERSION = 'v1.2.2'
+
 # reference to find different files in
 # the memory of the device
 WORK_DIR = '/home/pi/ras/'
