@@ -3,7 +3,7 @@ import os
 import shelve
 import logging
 from . import Clocking, routes
-from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR
+from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR, FIRMWARE_VERSION
 
 _logger = logging.getLogger(__name__)
 
@@ -200,7 +200,7 @@ class Tasks:
     def show_version(self):
         origin = (34, 20)
         size = 24
-        text = "v1.2"
+        text = FIRMWARE_VERSION
         self.Disp.display_msg_raw(origin, size, text)
         time.sleep(1)
 
