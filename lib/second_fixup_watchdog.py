@@ -20,7 +20,7 @@ def ensure_watchdog():
                         f.write(fixup1 + \
                         "	= 24" + eol )
                     elif fixup2 in line:
-                        f.write(fixup3 + \
+                        f.write(fixup2 + \
 			'		= /dev/watchdog' + eol )
                     else:
                         f.write(line)
