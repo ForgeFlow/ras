@@ -8,6 +8,7 @@ format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
+from lib import second_fixup_watchdog
 from lib import fixup_watchdog
 from lib import fixup
 import traceback
@@ -59,7 +60,8 @@ def main_loop():
     try:
         fixup.ensure_autostart_after_crash()
         fixup_watchdog.ensure_watchdog()
-        
+        second_fixup_watchdog.ensure_watchdog()
+
         Disp.initial_display()
         # if not Tasks.wifi_active():  # make sure that the Terminal is
         #     Tasks.reset_wifi()  # connected to a WiFi
