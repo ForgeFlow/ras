@@ -8,6 +8,10 @@ WORK_DIR = '/home/pi/ras/'
 # SSID when resetting the WiFi
 SSID_reset = '__RAS__'
 
+# Every Day the Terminal will reboot at this time
+# please format %H:%M (for example "03:33" or "23:55")
+DAILY_REBOOT_TIME = '03:33'
+
 # driver to be used by luma.core
 display_driver = 'sh1106'
 

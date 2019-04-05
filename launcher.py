@@ -85,10 +85,8 @@ def main_loop():
             B_OK.scanning()  # continue scanning
             _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
 
-        Disp.display_msg('shut_down')
-        time.sleep(1.5)
-        Disp.clear_display()
-        os.system('sudo reboot')
+        Tasks.reboot_procedure()
+
     except Exception as e:
         buff = StringIO()
         traceback.print_exc(file=buff)
@@ -97,7 +95,6 @@ def main_loop():
 
 
 class RASFormatter(logging.Formatter):
-    
     def format(self, record):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)

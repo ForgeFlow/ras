@@ -1,6 +1,9 @@
 import time
 import subprocess
 import logging
+import datetime
+import os
+from dicts.ras_dic import DAILY_REBOOT_TIME
 
 _logger = logging.getLogger(__name__)
 
@@ -16,6 +19,9 @@ class Clocking:
         self.Reader = hardware[2]  # Card Reader
 
         self.wifi = False
+
+        self.last_reboot = datetime.datetime.now().strftime('%d')
+        self.daily_reboot_time = DAILY_REBOOT_TIME
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -35,6 +41,19 @@ class Clocking:
         _logger.debug('Clocking Class Initialized')
 
     # ___________________
+
+    def reboot_procedure(self):
+        self.Disp.display_msg('shut_down')
+        time.sleep(1.5)
+        self.Disp.clear_display()
+        os.system('sudo reboot')
+
+    def check_daily_reboot(self):
+        now   = datetime.datetime.now().strftime('%H:%M')
+        today = datetime.datetime.now().strftime('%d')
+        if today != self.last_reboot:
+            if now > self.daily_reboot_time:
+                self.reboot_procedure()
 
     def wifi_active(self):
         iwconfig_out = subprocess.check_output(
@@ -160,6 +179,8 @@ class Clocking:
                 # uncomment this print to monitor how long the cycles are
                 # measured duration of every cycle (Luis)
                 # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
+
+                self.check_daily_reboot()
 
                 wifi_m = self.wifi_signal_msg()
                 if not self.wifi:
