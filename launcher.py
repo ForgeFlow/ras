@@ -34,8 +34,7 @@ def ask_twice():
     time.sleep(0.4)  # allow time to take the finger
     # away from the button
     while not (B_OK.pressed or B_Down.pressed):  # wait answer
-        B_Down.scanning()
-        B_OK.scanning()
+        pass
 
     if B_OK.pressed:  # OK pressed for a second time
 
