@@ -1,7 +1,6 @@
 #! /usr/bin/python3.5
 import os
 import time
-import psutil
 import logging
 import logging.handlers
 format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
@@ -14,6 +13,12 @@ from lib import fixup_watchdog
 from lib import fixup
 import traceback
 from io import StringIO
+
+try:
+    import psutil
+except:
+    os.system('pip3 install psutil')
+
 
 _logger = logging.getLogger(__name__)
 

@@ -32,10 +32,12 @@ class Clocking:
         # check out, communication with odoo not possible ...
 
         self.can_connect = odoo.can_connect
-        _logger.debug('Clocking Class Initialized')
-        self.minutes = 99
-        self.checkodoo_wifi =True
 
+        self.minutes        = 99
+        self.checkodoo_wifi = True
+        self.odoo_m         = " "
+        self.wifi_m         = " "
+        _logger.debug('Clocking Class Initialized')
 
     # ___________________
 
@@ -131,36 +133,37 @@ class Clocking:
             self.msg = 'ContactAdm'  # No Odoo Connection: Contact Your Admin
         _logger.info('Clocking sync returns: %s' % self.msg)
 
+    def get_messages(self):
+        self.wifi_m = self.wifi_signal_msg()  # get wifi strength signal
+        if not self.wifi:
+                    self.odoo_m = 'NO Odoo connected'
+                    self.odoo_conn = False
+        else:
+             self.odoo_m = self.odoo_msg()  # get odoo connection msg
+
     def clocking(self):
         # Main Functions of the Terminal:
         # Show Time and do the clockings (check in/out)
 
         _logger.debug('Clocking')
 
-        wifi_m =" "
-        odoo_m = " "
+        self.get_messages()
 
         while not (self.card == self.Odoo.adm):
 
-            if self.checkodoo_wifi:
-              if time.localtime().tm_sec == 30:
-                self.checkodoo_wifi = False
-                wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-                if not self.wifi:
-                    odoo_m = 'NO Odoo connected'
-                    self.odoo_conn = False
-                else:
-                    odoo_m = self.odoo_msg()  # get odoo connection msg
+            if self.checkodoo_wifi: # odoo connected and wifi strength
+                if time.localtime().tm_sec == 30: # messages are checked
+                    self.get_messages()           # only once per minute
+            else:                                 # (on the 30s spot)
+                if time.localtime().tm_sec == 31:
+                    self.checkodoo_wifi = True
 
-            if not self.checkodoo_wifi:
-              if time.localtime().tm_sec == 31:
-                self.checkodoo_wifi = True
-
-            if not (time.localtime().tm_min == self.minutes):
-                self.minutes = time.localtime().tm_min
-                self.Disp._display_time(wifi_m, odoo_m)
+            if not (time.localtime().tm_min == self.minutes): # Display is
+                self.minutes = time.localtime().tm_min    # refreshed only
+                self.Disp._display_time(self.wifi_m, self.odoo_m)   # once every minute
 
             self.card = self.Reader.scan_card()  # detect and store the UID
+
             # if an RFID  card is swipped
             time.sleep(0.01)
 
@@ -168,14 +171,14 @@ class Clocking:
 
                 begin_card_logging = time.perf_counter()
                 # store the time when the card logging process begin
-                wifi_m = self.wifi_signal_msg()
+                self.wifi_m = self.wifi_signal_msg()
 
                 if not self.wifi:
                     self.msg = 'ContactAdm'
                 else:
                     self.clock_sync()  # synchronous: when odoo not
                                        # connected, clocking not possible
-                    odoo_m = self.odoo_msg() # show actual status
+                    self.odoo_m = self.odoo_msg() # show actual status
 
 
                 self.Disp.display_msg(self.msg)  # clocking message
@@ -189,7 +192,7 @@ class Clocking:
                     rest_time = 0  # the rest time can not be negative
 
                 time.sleep(rest_time)
-                self.Disp._display_time(wifi_m, odoo_m)
+                self.Disp._display_time(self.wifi_m, self.odoo_m)
 
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
