@@ -18,11 +18,8 @@ class Display:
         _logger.debug('Display Class Initialized')
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
-        self.minutes = 99
 
     def _display_time(self, wifi_quality, odoo_m):
-        if not (time.localtime().tm_min == self.minutes):
-            self.minutes = time.localtime().tm_min
             with canvas(self.device) as draw:
                 hour = time.strftime("%H:%M", time.localtime())
                 num_ones = hour.count('1')
