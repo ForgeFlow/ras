@@ -33,6 +33,9 @@ class Clocking:
 
         self.can_connect = odoo.can_connect
         _logger.debug('Clocking Class Initialized')
+        self.minutes = 99
+        self.checkodoo_wifi =True
+
 
     # ___________________
 
@@ -134,41 +137,32 @@ class Clocking:
 
         _logger.debug('Clocking')
 
-        count = 0
-        count_max = 265  # this corresponds roughly to 60 seconds
-        # iterations that will be waited to check if an asynchronous dump of
-        # data can be made form the local RPi queue to Odoo
-
-        wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-
-        if not self.wifi:
-            odoo_m = 'NO Odoo connected'
-            self.odoo_conn = False
-        else:
-            odoo_m = self.odoo_msg()  # get odoo connection msg
+        wifi_m =" "
+        odoo_m = " "
 
         while not (self.card == self.Odoo.adm):
 
-            self.Disp._display_time(wifi_m, odoo_m)
-            self.card = self.Reader.scan_card()  # detect and store the UID
-            # if an RFID  card is swipped
- #           time.sleep(0.01)
-            count = count + 1
-
-            if count > count_max:  # periodically tests
-                # print (time.strftime('%X %x %Z'))
-                # uncomment this print to monitor how long the cycles are
-                # measured duration of every cycle (Luis)
-                # 226ms per cycle or 4,4 cycles per second = 4,4 Hz
-
-                wifi_m = self.wifi_signal_msg()
+            if self.checkodoo_wifi:
+              if time.localtime().tm_sec == 30:
+                self.checkodoo_wifi = False
+                wifi_m = self.wifi_signal_msg()  # get wifi strength signal
                 if not self.wifi:
                     odoo_m = 'NO Odoo connected'
                     self.odoo_conn = False
                 else:
                     odoo_m = self.odoo_msg()  # get odoo connection msg
 
-                count = 0
+            if not self.checkodoo_wifi:
+              if time.localtime().tm_sec == 31:
+                self.checkodoo_wifi = True
+
+            if not (time.localtime().tm_min == self.minutes):
+                self.minutes = time.localtime().tm_min
+                self.Disp._display_time(wifi_m, odoo_m)
+
+            self.card = self.Reader.scan_card()  # detect and store the UID
+            # if an RFID  card is swipped
+            time.sleep(0.01)
 
             if self.card and not (self.card.lower() == self.Odoo.adm.lower()):
 
@@ -195,6 +189,7 @@ class Clocking:
                     rest_time = 0  # the rest time can not be negative
 
                 time.sleep(rest_time)
+                self.Disp._display_time(wifi_m, odoo_m)
 
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
