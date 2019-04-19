@@ -152,7 +152,7 @@ class Clocking:
             self.Disp._display_time(wifi_m, odoo_m)
             self.card = self.Reader.scan_card()  # detect and store the UID
             # if an RFID  card is swipped
-
+ #           time.sleep(0.01)
             count = count + 1
 
             if count > count_max:  # periodically tests
