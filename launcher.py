@@ -18,7 +18,7 @@ try:
     import psutil
 except:
     os.system('pip3 install psutil')
-
+    import psutil
 
 _logger = logging.getLogger(__name__)
 
