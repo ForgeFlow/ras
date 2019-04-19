@@ -1,7 +1,6 @@
 #! /usr/bin/python3.5
 import os
 import time
-import psutil
 import logging
 import logging.handlers
 
@@ -12,6 +11,12 @@ from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
 import traceback
 from io import StringIO
+
+try:
+    import psutil
+except:
+    os.system('pip3 install psutil')
+
 
 _logger = logging.getLogger(__name__)
 
