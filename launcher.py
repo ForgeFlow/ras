@@ -1,7 +1,6 @@
 #! /usr/bin/python3.5
 import os
 import time
-import psutil
 import logging
 import logging.handlers
 

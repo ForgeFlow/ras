@@ -52,6 +52,11 @@ class Clocking:
         self.minutes = 99
         self.checkodoo_wifi =True
 
+        self.minutes        = 99
+        self.checkodoo_wifi = True
+        self.odoo_m         = " "
+        self.wifi_m         = " "
+        _logger.debug('Clocking Class Initialized')
 
     # ___________________
 
