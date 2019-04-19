@@ -1,6 +1,7 @@
 #! /usr/bin/python3.5
 import os
 import time
+import psutil
 import logging
 import logging.handlers
 
@@ -17,6 +18,9 @@ from io import StringIO
 
 
 _logger = logging.getLogger(__name__)
+
+p = psutil.Process(os.getpid())
+p.nice(6) # give the launcher process a low priority
 
 Buz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
