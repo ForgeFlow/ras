@@ -22,12 +22,12 @@
 import signal
 import time
 
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import spi
 
 
 class CardReader:
-  NRSTPD = 22
+#  NRSTPD = 22
 
   MAX_LEN = 16
 
@@ -35,11 +35,11 @@ class CardReader:
   PCD_AUTHENT    = 0x0E
   PCD_RECEIVE    = 0x08
   PCD_TRANSMIT   = 0x04
-  PCD_TRANSCEIVE = 0x0C
-  PCD_RESETPHASE = 0x0F
+  PCD_TRANSCEIVE = 0x0C # scan card
+  PCD_RESETPHASE = 0x0F # to reset MFRC522
   PCD_CALCCRC    = 0x03
 
-  PICC_REQIDL    = 0x26
+  PICC_REQIDL    = 0x26 # scan card
   PICC_REQALL    = 0x52
   PICC_ANTICOLL  = 0x93
   PICC_SElECTTAG = 0x93
@@ -58,7 +58,7 @@ class CardReader:
   MI_ERR      = 2
 
   Reserved00     = 0x00
-  CommandReg     = 0x01
+  CommandReg     = 0x01 # set to PCD_RESETPHASE(0F)- SoftReset - resets the MFRC522
   CommIEnReg     = 0x02
   DivlEnReg      = 0x03
   CommIrqReg     = 0x04
@@ -70,16 +70,16 @@ class CardReader:
   FIFOLevelReg   = 0x0A
   WaterLevelReg  = 0x0B
   ControlReg     = 0x0C
-  BitFramingReg  = 0x0D
+  BitFramingReg  = 0x0D # scan card
   CollReg        = 0x0E
   Reserved01     = 0x0F
 
   Reserved10     = 0x10
-  ModeReg        = 0x11
+  ModeReg        = 0x11 # set to 3D
   TxModeReg      = 0x12
   RxModeReg      = 0x13
   TxControlReg   = 0x14
-  TxAutoReg      = 0x15
+  TxASKReg      = 0x15 # set to 40
   TxSelReg       = 0x16
   RxSelReg       = 0x17
   RxThresholdReg = 0x18
@@ -101,10 +101,10 @@ class CardReader:
   GsNReg            = 0x27
   CWGsPReg          = 0x28
   ModGsPReg         = 0x29
-  TModeReg          = 0x2A
-  TPrescalerReg     = 0x2B
-  TReloadRegH       = 0x2C
-  TReloadRegL       = 0x2D
+  TModeReg          = 0x2A # Set to 8D
+  TPrescalerReg     = 0x2B # set to 3E
+  TReloadRegH       = 0x2C # set to 0
+  TReloadRegL       = 0x2D # set to 30
   TCounterValueRegH = 0x2E
   TCounterValueRegL = 0x2F
 
@@ -127,15 +127,11 @@ class CardReader:
 
   serNum = []
 
-  def __init__(self, dev='/dev/spidev0.0', spd=1000000):
-    spi.openSPI(device=dev,speed=spd)
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(self.NRSTPD, GPIO.OUT)
-    GPIO.output(self.NRSTPD, 1)
-    self.MFRC522_Init()
+#________________________________________________________________________-
 
-  def MFRC522_Reset(self):
-    self.Write_MFRC522(self.CommandReg, self.PCD_RESETPHASE)
+  def __init__(self, dev='/dev/spidev0.0', spd=200):
+    spi.openSPI(device=dev,speed=spd)
+    self.MFRC522_Init()
 
   def Write_MFRC522(self, addr, val):
     spi.transfer(((addr<<1)&0x7E,val))
@@ -153,14 +149,22 @@ class CardReader:
     self.Write_MFRC522(reg, tmp & (~mask))
 
   def AntennaOn(self):
-    temp = self.Read_MFRC522(self.TxControlReg)
-    if(~(temp & 0x03)):
+    temp = self.Read_MFRC522(self.TxControlReg) # (bit 1) Tx2RFEn - Transmission Tx2  to RF enabled
+                                                # output Signal on pin TX2 delivers the 13,56MHz energy carrier
+                                                # modulated by the transmission data
+                                                # (bit 0) Tx1RFen - same for Tx1
+    if(~(temp & 0x03)): # 0000 0011
       self.SetBitMask(self.TxControlReg, 0x03)
 
   def AntennaOff(self):
     self.ClearBitMask(self.TxControlReg, 0x03)
+#________________________________________________________
 
-  def MFRC522_ToCard(self,command,sendData):
+#_________________________________________________________
+
+
+  def MFRC522_ToCard( self, command, sendData):
+  #command : PCD_TRANSCEIVE=0x0C  , sendData: PICC_REQIDL=0x26
     backData = []
     backLen = 0
     status = self.MI_ERR
@@ -229,24 +233,30 @@ class CardReader:
         status = self.MI_ERR
 
     return (status,backData,backLen)
+#_____________________________________________________________________________________________________
 
-
-  def MFRC522_Request(self, reqMode):
+  def MFRC522_Request(self, reqMode): # scan card reqMode is 0x26
+                                      #  PICC_REQIDL    = 0x26
     status = None
     backBits = None
     TagType = []
 
-    self.Write_MFRC522(self.BitFramingReg, 0x07)
+    self.Write_MFRC522(self.BitFramingReg, 0x07) #adjusments for bit-oriented frames
+                                  # 0000 0111 - (6..4) 000 means LSB of the received bit is stored
+                                  # at position 0, the second bit is stored at position 1
+                                  # (2..0) 111 - defines the number of bits of the last byte that
+                                  # will be transmitted
 
     TagType.append(reqMode)
 
     (status,backData,backBits) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, TagType)
+                                   #PCD_TRANSCEIVE=0x0C  ,PICC_REQIDL=0x26
 
     if ((status != self.MI_OK) | (backBits != 0x10)):
       status = self.MI_ERR
 
     return (status,backBits)
-
+#______________________________________________________________________________________________________
 
   def MFRC522_Anticoll(self):
     backData = []
@@ -402,17 +412,35 @@ class CardReader:
         i = i+1
 
   def MFRC522_Init(self):
-    GPIO.output(self.NRSTPD, 1)
+    #GPIO.setmode(GPIO.BOARD)
+    #GPIO.setup(self.NRSTPD, GPIO.OUT)
+    #GPIO.output(self.NRSTPD, 1)
 
-    self.MFRC522_Reset()
+    self.Write_MFRC522(self.CommandReg, self.PCD_RESETPHASE) # Command to initiate a Software Reset
 
-    self.Write_MFRC522(self.TModeReg, 0x8D)
-    self.Write_MFRC522(self.TPrescalerReg, 0x3E)
-    self.Write_MFRC522(self.TReloadRegL, 30)
-    self.Write_MFRC522(self.TReloadRegH, 0)
+    self.Write_MFRC522(self.TModeReg, 0x8D) # 0100 1101 - Define the Timer Settings
+                                           # (7) - timer not influenced by the protocol
+                                           # (6..5) - TGated - internal timer is gated by pin AUX1
+                                           # (4) - TAutoRestart - timer decrements to 0
+                                           # TimerIRQ bit on ComIrqReg is set to 1
+                                           # (3..0) - Higher 4 bits of TPrescaler
+    self.Write_MFRC522(self.TPrescalerReg, 0x3E) # 0010 1110
+                                           # (7..0) - Lower 8 Bits of TPrescaler
+                                           # TPrescaler is (12 bits) 1101 0010 1110 = 3374(dec)
+    self.Write_MFRC522(self.TReloadRegL, 0x30) # defines the 16-bit timer reload value
+    self.Write_MFRC522(self.TReloadRegH, 0)    # 0x 30 00 = 12 288(dec)
+                                           # TPrescaler and Treload define a total delay time of 6,1s
 
-    self.Write_MFRC522(self.TxAutoReg, 0x40)
-    self.Write_MFRC522(self.ModeReg, 0x3D)
+
+    self.Write_MFRC522(self.TxASKReg, 0x40) #controls the Setting of the Transmission Regulation
+                                           # 0100 0000 - (6) Force100ASK - forces a 100%ASK modulation independent
+                                           # of the ModGsPReg register Setting
+    self.Write_MFRC522(self.ModeReg, 0x3D) # 0011 1101
+                                           # (7)MSBFirst = 0 (Calculation CRC coprocessor)
+                                           # (6) reserved - (5) TxWaitRF=1 Transmitter only started when RF Field
+                                           # (4) reserved - (3) MFIN is active HIGH - (2) reserved
+                                           # (1..0) preset value for CalcCRC is 6363h
+
     self.AntennaOn()
 
   def scan_card(self):
@@ -424,7 +452,7 @@ class CardReader:
 
     # Scan for cards
     (status, TagType) = \
-       self.MFRC522_Request(self.PICC_REQIDL)
+       self.MFRC522_Request(self.PICC_REQIDL) #0x26
 
     # Get the UID of the card
     (status, uid) = self.MFRC522_Anticoll()
@@ -435,5 +463,5 @@ class CardReader:
                hex(int(uid[1])).split('x')[-1] + \
                hex(int(uid[2])).split('x')[-1] + \
                hex(int(uid[3])).split('x')[-1]
-    return card
 
+    return card

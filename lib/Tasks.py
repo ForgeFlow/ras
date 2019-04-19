@@ -130,7 +130,6 @@ class Tasks:
         self.Disp.display_msg('configure_wifi')
         os.system('sudo rm -R /etc/NetworkManager/system-connections/*')
         os.system('sudo wifi-connect --portal-ssid ' + SSID_reset)
-        os.system('sudo systemctl restart ras-portal.service')
         self.Buzz.Play('back_to_menu')
         self.back_to_begin_option()
 
