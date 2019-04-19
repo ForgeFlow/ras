@@ -28,7 +28,6 @@ Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
-
 def ask_twice():
     # user asked twice before executing -'are you sure?'
     Buz.Play("OK")
