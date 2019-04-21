@@ -1,4 +1,5 @@
 Flask
 luma.oled
 spi
-raven
+psutil
+RPi.GPIO
