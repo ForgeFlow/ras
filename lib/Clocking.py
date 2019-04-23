@@ -1,6 +1,7 @@
 import time
 import subprocess
 import logging
+from dicts.ras_dic import NET_INTERFACE
 
 _logger = logging.getLogger(__name__)
 
@@ -14,7 +15,10 @@ class Clocking:
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
 
+        self.net_interface = NET_INTERFACE # wlan0 or eth0
         self.wifi = False
+        self.interface_stable = False
+        self.interface_msg = 'Unknown'
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -50,6 +54,19 @@ class Clocking:
         else:
             wifi_active = True
         return wifi_active
+
+    def interface_active(self):
+        if self.net_interface == 'wlan0':
+            interface_active = self.wifi_active()
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+                'ifconfig eth0', shell=True).decode('utf-8')
+            if 'UP' in ifconfig_out:
+                interface_active = True
+            else:
+                interface_active = False
+            _logger.warning('Ethernet Active is %s' % interface_active)
+        return interface_active
 
     def get_status(self):
         iwresult = subprocess.check_output(
@@ -104,18 +121,43 @@ class Clocking:
                 self.wifi = True
         return msg
 
+    def get_interface_msg(self):
+        if self.net_interface == 'wlan0':
+            return self.wifi_signal_msg()
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+                'ifconfig eth0', shell=True).decode('utf-8')
+            if 'RUNNING' in ifconfig_out:
+                return '       Ethernet OK'
+            else:
+                return '       NO Ethernet'
+
+    def interface_running(self):
+        if self.net_interface == 'wlan0':
+            self.interface_stable = self.wifi_stable()
+        elif self.net_interface == 'eth0':
+            ifconfig_out = subprocess.check_output(
+                'ifconfig eth0', shell=True).decode('utf-8')
+            if 'RUNNING' in ifconfig_out:
+                self.interface_stable = True  # stable in the case of ethernet
+                # means 'running'
+            else:
+                self.interface_stable = False
+        return self.interface_stable
+
     def wifi_stable(self):
         msg = self.wifi_signal_msg()
         return self.wifi
 
     def odoo_msg(self):
-        msg = "NO Odoo connected"
-        self.odoo_conn = False
-        if self.wifi_stable():
+        if self.interface_running():
             if self.Odoo._get_user_id():
                 msg = "           Odoo OK"
                 self.odoo_conn = True
                 return msg
+        else:
+            msg = "NO Odoo connected"
+            self.odoo_conn = False
         _logger.warn(msg)
         return msg
 
@@ -143,12 +185,8 @@ class Clocking:
         _logger.info("Clocking sync returns: %s" % self.msg)
 
     def get_messages(self):
-        self.wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-        if not self.wifi:
-            self.odoo_m = "NO Odoo connected"
-            self.odoo_conn = False
-        else:
-            self.odoo_m = self.odoo_msg()  # get odoo connection msg
+        self.odoo_m = self.odoo_msg()
+        self.interface_msg = self.get_interface_msg()
 
     def clocking(self):
         # Main Functions of the Terminal:
@@ -184,7 +222,7 @@ class Clocking:
                 # store the time when the card logging process begin
                 self.wifi_m = self.wifi_signal_msg()
 
-                if not self.wifi:
+                if not self.interface_running():
                     self.msg = "ContactAdm"
                 else:
                     self.clock_sync()  # synchronous: when odoo not
