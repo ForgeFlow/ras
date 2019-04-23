@@ -2,6 +2,7 @@ import os
 import time
 import json
 import logging
+import requests
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
@@ -48,7 +49,10 @@ class OdooXMLrpc:
             self.pswd = self.j_data["user_password"][0]
             self.host = self.j_data["odoo_host"][0]
             self.port = self.j_data["odoo_port"][0]
-
+            if "iot_call" in self.j_data:
+                self.iot_call = True
+            else:
+                self.iot_call = False
             self.adm = self.j_data["admin_id"][0]
             self.tz = self.j_data["timezone"][0]
 
@@ -87,6 +91,8 @@ class OdooXMLrpc:
 
     def _get_user_id(self):
         try:
+            if self.iot_call:
+                return True
             login_facade = self._get_object_facade("/xmlrpc/common")
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
@@ -101,6 +107,14 @@ class OdooXMLrpc:
 
     def check_attendance(self, card):
         try:
+            if self.iot_call:
+                return json.loads(requests.post(
+                    '%s/iot/%s/action' % (self.url_template, self.user),
+                    data={
+                        'passphrase': self.pswd,
+                        'value': card,
+                    },
+                ).content.decode('utf-8'))
             object_facade = self._get_object_facade("/xmlrpc/object")
             if object_facade:
                 res = object_facade.execute(
