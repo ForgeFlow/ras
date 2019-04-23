@@ -3,13 +3,13 @@ FIRMWARE_VERSION = 'v1.2.8'
 
 # reference to find different files in
 # the memory of the device
-WORK_DIR = '/home/pi/ras/'
+WORK_DIR = "/home/pi/ras/"
 
 # SSID when resetting the WiFi
-SSID_reset = '__RAS__'
+SSID_reset = "__RAS__"
 
 # driver to be used by luma.core
-display_driver = 'sh1106'
+display_driver = "sh1106"
 
 # I/O PINS DEFINITION on the RPi Zero W
 # Using the BOARD numbering system
