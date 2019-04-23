@@ -187,7 +187,7 @@ class Clocking:
 
                 begin_card_logging = time.perf_counter()
                 # store the time when the card logging process begin
-                self.wifi_m = self.wifi_signal_msg()
+                self.wifi_m = self.get_interface_msg()
 
                 if not self.interface_running():
                     self.msg = "ContactAdm"
