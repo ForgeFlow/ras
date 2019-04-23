@@ -12,14 +12,13 @@ GPIO.setwarnings(False)
 
 
 class PasBuz:
-
     def __init__(self, pins):
         self.PinBuz = pins[0]  # signal Pin
         self.PinPower = pins[1]
-        _logger.debug('PasBuz Class Initialized')
+        _logger.debug("PasBuz Class Initialized")
 
     def Play(self, msg):
-        _logger.debug('Playing PasBuz')
+        _logger.debug("Playing PasBuz")
         self.InitBuz()
         data = dic[msg]
 

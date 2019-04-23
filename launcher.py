@@ -4,7 +4,7 @@ import time
 import logging
 import logging.handlers
 
-format = '%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s'
+format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
 
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
@@ -18,7 +18,7 @@ import psutil
 _logger = logging.getLogger(__name__)
 
 p = psutil.Process(os.getpid())
-p.nice(6) # give the launcher process a low priority
+p.nice(6)  # give the launcher process a low priority
 
 Buz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
@@ -30,10 +30,11 @@ Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
+
 def ask_twice():
     # user asked twice before executing -'are you sure?'
-    Buz.Play('OK')
-    Disp.display_msg('sure?')
+    Buz.Play("OK")
+    Disp.display_msg("sure?")
     B_OK.pressed = False  # avoid false positives
     B_Down.pressed = False
     time.sleep(0.4)  # allow time to take the finger
@@ -47,7 +48,7 @@ def ask_twice():
         # When the Admin Card is swiped
         # the Program returns here again.
     else:
-        Buz.Play('down')
+        Buz.Play("down")
         time.sleep(0.4)  # allow time to take the finger
         # away from the button
         B_OK.pressed = False  # avoid false positives
@@ -80,14 +81,14 @@ def main_loop():
                     Tasks.selected()
             elif B_Down.pressed:
                 Tasks.down()
-            _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
+            _logger.debug("Tasks.reboot = " + str(Tasks.reboot))
             B_OK.pressed = False
             B_Down.pressed = False
 
-        Disp.display_msg('shut_down')
+        Disp.display_msg("shut_down")
         time.sleep(1.5)
         Disp.clear_display()
-        os.system('sudo reboot')
+        os.system("sudo reboot")
     except Exception as e:
         buff = StringIO()
         traceback.print_exc(file=buff)
@@ -96,14 +97,14 @@ def main_loop():
 
 
 class RASFormatter(logging.Formatter):
-
     def format(self, record):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
 
 handler = logging.handlers.TimedRotatingFileHandler(
-    filename='/var/log/ras.log', when='D', interval=1, backupCount=30)
+    filename="/var/log/ras.log", when="D", interval=1, backupCount=30
+)
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
 main_loop()
