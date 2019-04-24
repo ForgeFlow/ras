@@ -14,6 +14,7 @@ from lib import fixup
 import traceback
 from io import StringIO
 
+
 _logger = logging.getLogger(__name__)
 
 Buz = PasBuz.PasBuz(PinsBuzzer)
@@ -25,7 +26,6 @@ Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 
 Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
 Tasks = Tasks.Tasks(Odoo, Hardware)
-
 
 def ask_twice():
     # user asked twice before executing -'are you sure?'
