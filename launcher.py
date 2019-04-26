@@ -18,9 +18,6 @@ from io import StringIO
 
 _logger = logging.getLogger(__name__)
 
-p = psutil.Process(os.getpid())
-p.nice(6)  # give the launcher process a low priority
-
 Buz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
 Reader = CardReader.CardReader()
