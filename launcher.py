@@ -12,13 +12,8 @@ from lib import OdooXMLrpc, Tasks
 import traceback
 from io import StringIO
 
-import psutil
-
 
 _logger = logging.getLogger(__name__)
-
-p = psutil.Process(os.getpid())
-p.nice(6)  # give the launcher process a low priority
 
 Buz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
