@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to running container",
+            "type": "python",
+            "request": "attach",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceRoot}",
+                    "remoteRoot": "/home/pi/ras"
+                }
+            ],
+            "port": 6899,
+            "host": "raspberrypi.local",
+            "subProcess": true
+        }
+    ]
+}

@@ -3,3 +3,4 @@ luma.oled
 spi
 psutil
 RPi.GPIO
+ptvsd
