@@ -41,6 +41,7 @@ class Tasks:
             self.reset_odoo,
             #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
+            self.shutdown_safe,
             self.rebooting]
 
         self.optionmax = len(self.tasks_menu) - 1
@@ -199,6 +200,12 @@ class Tasks:
         text = FIRMWARE_VERSION
         self.Disp.display_msg_raw(origin, size, text)
         time.sleep(1)
+
+    def shutdown_safe(self):
+        _logger.debug('Shutting down safe')
+        time.sleep(0.5)
+        self.Disp.clear_display()
+        os.system('sudo shutdown now')
 
     def rebooting(self):
         _logger.debug('Rebooting')

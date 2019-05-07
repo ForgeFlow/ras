@@ -33,6 +33,7 @@ PinsOK = (PinSignalOK, PinPowerOK)
 ask_twice = ['update_firmware',
              'reset_wifi',
              'reset_odoo',
+             'shutdown_safe',
              'rebooting']
 
 # allows to display the different messages
@@ -217,6 +218,12 @@ messages_dic = {
          'press OK to see' + '\n' +
          'the firmware' + '\n' +
          'VERSION'],
+
+    'shutdown_safe':
+        [(22, 1), 16,
+         'press OK' + '\n' +
+         'to safe' + '\n' +
+         'SHUTDOWN'],
 
     'rebooting':
         [(22, 1), 20,
