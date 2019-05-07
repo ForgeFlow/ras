@@ -42,8 +42,7 @@ class Tasks:
             #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
             self.shutdown_safe,
-            self.rebooting,
-        ]
+            self.rebooting]
 
         self.optionmax = len(self.tasks_menu) - 1
         _logger.debug("Tasks Class Initialized")
@@ -204,10 +203,10 @@ class Tasks:
         time.sleep(1)
 
     def shutdown_safe(self):
-        _logger.debug("Shutting down safe")
+        _logger.debug('Shutting down safe')
         time.sleep(0.5)
         self.Disp.clear_display()
-        os.system("sudo shutdown now")
+        os.system('sudo shutdown now')
 
     def rebooting(self):
         _logger.debug("Rebooting")
