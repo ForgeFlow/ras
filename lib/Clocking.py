@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import logging
+from pythonwifi.iwlibs import Wireless
 
 from dicts.ras_dic import WORK_DIR
 from . import routes
@@ -26,6 +27,7 @@ class Clocking:
         self.both_buttons_pressed = False
 
         self.wifi = False
+        self.wifi_con = Wireless('wlan0')
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -60,52 +62,17 @@ class Clocking:
     # ___________________
 
     def wifi_active(self):
-        iwconfig_out = subprocess.check_output(
-            "iwconfig wlan0", shell=True
-        ).decode("utf-8")
-        if "Access Point: Not-Associated" in iwconfig_out:
-            wifi_active = False
-            _logger.warn("Wifi Active is %s" % wifi_active)
-        else:
-            wifi_active = True
-        return wifi_active
+        return self.wifi_con.getAPaddr() != "00:00:00:00:00:00"
 
     def get_status(self):
-        iwresult = subprocess.check_output(
-            "iwconfig wlan0", shell=True
-        ).decode("utf-8")
-        resultdict = {}
-        for iwresult in iwresult.split("  "):
-            if iwresult:
-                if iwresult.find(":") > 0:
-                    datumname = iwresult.strip().split(":")[0]
-                    datum = (
-                        iwresult.strip()
-                        .split(":")[1]
-                        .split(" ")[0]
-                        .split("/")[0]
-                        .replace('"', "")
-                    )
-                    resultdict[datumname] = datum
-                elif iwresult.find("=") > 0:
-                    datumname = iwresult.strip().split("=")[0]
-                    datum = (
-                        iwresult.strip()
-                        .split("=")[1]
-                        .split(" ")[0]
-                        .split("/")[0]
-                        .replace('"', "")
-                    )
-                    resultdict[datumname] = datum
-        return resultdict
+         return self.wifi_con.getTXPower().split(' ')[0]
 
     def wifi_signal_msg(self):
         if not self.wifi_active():
             msg = "    No WiFi signal"
-            self.wifi = False
             _logger.warn(msg)
         else:
-            strength = -int(self.get_status()["Signal level"])  # in dBm
+            strength = int(self.get_status())  # in dBm
             if strength >= 79:
                 msg = " " * 9 + "WiFi: " + "\u2022" * 1 + "o" * 4
                 self.wifi = False
