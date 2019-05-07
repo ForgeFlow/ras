@@ -42,7 +42,12 @@ class Tasks:
             #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
             self.shutdown_safe,
+<<<<<<< 4991b95f4a78dc71e127e8f3bbacc3a5c1f55c93
             self.rebooting]
+=======
+            self.rebooting,
+        ]
+>>>>>>> shutdown safe (software) the terminal RAS
 
         self.optionmax = len(self.tasks_menu) - 1
         _logger.debug("Tasks Class Initialized")
@@ -203,10 +208,17 @@ class Tasks:
         time.sleep(1)
 
     def shutdown_safe(self):
+<<<<<<< 4991b95f4a78dc71e127e8f3bbacc3a5c1f55c93
         _logger.debug('Shutting down safe')
         time.sleep(0.5)
         self.Disp.clear_display()
         os.system('sudo shutdown now')
+=======
+        _logger.debug("Shutting down safe")
+        time.sleep(0.5)
+        self.Disp.clear_display()
+        os.system("sudo shutdown now")
+>>>>>>> shutdown safe (software) the terminal RAS
 
     def rebooting(self):
         _logger.debug("Rebooting")
