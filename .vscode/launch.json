@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach to running container",
+            "name": "Attach to RAS",
             "type": "python",
             "request": "attach",
             "pathMappings": [
