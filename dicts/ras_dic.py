@@ -27,7 +27,11 @@ PinsOK = (PinSignalOK, PinPowerOK)
 # stores a list of tasks, which upon selection
 # on the menu of the Terminal, will be asked twice before
 # execution ('are you sure?' Question)
-ask_twice = ["update_firmware", "reset_wifi", "reset_odoo", "rebooting"]
+ask_twice = ['update_firmware',
+             'reset_wifi',
+             'reset_odoo',
+             'shutdown_safe',
+             'rebooting']
 
 # allows to display the different messages
 # by defining the parameters needed to  use
@@ -120,6 +124,11 @@ messages_dic = {
         16,
         "press OK to see\n" + "the firmware\n" + "VERSION",
     ],
+    'shutdown_safe': [
+        (22, 1),
+        16,
+        'press OK\n' + 'to safe\n' + 'SHUTDOWN'
+    ],     
     "rebooting": [(22, 1), 20, "press OK\n" + "to\n" + "REBOOT"],
     "sure?": [
         (5, 5),
