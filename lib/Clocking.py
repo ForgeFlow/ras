@@ -157,7 +157,8 @@ class Clocking:
         _logger.debug("Clocking")
 
         self.get_messages()
-
+        self.minutes = 100 # ensure that the time is allways displayed on calling
+        
         while not (self.card == self.Odoo.adm):
 
             if self.checkodoo_wifi:  # odoo connected and wifi strength
