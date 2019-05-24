@@ -92,6 +92,14 @@ class Tasks:
         self.Disp.display_msg('swipecard')
         while not (self.card == self.Odoo.adm):
             self.card = self.Reader.scan_card()
+            if time.localtime().tm_sec % 4 == 0:
+                self.Clock.check_both_buttons_pressed() #check if the user wants
+                            # to go to the admin menu on the terminal
+                            # without admin card, only pressing both
+                            # capacitive buttons longer than between
+                            # 4*3 and 4*(3+3) seconds
+                if (self.Clock.card == self.Odoo.adm):
+                    self.card = self.Odoo.adm
             if self.card and not (self.card == self.Odoo.adm):
                 self.Disp.show_card(self.card)
                 self.Buzz.Play('cardswiped')

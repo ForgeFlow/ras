@@ -14,6 +14,11 @@ class Clocking:
         self.Buzz = hardware[0]  # Passive Buzzer
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
+        self.B_Down = hardware[3] # Button Down
+        self.B_OK = hardware[4] # Button OK
+        self.buttons_counter = 0 # to determine how long OK and Down Buttons
+                              # have been pressed together to go to the
+                              # Admin Menu without admin Card
 
         self.wifi = False
 
@@ -141,6 +146,25 @@ class Clocking:
         else:
              self.odoo_m = self.odoo_msg()  # get odoo connection msg
 
+    def check_both_buttons_pressed(self):
+        self.B_OK.pressed = False  # avoid false positives
+        self.B_OK.scanning()
+        if self.B_OK.pressed:
+            self.B_Down.pressed = False
+            self.B_Down.scanning()
+            if self.B_Down.pressed:
+                self.buttons_counter += 1
+                if self.buttons_counter >3:
+                    self.B_OK.pressed = False  # avoid false positives
+                    self.B_Down.pressed = False
+                    self.card = self.Odoo.adm
+                    self.buttons_counter = 0
+            else:
+                self.buttons_counter = 0
+        else:
+            self.buttons_counter = 0
+
+
     def clocking(self):
         # Main Functions of the Terminal:
         # Show Time and do the clockings (check in/out)
@@ -149,7 +173,7 @@ class Clocking:
 
         self.get_messages()
         self.minutes = 100 # ensure that the time is allways displayed on calling
-        
+
         while not (self.card == self.Odoo.adm):
 
             if self.checkodoo_wifi: # odoo connected and wifi strength
@@ -158,6 +182,7 @@ class Clocking:
             else:                                 # (on the 30s spot)
                 if time.localtime().tm_sec == 31:
                     self.checkodoo_wifi = True
+
 
             if not (time.localtime().tm_min == self.minutes): # Display is
                 self.minutes = time.localtime().tm_min    # refreshed only
@@ -194,6 +219,13 @@ class Clocking:
 
                 time.sleep(rest_time)
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
+
+            if time.localtime().tm_sec % 4 == 0:
+                self.check_both_buttons_pressed() #check if the user wants
+                            # to go to the admin menu on the terminal
+                            # without admin card, only pressing both
+                            # capacitive buttons longer than between
+                            # 4*3 and 4*(3+3) seconds
 
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
