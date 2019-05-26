@@ -1,6 +1,10 @@
 import time
+import json
+import os
 import subprocess
 import logging
+
+from . import routes_adm
 
 _logger = logging.getLogger(__name__)
 
@@ -14,6 +18,12 @@ class Clocking:
         self.Buzz = hardware[0]  # Passive Buzzer
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
+        self.B_Down = hardware[3] # Button Down
+        self.B_OK = hardware[4] # Button OK
+        self.buttons_counter = 0 # to determine how long OK and Down Buttons
+                              # have been pressed together to go to the
+                              # Admin Menu without admin Card
+        self.both_buttons_pressed = False
 
         self.wifi = False
 
@@ -37,6 +47,9 @@ class Clocking:
         self.checkodoo_wifi = True
         self.odoo_m         = " "
         self.wifi_m         = " "
+
+        self.get_ip = routes_adm.get_ip
+
         _logger.debug('Clocking Class Initialized')
 
     # ___________________
@@ -141,6 +154,88 @@ class Clocking:
         else:
              self.odoo_m = self.odoo_msg()  # get odoo connection msg
 
+    def server_for_new_admin(self): # opens a server and waits for input
+                         # this can be aborted by pressing
+                         # both capacitive buttons long enough
+        _logger.debug('Enter New Admin Card on Flask app')
+        origin = (0, 0)
+        size = 14
+        text = 'Browse to' + '\n' + \
+               self.get_ip() + ':3000\n' + \
+               'to introduce new' + '\n' + \
+               'Admin Card RFID'
+        loop_ended = False
+        while not os.path.isfile(self.Odoo.datajson_adm) and not loop_ended:
+            self.Disp.display_msg_raw(origin, size, text)
+            card = self.Reader.scan_card()
+            if card:
+                self.Disp.show_card(card)
+                self.Buzz.Play('cardswiped')
+                time.sleep(2)
+            self.check_both_buttons_pressed()
+            if self.both_buttons_pressed:
+               self.both_buttons_pressed = False
+               loop_ended = True
+
+    def new_admin_in_json(self):
+        with open(self.Odoo.datajson_adm) as f:
+            j_adm_data = json.load(f)
+        new_admin_id = j_adm_data["admin_id"][0]
+        with open(self.Odoo.datajson) as f:
+            j_data = json.load(f)
+        j_data["admin_id"][0] = new_admin_id
+        with open(self.Odoo.datajson, 'w') as f:
+            json.dump(j_data, f)
+        print(new_admin_id)
+        self.Odoo.adm = new_admin_id
+
+    def new_admin(self): # checks if there is wif before
+                         # opening server and handles the results
+        _logger.debug('New Admin RFID Card')
+        #if not self.wifi_active():  # is the Terminal
+        #    self.reset_wifi()  # connected to a WiFi
+
+        if self.wifi_stable():
+            routes_adm.start_server()
+            if os.path.isfile(self.Odoo.datajson_adm):
+                os.system('sudo rm ' + self.Odoo.datajson_adm)
+            self.server_for_new_admin()
+            routes_adm.stop_server()
+            if os.path.isfile(self.Odoo.datajson_adm):
+                self.Disp.display_msg('new_adm_card')
+                self.new_admin_in_json() # stores new admin card id
+                                    # in the odoo data json
+            else:
+                self.Disp.display_msg('same_adm_card')
+            self.Buzz.Play('back_to_menu')
+        else:
+            self.Disp.display_msg('no_wifi')
+            self.Buzz.Play('FALSE')
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
+        #self.back_to_begin_option()
+
+
+    def check_both_buttons_pressed(self):
+      if time.localtime().tm_sec % 4 == 0:
+        self.B_OK.pressed = False  # avoid false positives
+        self.B_OK.scanning()
+        if self.B_OK.pressed:
+            self.B_Down.pressed = False
+            self.B_Down.scanning()
+            if self.B_Down.pressed:
+                self.buttons_counter += 1
+                if self.buttons_counter >3:
+                    self.B_OK.pressed = False  # avoid false positives
+                    self.B_Down.pressed = False
+                    self.both_buttons_pressed = True # both buttons
+                                      # were pressed for a long time
+                    self.buttons_counter = 0
+            else:
+                self.buttons_counter = 0
+        else:
+            self.buttons_counter = 0
+
     def clocking(self):
         # Main Functions of the Terminal:
         # Show Time and do the clockings (check in/out)
@@ -149,7 +244,7 @@ class Clocking:
 
         self.get_messages()
         self.minutes = 100 # ensure that the time is allways displayed on calling
-        
+
         while not (self.card == self.Odoo.adm):
 
             if self.checkodoo_wifi: # odoo connected and wifi strength
@@ -194,6 +289,17 @@ class Clocking:
 
                 time.sleep(rest_time)
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
+
+            self.check_both_buttons_pressed() #check if the user wants
+                            # to go to the admin menu on the terminal
+                            # without admin card, only pressing both
+                            # capacitive buttons longer than between
+                            # 4*3 and 4*(3+3) seconds
+            if self.both_buttons_pressed:
+                self.both_buttons_pressed = False
+                self.new_admin()
+                self.Disp._display_time(self.wifi_m, self.odoo_m)
+
 
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)

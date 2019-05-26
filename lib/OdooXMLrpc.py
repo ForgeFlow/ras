@@ -13,6 +13,7 @@ class OdooXMLrpc():
     def __init__(self):
         self.workdir = WORK_DIR
         self.datajson = self.workdir + 'dicts/data.json'
+        self.datajson_adm = self.workdir + 'dicts/data_adm.json'
         self.set_params()
         _logger.debug('Odoo XMLrpc Class Initialized')
 

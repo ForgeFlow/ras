@@ -135,6 +135,19 @@ messages_dic = {
          'with Odoo' + '\n' +
          'established'],
 
+    'new_adm_card':
+        [(16, 0), 16,
+         'New Admin' + '\n' +
+         'RFID Card' + '\n' +
+         ' defined'],
+
+    'same_adm_card':
+        [(16, 0), 20,
+         '  No' + '\n' +
+         'Changes' + '\n' +
+         '-------'],
+
+
     'configure_wifi':
         [(12, 0), 14,
          '1. Connect to AP' + '\n' +
