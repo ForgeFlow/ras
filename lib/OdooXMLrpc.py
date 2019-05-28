@@ -63,8 +63,9 @@ class OdooXMLrpc:
                 self.https_on = False
             else:
                 self.https_on = True
-
-            if self.https_on:
+            if self.iot_call:
+                self.url_template = '%s' % self.host
+            elif self.https_on:
                 if self.port:
                     self.url_template = "https://%s:%s" % (
                         self.host,
@@ -82,7 +83,8 @@ class OdooXMLrpc:
 
     def _get_object_facade(self, url):
         try:
-            object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
+            object_facade = xmlrpclib.ServerProxy(
+                str(self.url_template) + str(url))
         except Exception as e:
             _logger.exception(e)
             object_facade = False

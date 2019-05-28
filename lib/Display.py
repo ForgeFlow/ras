@@ -6,9 +6,22 @@ from luma.core.render import canvas
 from .demo_opts import get_device
 from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
 
-
 _logger = logging.getLogger(__name__)
 
+
+def split_message(message, max_length=10):
+    words = message.split()
+    result = ''
+    current = words[0]
+    for wd in words[1:]:
+        lg = len(current) + len(wd)
+        if lg + 1 > max_length:
+            result += '\n' + current
+            current = wd
+            continue
+        current += ' ' + wd
+    result += '\n' + current
+    return result
 
 class Display:
     def __init__(self):
@@ -69,10 +82,15 @@ class Display:
                 origin, text, fill="white", font=font, align="center"
             )
 
-    def display_msg(self, param):
-        origin = messages_dic[param][0]
-        size = messages_dic[param][1]
-        text = messages_dic[param][2]
+    def display_msg(self, param, direct=False):
+        if not direct:
+            origin = messages_dic[param][0]
+            size = messages_dic[param][1]
+            text = messages_dic[param][2]
+        else:
+            origin = (1, 5)
+            size = 18
+            text = split_message(param)
         self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
 

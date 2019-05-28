@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class Clocking:
     def __init__(self, odoo, hardware):
         self.card = False  # currently swipped card code
-
+        self.msg_direct = False
         self.Odoo = odoo
         self.Buzz = hardware[0]  # Passive Buzzer
         self.Disp = hardware[1]  # Display
@@ -18,6 +18,8 @@ class Clocking:
 
         self.net_interface = NET_INTERFACE # wlan0 or eth0
         self.wifi = False
+
+        self.wifi_con = Wireless('wlan0')
         self.interface_stable = False
         self.interface_msg = 'Unknown'
 
@@ -31,6 +33,7 @@ class Clocking:
         # shown in the display
 
         self.msg = False
+        self.buzz_msg = False
         # Message that is used to Play a Melody or
         # Display which kind of Event happened: for example check in,
         # check out, communication with odoo not possible ...
@@ -136,18 +139,26 @@ class Clocking:
             try:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
-                    self.msg = res["action"]
+                    self.buzz_msg = res["action"]
+                    if 'action_msg' in res:
+                        self.msg = res["action_msg"]
+                        self.msg_direct = True
+                    else:
+                        self.msg = res['action']
                     _logger.debug(res)
                 else:
                     self.msg = "comm_failed"
+                    self.buzz_msg = self.msg
             except Exception as e:
                 _logger.exception(e)
                 # Reset parameters for Odoo connection because fails
                 # when start and odoo is not running
                 self.Odoo.set_params()
                 self.msg = "comm_failed"
+                self.buzz_msg = self.msg
         else:
             self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
+            self.buzz_msg = self.msg
         _logger.info("Clocking sync returns: %s" % self.msg)
 
     def get_messages(self):
@@ -191,13 +202,16 @@ class Clocking:
 
                 if not self.interface_running():
                     self.msg = "ContactAdm"
+                    self.buzz_msg = self.msg
                 else:
                     self.clock_sync()  # synchronous: when odoo not
                     # connected, clocking not possible
                     self.odoo_m = self.odoo_msg()  # show actual status
 
-                self.Disp.display_msg(self.msg)  # clocking message
-                self.Buzz.Play(self.msg)  # clocking acoustic feedback
+                self.Disp.display_msg(self.msg, self.msg_direct)
+                self.msg_direct = False
+                # clocking message
+                self.Buzz.Play(self.buzz_msg)  # clocking acoustic feedback
 
                 rest_time = self.card_logging_time_min - (
                     time.perf_counter() - begin_card_logging
