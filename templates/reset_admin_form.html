@@ -1,0 +1,25 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Define new Admin Card RFID</title>
+  <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="static/main.css?version=1">
+</head>
+
+<body>
+  <form action="/reset_admin_card" method="post" id="testform">
+    <h1>Enter new Admin ID</h1>
+    <fieldset>
+      <legend><span class="number">1</span>Enter ID</legend>
+      <label for="admin_id">Swap Admin RFID Card on device to get Admin ID</label>
+      <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. FFFFFFFF" pattern="^([A-Fa-f0-9]{1,20})$" required>
+    </fieldset>
+    <fieldset>
+      <legend><span class="number">2</span>Go!</legend>
+      <button type="submit">Save</button>
+      <button type="reset">Reset Data</button>
+    </fieldset>
+  </form>
+</body>
+</html>
