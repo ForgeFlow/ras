@@ -66,7 +66,27 @@ def start_server():
                 "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
             )
 
-    @app.route("/result", methods=["POST", "GET"])
+    def reset_admin_form():
+        _logger.debug('reset admin form')
+        if not session.get('logged_in'):
+            return render_template('login.html')
+        else:
+            return render_template('reset_admin_form.html', IP=str(get_ip()),
+                                    port=3000)
+    
+    @app.route('/reset_admin_card', methods=['POST'])
+    def reset_admin_card_result():
+         if request.method == 'POST':
+            results = request.form
+            dic = results.to_dict(flat=False)
+            with open(WORK_DIR + 'dicts/data.json') as read_from:
+                data = json.load(read_from)
+                data['admin_id'] = dic['admin_id']
+            with open(WORK_DIR + 'dicts/data.json', 'w+') as outfile:
+                json.dump(data, outfile)
+            return render_template("result.html", result=results)     
+
+    @app.route('/result', methods=['POST', 'GET'])
     def result():
         if request.method == "POST":
             results = request.form
@@ -91,6 +111,16 @@ def start_server():
             else:
                 flash("wrong password!")
             return form()
+        elif request.form.get('Reset AdminCard') == 'Reset AdminCard':
+            json_file = open(WORK_DIR + 'dicts/credentials.json')
+            json_data = json.load(json_file)
+            json_file.close()
+            if request.form['password'] == json_data['new password'][0] and \
+                    request.form['username'] == json_data['username'][0]:
+                session['logged_in'] = True
+            else:
+                flash('wrong password!')
+            return reset_admin_form()
         else:
             return form()
 

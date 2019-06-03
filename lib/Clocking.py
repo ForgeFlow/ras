@@ -1,7 +1,12 @@
 import time
+import json
+import os
 import subprocess
 import logging
 from pythonwifi.iwlibs import Wireless
+
+from dicts.ras_dic import WORK_DIR
+from . import routes
 
 _logger = logging.getLogger(__name__)
 
@@ -14,6 +19,12 @@ class Clocking:
         self.Buzz = hardware[0]  # Passive Buzzer
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
+        self.B_Down = hardware[3] # Button Down
+        self.B_OK = hardware[4] # Button OK
+        self.buttons_counter = 0 # to determine how long OK and Down Buttons
+                              # have been pressed together to go to the
+                              # Admin Menu without admin Card
+        self.both_buttons_pressed = False
 
         self.wifi = False
         self.wifi_con = Wireless('wlan0')
@@ -125,7 +136,7 @@ class Clocking:
 
         self.get_messages()
         self.minutes = 100 # ensure that the time is allways displayed on calling
-        
+
         while not (self.card == self.Odoo.adm):
 
             if self.checkodoo_wifi: # odoo connected and wifi strength
@@ -172,5 +183,74 @@ class Clocking:
                 time.sleep(rest_time)
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
 
+            self.check_both_buttons_pressed() #check if the user wants
+                            # to go to the admin menu on the terminal
+                            # without admin card, only pressing both
+                            # capacitive buttons longer than between
+                            # 4*3 and 4*(3+3) seconds
+            if self.both_buttons_pressed:
+                self.both_buttons_pressed = False
+                self.server_for_restore()
+                self.Disp._display_time(self.wifi_m, self.odoo_m)
+
+
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
+
+    def check_both_buttons_pressed(self):
+      if time.localtime().tm_sec % 4 == 0:
+        self.B_OK.pressed = False  # avoid false positives
+        self.B_OK.scanning()
+        if self.B_OK.pressed:
+            self.B_Down.pressed = False
+            self.B_Down.scanning()
+            if self.B_Down.pressed:
+                self.buttons_counter += 1
+                print(self.buttons_counter)
+                if self.buttons_counter > 3:
+                    self.B_OK.pressed = False  # avoid false positives
+                    self.B_Down.pressed = False
+                    self.both_buttons_pressed = True # both buttons
+                                      # were pressed for a long time
+                    self.buttons_counter = 0
+            else:
+                self.buttons_counter = 0
+        else:
+            self.buttons_counter = 0
+
+    def server_for_restore(self): # opens a server and waits for input
+                            # this can be aborted by pressing
+                            # both capacitive buttons long enough
+        _logger.debug('Enter New Admin Card on Flask app')
+        origin = (0, 0)
+        size = 14
+        text = 'Browse to' + '\n' + \
+            routes.get_ip() + ':3000\n' + \
+            'to introduce new' + '\n' + \
+            'Admin Card RFID'
+        routes.start_server()
+        loop_ended = False
+        datajson = WORK_DIR + 'dicts/data.json'
+        j_file = open(datajson)
+        j_data = json.load(j_file)
+        j_data_2 = j_data
+        j_file.close()
+        while j_data['admin_id'] == j_data_2['admin_id'] and not loop_ended:
+            j_file = open(datajson)
+            j_data_2 = json.load(j_file)
+            j_file.close()
+            self.Disp.display_msg_raw(origin, size, text)
+            card = self.Reader.scan_card()
+            if card:
+                self.Disp.show_card(card)
+                self.Buzz.Play('cardswiped')
+                time.sleep(2)
+            self.check_both_buttons_pressed()
+            if self.both_buttons_pressed:
+                self.both_buttons_pressed = False
+                loop_ended = True
+        routes.stop_server()
+        self.Odoo.adm = j_data_2["admin_id"][0]
+        self.Disp.display_msg('new_adm_card')
+        self.Buzz.Play('back_to_menu')
+        time.sleep(2)
