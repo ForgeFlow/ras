@@ -1,5 +1,5 @@
 # FIRMWARE Version
-FIRMWARE_VERSION = 'v1.2.5'
+FIRMWARE_VERSION = 'v1.2.6'
 
 # reference to find different files in
 # the memory of the device
@@ -235,5 +235,11 @@ messages_dic = {
         [(5, 5), 15,
          'ARE YOU SURE?' + '\n' +
          'Press OK again' + '\n' +
-         'if you are sure']
+         'if you are sure'],
+
+    'new_adm_card':
+        [(16, 0), 16,
+         'New Admin' + '\n' +
+         'RFID Card' + '\n' +
+         ' defined']
 }
