@@ -1,5 +1,5 @@
 # FIRMWARE Version
-FIRMWARE_VERSION = 'v1.2.6'
+FIRMWARE_VERSION = 'v1.2.7'
 
 # reference to find different files in
 # the memory of the device
