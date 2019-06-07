@@ -19,15 +19,15 @@
 
                         <tr>
                                 <td class="text-left"> Odoo Host </th>
-                                <td class="text-left"> {{ result["odoo_host"] }} </td>
+                                <td class="text-left"> {{ result["odoo_host"][0] }} </td>
                         </tr>
                         <tr>
                                 <td class="text-left"> Odoo Port </th>
-                                <td class="text-left"> {{ result["odoo_port"] }} </td>
+                                <td class="text-left"> {{ result["odoo_port"][0] }} </td>
                         </tr>
                         <tr>
                                 <td class="text-left"> Odoo User </th>
-                                <td class="text-left"> {{ result["user_name"] }} </td>
+                                <td class="text-left"> {{ result["user_name"][0] }} </td>
                         </tr>
                         <tr>
                                 <td class="text-left"> Odoo Password </th>
@@ -35,22 +35,17 @@
                         </tr>
                         <tr>
                                 <td class="text-left"> Odoo Database </th>
-                                <td class="text-left"> {{ result["db"] }} </td>
+                                <td class="text-left"> {{ result["db"][0] }} </td>
                         </tr>
                         <tr>
                                 <td class="text-left"> Admin ID </th>
-                                <td class="text-left"> {{ result["admin_id"] }} </td>
+                                <td class="text-left"> {{ result["admin_id"][0] }} </td>
                         </tr>
                         <tr>
                                 <td class="text-left"> Timezone </th>
-                                <td class="text-left"> {{ result["timezone"] }} </td>
+                                <td class="text-left"> {{ result["timezone"][0] }} </td>
                         </tr>
-                        <tr>
-                                <td class="text-left"> Current Version </th>
-                                <td class="text-left"> {{ result["version"] }} </td>
-                        </tr>
-                        <!-- <button type="submit" name="Log in" value="Log in" class="btn btn-primary btn-large btn-block">Log in</button>
-                        <button type="submit" name="Reset credentials" value="Reset credentials" class="btn btn-primary btn-large btn-block">Reset Credentials</button> -->
+
                 </tbody>
         </table>
 

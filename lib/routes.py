@@ -81,10 +81,13 @@ def start_server():
             dic = results.to_dict(flat=False)
             with open(WORK_DIR + 'dicts/data.json') as read_from:
                 data = json.load(read_from)
+                if data['admin_id'][0].lower() == dic['admin_id'][0].lower():
+                    flash('No valid AdminCard. Already in system')
+                    return reset_admin_form()
                 data['admin_id'] = dic['admin_id']
             with open(WORK_DIR + 'dicts/data.json', 'w+') as outfile:
                 json.dump(data, outfile)
-            return render_template("result.html", result=results)     
+            return render_template("result.html", result=data)     
 
     @app.route('/result', methods=['POST', 'GET'])
     def result():
@@ -93,7 +96,7 @@ def start_server():
             dic = results.to_dict(flat=False)
             with open(WORK_DIR + "dicts/data.json", "w+") as outfile:
                 json.dump(dic, outfile)
-            return render_template("result.html", result=results)
+            return render_template("result.html", result=dic)
 
     @app.route("/login", methods=["POST"])
     def do_admin_login():

@@ -10,6 +10,15 @@
 <body>
   <form action="/reset_admin_card" method="post" id="testform">
     <h1>Enter new Admin ID</h1>
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+          {% for message in messages %}
+            <li style="color:red;">{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      {% endwith %}
     <fieldset>
       <legend><span class="number">1</span>Enter ID</legend>
       <label for="admin_id">Swap Admin RFID Card on device to get Admin ID</label>
