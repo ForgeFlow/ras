@@ -9,7 +9,7 @@ from flask import Flask, flash, render_template, request, session
 
 from dicts.tz_dic import tz_dic
 from dicts.ras_dic import WORK_DIR
-
+import requests
 from werkzeug.serving import make_server
 
 import threading
@@ -66,11 +66,58 @@ def start_server():
                 "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
             )
 
+    @app.route("/form_direct")
+    def form_iot():
+        _logger.debug("inside form")
+        tz_sorted = OrderedDict(sorted(tz_dic.items()))
+        if not session.get("logged_in"):
+            return render_template("login.html")
+        else:
+            return render_template(
+                "form_direct.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
+            )
+
+    @app.route("/form_iot")
+    def form_direct():
+        _logger.debug("inside form")
+        tz_sorted = OrderedDict(sorted(tz_dic.items()))
+        if not session.get("logged_in"):
+            return render_template("login.html")
+        else:
+            return render_template(
+                "form_iot.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
+            )
+
     @app.route("/result", methods=["POST", "GET"])
     def result():
         if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
+            with open(WORK_DIR + "dicts/data.json", "w+") as outfile:
+                json.dump(dic, outfile)
+            return render_template("result.html", result=results)
+
+    @app.route("/result_iot", methods=["POST", "GET"])
+    def result_iot():
+        if request.method == "POST":
+            results = request.form
+            result_dic = results.to_dict(flat=False)
+            result = json.loads(requests.post(
+                result_dic['odoo_link'][0],
+                data={
+                    'template': 'eficent.ras',
+                },
+            ).content.decode('utf-8'))
+            dic = {
+                'iot_call': [True],
+                'db': result_dic['db'],
+                'odoo_host': [result['host']],
+                'odoo_port': ['8069'],
+                'admin_id': result_dic['admin_id'],
+                'timezone': result_dic['timezone'],
+                'user_name': [result['inputs']['rfid_read']['serial']],
+                'user_password': [result['inputs']['rfid_read']['passphrase']],
+            }
             with open(WORK_DIR + "dicts/data.json", "w+") as outfile:
                 json.dump(dic, outfile)
             return render_template("result.html", result=results)

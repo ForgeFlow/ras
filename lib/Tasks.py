@@ -26,7 +26,7 @@ class Tasks:
         # 'are you sure?' upon selection
         self.get_ip = routes.get_ip
         self.can_connect = Odoo.can_connect
-        self.wifi_active = self.Clock.wifi_active
+        self.wifi_active = self.Clock.interface_active
         self.wifi_stable = self.Clock.wifi_stable
 
         # Menu vars

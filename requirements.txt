@@ -5,3 +5,4 @@ psutil
 RPi.GPIO
 ptvsd
 -e git+https://github.com/hveficent/python3-wifi.git@master#egg=python3-wifi
+requests

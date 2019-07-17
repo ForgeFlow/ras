@@ -1,0 +1,35 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration portal</title>
+  <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="static/main.css?version=1">
+</head>
+
+<body>
+  <form action="/result_iot" method="post" id="testform">
+    <h1>Configuration portal</h1>
+    <fieldset>
+      <legend><span class="number">1</span>Odoo Parameters</legend>
+      <label for="name">Odoo Link</label>
+      <input type="text" id="odoo_link" name="odoo_link" placeholder="demo.odoo.com" required>
+      <label for="name">Odoo DB</label>
+      <input type="text" id="db" name="db" placeholder="odoo" required><label for="admin_id">Admin ID (*)</label>
+      <span>Swap Admin RFID Card on device to get Admin ID</span>
+      <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. FFFFFFFF" pattern="^([A-Fa-f0-9]{1,20})$" required>
+      <label for="timezone">Country:</label>
+      <select name="timezone" form="testform" required>
+        {% for tz in tz_dic %}
+        <option value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
+        {% endfor %}
+      </select>
+    </fieldset>
+    <fieldset>
+      <legend><span class="number">2</span>Go!</legend>
+      <button type="submit">Configure!</button>
+      <button type="reset">Reset parameters</button>
+    </fieldset>
+  </form>
+</body>
+</html>

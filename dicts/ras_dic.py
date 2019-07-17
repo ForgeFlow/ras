@@ -2,6 +2,9 @@
 # the memory of the device
 WORK_DIR = "/home/pi/ras/"
 
+#network interface: wlan0 (WLAN), eth0 (Ethernet)
+NET_INTERFACE = 'wlan0'
+
 # SSID when resetting the WiFi
 SSID_reset = "__RAS__"
 
