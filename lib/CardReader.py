@@ -492,11 +492,7 @@ class CardReader:
 
         # If we have the UID, continue
         if status == self.MI_OK:
-            card = (
-                hex(int(uid[0])).split("x")[-1]
-                + hex(int(uid[1])).split("x")[-1]
-                + hex(int(uid[2])).split("x")[-1]
-                + hex(int(uid[3])).split("x")[-1]
-            )
+            card = '{:02x}{:02x}{:02x}{:02x}'.format(
+                uid[0], uid[1], uid[2], uid[3])
 
         return card
