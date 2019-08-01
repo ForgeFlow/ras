@@ -27,7 +27,7 @@ class Tasks:
         self.get_ip = routes.get_ip
         self.can_connect = Odoo.can_connect
         self.wifi_active = self.Clock.interface_active
-        self.wifi_stable = self.Clock.wifi_stable
+        self.wifi_stable = self.Clock.interface_running
 
         # Menu vars
         self.begin_option = 0  # the Terminal begins with this option

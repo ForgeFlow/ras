@@ -43,6 +43,7 @@ class OdooXMLrpc:
             self.https_on = False
             self.url_template = False
             self.uid = False
+            self.iot_call = False
         else:
             self.db = self.j_data["db"][0]
             self.user = self.j_data["user_name"][0]
