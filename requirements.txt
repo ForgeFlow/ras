@@ -1,0 +1,3 @@
+git+https://github.com/tegin/oot@0.0.3#egg=oot==0.0.4
+PyGithub
+cmdline
