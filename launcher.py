@@ -11,7 +11,7 @@ import ras.migrations as migrations
 from ras import Display, RasLauncher
 
 p = psutil.Process(os.getpid())
-p.nice(6)  # give the launcher process a low priority
+#p.nice(6)  # give the launcher process a low priority
 
 GPIO.setmode(GPIO.BOARD)
 
@@ -50,9 +50,10 @@ if upgrade(
 display = Display(path)
 RasLauncher(
     data_folder + "/data.json",
-    CardReader(spd=100000),
+    CardReader(spd=10000),
     display,
-    Buzzer(7, 13),
+    Buzzer(12, 13),
+    35, 31, 35, 29,
     version,
     path,
 ).run()
