@@ -42,7 +42,8 @@ class Tasks:
             #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
             self.shutdown_safe,
-            self.rebooting]
+            self.rebooting,
+        ]
 
         self.optionmax = len(self.tasks_menu) - 1
         _logger.debug("Tasks Class Initialized")
@@ -126,11 +127,11 @@ class Tasks:
             self.back_to_begin_option()
 
     def reset_wifi(self):
-        _logger.debug('Reset WI-FI')
-        self.Disp.display_msg('configure_wifi')
-        os.system('sudo rm -R /etc/NetworkManager/system-connections/*')
-        os.system('sudo wifi-connect --portal-ssid ' + SSID_reset)
-        self.Buzz.Play('back_to_menu')
+        _logger.debug("Reset WI-FI")
+        self.Disp.display_msg("configure_wifi")
+        os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
+        os.system("sudo wifi-connect --portal-ssid " + SSID_reset)
+        self.Buzz.Play("back_to_menu")
         self.back_to_begin_option()
 
     def odoo_config(self):
@@ -203,10 +204,10 @@ class Tasks:
         time.sleep(1)
 
     def shutdown_safe(self):
-        _logger.debug('Shutting down safe')
+        _logger.debug("Shutting down safe")
         time.sleep(0.5)
         self.Disp.clear_display()
-        os.system('sudo shutdown now')
+        os.system("sudo shutdown now")
 
     def rebooting(self):
         _logger.debug("Rebooting")

@@ -19,15 +19,15 @@ class Clocking:
         self.Buzz = hardware[0]  # Passive Buzzer
         self.Disp = hardware[1]  # Display
         self.Reader = hardware[2]  # Card Reader
-        self.B_Down = hardware[3] # Button Down
-        self.B_OK = hardware[4] # Button OK
-        self.buttons_counter = 0 # to determine how long OK and Down Buttons
-                              # have been pressed together to go to the
-                              # Admin Menu without admin Card
+        self.B_Down = hardware[3]  # Button Down
+        self.B_OK = hardware[4]  # Button OK
+        self.buttons_counter = 0  # to determine how long OK and Down Buttons
+        # have been pressed together to go to the
+        # Admin Menu without admin Card
         self.both_buttons_pressed = False
 
         self.wifi = False
-        self.wifi_con = Wireless('wlan0')
+        self.wifi_con = Wireless("wlan0")
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -45,11 +45,11 @@ class Clocking:
 
         self.can_connect = odoo.can_connect
 
-        self.minutes        = 99
+        self.minutes = 99
         self.checkodoo_wifi = True
-        self.odoo_m         = " "
-        self.wifi_m         = " "
-        _logger.debug('Clocking Class Initialized')
+        self.odoo_m = " "
+        self.wifi_m = " "
+        _logger.debug("Clocking Class Initialized")
 
     # ___________________
 
@@ -57,7 +57,7 @@ class Clocking:
         return self.wifi_con.getAPaddr() != "00:00:00:00:00:00"
 
     def get_status(self):
-         return self.wifi_con.getTXPower().split(' ')[0]
+        return self.wifi_con.getTXPower().split(" ")[0]
 
     def wifi_signal_msg(self):
         if not self.wifi_active():
@@ -102,7 +102,7 @@ class Clocking:
             self.Odoo.set_params()  # be sure that always uid is set to
             # the last Odoo status (if connected)
         if self.can_connect(self.Odoo.url_template):
-            self.Disp.display_msg('connecting')
+            self.Disp.display_msg("connecting")
             try:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
@@ -117,8 +117,8 @@ class Clocking:
                 self.Odoo.set_params()
                 self.msg = "comm_failed"
         else:
-            self.msg = 'ContactAdm'  # No Odoo Connection: Contact Your Admin
-        _logger.info('Clocking sync returns: %s' % self.msg)
+            self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
+        _logger.info("Clocking sync returns: %s" % self.msg)
 
     def get_messages(self):
         self.wifi_m = self.wifi_signal_msg()  # get wifi strength signal
@@ -135,20 +135,20 @@ class Clocking:
         _logger.debug('Clocking')
 
         self.get_messages()
-        self.minutes = 100 # ensure that the time is allways displayed on calling
+        self.minutes = 100  # ensure that the time is allways displayed on calling
 
         while not (self.card == self.Odoo.adm):
 
-            if self.checkodoo_wifi: # odoo connected and wifi strength
-                if time.localtime().tm_sec == 30: # messages are checked
-                    self.get_messages()           # only once per minute
-            else:                                 # (on the 30s spot)
+            if self.checkodoo_wifi:  # odoo connected and wifi strength
+                if time.localtime().tm_sec == 30:  # messages are checked
+                    self.get_messages()  # only once per minute
+            else:  # (on the 30s spot)
                 if time.localtime().tm_sec == 31:
                     self.checkodoo_wifi = True
 
-            if not (time.localtime().tm_min == self.minutes): # Display is
-                self.minutes = time.localtime().tm_min    # refreshed only
-                self.Disp._display_time(self.wifi_m, self.odoo_m)   # once every minute
+            if not (time.localtime().tm_min == self.minutes):  # Display is
+                self.minutes = time.localtime().tm_min  # refreshed only
+                self.Disp._display_time(self.wifi_m, self.odoo_m)  # once every minute
 
             self.card = self.Reader.scan_card()  # detect and store the UID
 
@@ -162,12 +162,11 @@ class Clocking:
                 self.wifi_m = self.wifi_signal_msg()
 
                 if not self.wifi:
-                    self.msg = 'ContactAdm'
+                    self.msg = "ContactAdm"
                 else:
                     self.clock_sync()  # synchronous: when odoo not
-                                       # connected, clocking not possible
-                    self.odoo_m = self.odoo_msg() # show actual status
-
+                    # connected, clocking not possible
+                    self.odoo_m = self.odoo_msg()  # show actual status
 
                 self.Disp.display_msg(self.msg)  # clocking message
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
@@ -183,59 +182,63 @@ class Clocking:
                 time.sleep(rest_time)
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
 
-            self.check_both_buttons_pressed() #check if the user wants
-                            # to go to the admin menu on the terminal
-                            # without admin card, only pressing both
-                            # capacitive buttons longer than between
-                            # 4*3 and 4*(3+3) seconds
+            self.check_both_buttons_pressed()  # check if the user wants
+            # to go to the admin menu on the terminal
+            # without admin card, only pressing both
+            # capacitive buttons longer than between
+            # 4*3 and 4*(3+3) seconds
             if self.both_buttons_pressed:
                 self.both_buttons_pressed = False
                 self.server_for_restore()
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
 
-
         self.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
 
     def check_both_buttons_pressed(self):
-      if time.localtime().tm_sec % 4 == 0:
-        self.B_OK.pressed = False  # avoid false positives
-        self.B_OK.scanning()
-        if self.B_OK.pressed:
-            self.B_Down.pressed = False
-            self.B_Down.scanning()
-            if self.B_Down.pressed:
-                self.buttons_counter += 1
-                print(self.buttons_counter)
-                if self.buttons_counter > 3:
-                    self.B_OK.pressed = False  # avoid false positives
-                    self.B_Down.pressed = False
-                    self.both_buttons_pressed = True # both buttons
-                                      # were pressed for a long time
+        if time.localtime().tm_sec % 4 == 0:
+            self.B_OK.pressed = False  # avoid false positives
+            self.B_OK.scanning()
+            if self.B_OK.pressed:
+                self.B_Down.pressed = False
+                self.B_Down.scanning()
+                if self.B_Down.pressed:
+                    self.buttons_counter += 1
+                    print(self.buttons_counter)
+                    if self.buttons_counter > 3:
+                        self.B_OK.pressed = False  # avoid false positives
+                        self.B_Down.pressed = False
+                        self.both_buttons_pressed = True  # both buttons
+                        # were pressed for a long time
+                        self.buttons_counter = 0
+                else:
                     self.buttons_counter = 0
             else:
                 self.buttons_counter = 0
-        else:
-            self.buttons_counter = 0
 
-    def server_for_restore(self): # opens a server and waits for input
-                            # this can be aborted by pressing
-                            # both capacitive buttons long enough
-        _logger.debug('Enter New Admin Card on Flask app')
+    def server_for_restore(self):  # opens a server and waits for input
+        # this can be aborted by pressing
+        # both capacitive buttons long enough
+        _logger.debug("Enter New Admin Card on Flask app")
         origin = (0, 0)
         size = 14
-        text = 'Browse to' + '\n' + \
-            routes.get_ip() + ':3000\n' + \
-            'to introduce new' + '\n' + \
-            'Admin Card RFID'
+        text = (
+            "Browse to"
+            + "\n"
+            + routes.get_ip()
+            + ":3000\n"
+            + "to introduce new"
+            + "\n"
+            + "Admin Card RFID"
+        )
         routes.start_server()
         loop_ended = False
-        datajson = WORK_DIR + 'dicts/data.json'
+        datajson = WORK_DIR + "dicts/data.json"
         j_file = open(datajson)
         j_data = json.load(j_file)
         j_data_2 = j_data
         j_file.close()
-        while j_data['admin_id'] == j_data_2['admin_id'] and not loop_ended:
+        while j_data["admin_id"] == j_data_2["admin_id"] and not loop_ended:
             j_file = open(datajson)
             j_data_2 = json.load(j_file)
             j_file.close()
@@ -243,7 +246,7 @@ class Clocking:
             card = self.Reader.scan_card()
             if card:
                 self.Disp.show_card(card)
-                self.Buzz.Play('cardswiped')
+                self.Buzz.Play("cardswiped")
                 time.sleep(2)
             self.check_both_buttons_pressed()
             if self.both_buttons_pressed:
@@ -251,6 +254,6 @@ class Clocking:
                 loop_ended = True
         routes.stop_server()
         self.Odoo.adm = j_data_2["admin_id"][0]
-        self.Disp.display_msg('new_adm_card')
-        self.Buzz.Play('back_to_menu')
+        self.Disp.display_msg("new_adm_card")
+        self.Buzz.Play("back_to_menu")
         time.sleep(2)
