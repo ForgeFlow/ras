@@ -17,10 +17,7 @@ class Button:
         GPIO.output(self.pin_power, 0)
         self.pressed = False
         GPIO.add_event_detect(
-            self.pin_signal,
-            GPIO.FALLING,
-            callback=self.scanning,
-            bouncetime=400,
+            self.pin_signal, GPIO.FALLING, callback=self.scanning, bouncetime=400
         )
         _logger.debug("Button Class Initialized")
 

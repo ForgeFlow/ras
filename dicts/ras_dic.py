@@ -1,5 +1,5 @@
 # FIRMWARE Version
-FIRMWARE_VERSION = 'v1.2.8'
+FIRMWARE_VERSION = "v1.2.8"
 
 # reference to find different files in
 # the memory of the device
@@ -30,11 +30,13 @@ PinsOK = (PinSignalOK, PinPowerOK)
 # stores a list of tasks, which upon selection
 # on the menu of the Terminal, will be asked twice before
 # execution ('are you sure?' Question)
-ask_twice = ['update_firmware',
-             'reset_wifi',
-             'reset_odoo',
-             'shutdown_safe',
-             'rebooting']
+ask_twice = [
+    "update_firmware",
+    "reset_wifi",
+    "reset_odoo",
+    "shutdown_safe",
+    "rebooting",
+]
 
 # allows to display the different messages
 # by defining the parameters needed to  use

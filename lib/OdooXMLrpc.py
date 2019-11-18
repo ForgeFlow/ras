@@ -62,10 +62,7 @@ class OdooXMLrpc:
 
             if self.https_on:
                 if self.port:
-                    self.url_template = "https://%s:%s" % (
-                        self.host,
-                        self.port,
-                    )
+                    self.url_template = "https://%s:%s" % (self.host, self.port)
                 else:
                     self.url_template = "https://%s" % self.host
             else:

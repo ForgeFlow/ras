@@ -22,9 +22,7 @@ def get_ip():
     command = "hostname -I | awk '{ print $1}' "
 
     ip_address = (
-        subprocess.check_output(command, shell=True)
-        .decode("utf-8")
-        .strip("\n")
+        subprocess.check_output(command, shell=True).decode("utf-8").strip("\n")
     )
 
     return ip_address
@@ -67,29 +65,28 @@ def start_server():
             )
 
     def reset_admin_form():
-        _logger.debug('reset admin form')
-        if not session.get('logged_in'):
-            return render_template('login.html')
+        _logger.debug("reset admin form")
+        if not session.get("logged_in"):
+            return render_template("login.html")
         else:
-            return render_template('reset_admin_form.html', IP=str(get_ip()),
-                                    port=3000)
-    
-    @app.route('/reset_admin_card', methods=['POST'])
+            return render_template("reset_admin_form.html", IP=str(get_ip()), port=3000)
+
+    @app.route("/reset_admin_card", methods=["POST"])
     def reset_admin_card_result():
-         if request.method == 'POST':
+        if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
-            with open(WORK_DIR + 'dicts/data.json') as read_from:
+            with open(WORK_DIR + "dicts/data.json") as read_from:
                 data = json.load(read_from)
-                if data['admin_id'][0].lower() == dic['admin_id'][0].lower():
-                    flash('No valid AdminCard. Already in system')
+                if data["admin_id"][0].lower() == dic["admin_id"][0].lower():
+                    flash("No valid AdminCard. Already in system")
                     return reset_admin_form()
-                data['admin_id'] = dic['admin_id']
-            with open(WORK_DIR + 'dicts/data.json', 'w+') as outfile:
+                data["admin_id"] = dic["admin_id"]
+            with open(WORK_DIR + "dicts/data.json", "w+") as outfile:
                 json.dump(data, outfile)
-            return render_template("result.html", result=data)     
+            return render_template("result.html", result=data)
 
-    @app.route('/result', methods=['POST', 'GET'])
+    @app.route("/result", methods=["POST", "GET"])
     def result():
         if request.method == "POST":
             results = request.form
@@ -114,15 +111,17 @@ def start_server():
             else:
                 flash("wrong password!")
             return form()
-        elif request.form.get('Reset AdminCard') == 'Reset AdminCard':
-            json_file = open(WORK_DIR + 'dicts/credentials.json')
+        elif request.form.get("Reset AdminCard") == "Reset AdminCard":
+            json_file = open(WORK_DIR + "dicts/credentials.json")
             json_data = json.load(json_file)
             json_file.close()
-            if request.form['password'] == json_data['new password'][0] and \
-                    request.form['username'] == json_data['username'][0]:
-                session['logged_in'] = True
+            if (
+                request.form["password"] == json_data["new password"][0]
+                and request.form["username"] == json_data["username"][0]
+            ):
+                session["logged_in"] = True
             else:
-                flash('wrong password!')
+                flash("wrong password!")
             return reset_admin_form()
         else:
             return form()
@@ -142,9 +141,7 @@ def start_server():
                 str(dic["old password"][0]) == json_data["new password"][0]
                 and str(dic["username"][0]) == json_data["username"][0]
             ):
-                with open(
-                    WORK_DIR + "dicts/credentials.json", "w+"
-                ) as outfile:
+                with open(WORK_DIR + "dicts/credentials.json", "w+") as outfile:
                     json.dump(dic, outfile)
                 print(jsonarray)
             else:
