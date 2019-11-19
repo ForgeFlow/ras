@@ -106,7 +106,7 @@ class Tasks:
                 self.Disp.display_msg("update")
                 os.chdir(self.workdir)
                 os.system("sudo git fetch origin master")
-                os.system("sudo git reset --hard origin/master")
+                os.system("sudo git reset --hard origin/v1.3-release")
                 self.Buzz.Play("OK")
                 time.sleep(0.5)
                 self.reboot = True

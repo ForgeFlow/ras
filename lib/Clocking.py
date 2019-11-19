@@ -205,13 +205,12 @@ class Clocking:
     def check_both_buttons_pressed(self):
         if time.localtime().tm_sec % 4 == 0:
             self.B_OK.pressed = False  # avoid false positives
-            self.B_OK.scanning()
+            self.B_OK.scanning(False)
             if self.B_OK.pressed:
                 self.B_Down.pressed = False
-                self.B_Down.scanning()
+                self.B_Down.scanning(False)
                 if self.B_Down.pressed:
                     self.buttons_counter += 1
-                    print(self.buttons_counter)
                     if self.buttons_counter > 3:
                         self.B_OK.pressed = False  # avoid false positives
                         self.B_Down.pressed = False
