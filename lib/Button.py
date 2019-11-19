@@ -22,9 +22,17 @@ class Button:
         _logger.debug("Button Class Initialized")
 
     def scanning(self, channel):
-        GPIO.output(self.pin_power, 1)
-        self.pressed = True
-        _logger.debug("Button Pressed")
+        if channel:
+            GPIO.output(self.pin_power, 1)
+            self.pressed = True
+            _logger.debug("Button Pressed")
+        else:
+            if not self.pressed and GPIO.input(self.pin_signal) == GPIO.HIGH:
+                self.pressed = True
+                _logger.debug('Button Pressed')
+            elif self.pressed and GPIO.input(self.pin_signal) == GPIO.LOW:
+                self.pressed = False
+                _logger.debug('Button Unpressed')
         time.sleep(0.02)
 
     def poweroff(self):

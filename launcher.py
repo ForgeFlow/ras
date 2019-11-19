@@ -59,10 +59,6 @@ def main_loop():
     # the program returns to this Loop, where a new Task
     # can be selected using the OK and Down Buttons.
     try:
-        fixup.ensure_autostart_after_crash()
-        fixup_watchdog.ensure_watchdog()
-        second_fixup_watchdog.ensure_watchdog()
-
         Disp.initial_display()
         # if not Tasks.wifi_active():  # make sure that the Terminal is
         #     Tasks.reset_wifi()  # connected to a WiFi
