@@ -105,7 +105,7 @@ class Tasks:
                 _logger.debug("Updating Firmware")
                 self.Disp.display_msg("update")
                 os.chdir(self.workdir)
-                os.system("sudo git fetch origin master")
+                os.system("sudo git fetch origin v1.3-release")
                 os.system("sudo git reset --hard origin/v1.3-release")
                 self.Buzz.Play("OK")
                 time.sleep(0.5)
@@ -126,13 +126,20 @@ class Tasks:
             time.sleep(2)
             self.back_to_begin_option()
 
-    def reset_wifi(self):
+    def _reset_wifi(self):
         _logger.debug("Reset WI-FI")
         self.Disp.display_msg("configure_wifi")
         os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
         os.system("sudo wifi-connect --portal-ssid " + SSID_reset)
         self.Buzz.Play("back_to_menu")
+
+    def reset_wifi(self):
+        self._reset_wifi()
         self.back_to_begin_option()
+    
+    def is_wifi_configured(self):
+        _logger.debug("Looking for existing WIFI configurations")
+        return len(os.listdir('/etc/NetworkManager/system-connections')) > 0
 
     def odoo_config(self):
         _logger.debug("Configure Odoo on Flask app")
@@ -152,6 +159,13 @@ class Tasks:
                 self.Disp.show_card(self.card)
                 self.Buzz.Play("cardswiped")
                 time.sleep(2)
+            self.Clock.check_both_buttons_pressed()  # check if the user wants
+            # to go to the admin menu on the terminal
+            # without admin card, only pressing both
+            # capacitive buttons longer than between
+            # 4*3 and 4*(3+3) seconds
+            if self.Clock.both_buttons_pressed:
+                return True
         self.Odoo.set_params()
         if not self.Odoo.uid:
             self.Buzz.Play("FALSE")
@@ -163,7 +177,6 @@ class Tasks:
         _logger.debug("Reset Odoo credentials")
         if not self.wifi_active():  # is the Terminal
             self.reset_wifi()  # connected to a WiFi
-
         if self.wifi_stable():
             routes.start_server()
             self.Odoo.uid = False
@@ -171,7 +184,14 @@ class Tasks:
                 if os.path.isfile(self.Odoo.datajson):
                     os.system("sudo rm " + self.Odoo.datajson)
                 self.odoo_config()
+                if self.Clock.both_buttons_pressed:
+                    break
             routes.stop_server()
+            if self.Clock.both_buttons_pressed:
+                self.Clock.both_buttons_pressed = False
+                self._reset_wifi()
+                time.sleep(5)
+                self.reset_odoo()
             self.Disp.display_msg("odoo_success")
             self.Buzz.Play("back_to_menu")
         else:

@@ -57,8 +57,8 @@ def main_loop():
     # can be selected using the OK and Down Buttons.
     try:
         Disp.initial_display()
-        # if not Tasks.wifi_active():  # make sure that the Terminal is
-        #     Tasks.reset_wifi()  # connected to a WiFi
+        if not Tasks.is_wifi_configured():  # make sure that the Terminal is
+            Tasks.reset_wifi()  # connected to a WiFi
         if not Odoo.user:  # make sure that we have
             Tasks.reset_odoo()  # access to an odoo db
         Tasks.selected()  # when the terminal is switched on it goes

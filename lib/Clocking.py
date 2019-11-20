@@ -5,7 +5,7 @@ import subprocess
 import logging
 from pythonwifi.iwlibs import Wireless
 
-from dicts.ras_dic import WORK_DIR
+from dicts.ras_dic import WORK_DIR, SSID_reset
 from . import routes
 
 _logger = logging.getLogger(__name__)
@@ -46,14 +46,6 @@ class Clocking:
         self.can_connect = odoo.can_connect
 
         self.minutes = 99
-        self.checkodoo_wifi = True
-        self.odoo_m         = " "
-        self.wifi_m         = " "
-        _logger.debug('Clocking Class Initialized')
-        self.minutes = 99
-        self.checkodoo_wifi =True
-
-        self.minutes        = 99
         self.checkodoo_wifi = True
         self.odoo_m         = " "
         self.wifi_m         = " "
