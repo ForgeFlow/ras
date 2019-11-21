@@ -1,8 +1,11 @@
 import logging
-import time
-import psutil
 import os
-from oot import OotAmqp, api, Field
+import time
+
+import psutil
+from oot import Field, OotAmqp, api
+from oot.connection import OdooConnectionXMLRPC
+
 from .button import Button
 
 _logger = logging.getLogger(__name__)
@@ -15,10 +18,26 @@ hz = 440
 class RasLauncher(OotAmqp):
     template = "eficent.ras"
     oot_input = "rfid_read"
+    connection_class = OdooConnectionXMLRPC
 
+    user = Field(name="Odoo user", required=True)
+    db = Field(name="Odoo Database", required=True)
+    password = Field(name="Odoo Password", required=True)
     admin_id = Field(name="Admin key", required=True)
 
-    def __init__(self, connection, reader, display, buzzer, up_pwr, up, down_pwr, down, version, path):
+    def __init__(
+        self,
+        connection,
+        reader,
+        display,
+        buzzer,
+        up_pwr,
+        up,
+        down_pwr,
+        down,
+        version,
+        path,
+    ):
         super().__init__(connection)
         self.version = version
         self.path = path
@@ -44,6 +63,7 @@ class RasLauncher(OotAmqp):
     def button_result(self, value):
         def button_function(channel):
             self.queue.put((value, {"button": True}))
+
         return button_function
 
     def print_card(self, key, **kwargs):
@@ -65,8 +85,8 @@ class RasLauncher(OotAmqp):
 
     def amqp_demo(self, channel, basic_deliver, properties, body):
         print(body)
-        _logger.info(body.decode('utf-8'))
-        self.queue.put(body.decode('UTF-8'))
+        _logger.info(body.decode("utf-8"))
+        self.queue.put(body.decode("UTF-8"))
 
     def get_default_amqp_options(self):
         res = super().get_default_amqp_options()
@@ -76,7 +96,10 @@ class RasLauncher(OotAmqp):
     @api.oot
     def display_show(self):
         while True:
-            if not (time.localtime().tm_min == self.minutes) and not self.showing_on_display:
+            if (
+                not (time.localtime().tm_min == self.minutes)
+                and not self.showing_on_display
+            ):
                 self.minutes = time.localtime().tm_min  # refreshed only
                 self.display._display_time()
             time.sleep(0.5)
@@ -85,16 +108,18 @@ class RasLauncher(OotAmqp):
         self.showing_on_display = False
         self.display._display_time()
         super()._run()
-    
+
     def check_key(self, key, **kwargs):
         self.showing_on_display = True
         if key == self.admin_id:
             return {"admin_key": True}
         if not self.admin:
-            self.display.display_msg('Connecting...')
+            self.display.display_msg("Connecting...")
             if self.function:
                 return self.function(key, **kwargs)
-            return super().check_key(key, **kwargs)
+            return self.connection.execute_action(
+                key, model="hr.employee", function="register_attendance"
+            )
         if kwargs.get("button", False):
             return {"status": "ok", "button": key}
         return {}
@@ -108,7 +133,7 @@ class RasLauncher(OotAmqp):
             self.menu_id = (self.menu_id + 1) % len(self.menus)
             name, self.confirm, self.pre_function = self.menus[self.menu_id]
             self.display.display_msg(name)
-            return        
+            return
         if not self.confirm or self.confirm_button:
             if self.confirm_button:
                 self.confirm(key=key, result=result, **kwargs)
@@ -119,7 +144,7 @@ class RasLauncher(OotAmqp):
         else:
             self.confirm_button = True
             self.display.display_msg("Are you sure?")
-    
+
     def reset(self, **kwargs):
         _logger.info("Reseting data")
         if self.connection_path:
@@ -146,30 +171,33 @@ class RasLauncher(OotAmqp):
             return self.menu_selection(key, result, **kwargs)
         if result.get("status", "ko") == "ok":
             self.display.display_msg(result.get("action_msg", "Checked"))
-            if result.get('action', 'check_out') == 'check_in':
-                self.buzzer.play([
-                    (volume, hz, duration * 2),
-                    (volume, hz * 1.28, duration * 2),
-                    (volume, 5, duration * 2),
-                ])
+            if result.get("action", "check_out") == "check_in":
+                self.buzzer.play(
+                    [
+                        (volume, hz, duration * 2),
+                        (volume, hz * 1.28, duration * 2),
+                        (volume, 5, duration * 2),
+                    ]
+                )
             else:
-                self.buzzer.play([
-                    (volume, hz * 1.26, duration),
-                    (volume, hz, duration),
-                ])
+                self.buzzer.play(
+                    [(volume, hz * 1.26, duration), (volume, hz, duration)]
+                )
         else:
-            self.buzzer.play([
-                (volume, hz * 4, duration / 4),
-                (volume, 20, duration / 2),
-                (volume, hz * 4, duration / 4),
-                (volume, 20, duration / 2),
-                (volume, hz * 4, duration / 4),
-                (volume, 20, duration / 2),
-                (volume, hz * 4, duration / 4),
-                (volume, 20, duration / 2),
-                (volume, hz * 4, duration / 4),
-                (volume, 20, duration / 2),
-            ])
+            self.buzzer.play(
+                [
+                    (volume, hz * 4, duration / 4),
+                    (volume, 20, duration / 2),
+                    (volume, hz * 4, duration / 4),
+                    (volume, 20, duration / 2),
+                    (volume, hz * 4, duration / 4),
+                    (volume, 20, duration / 2),
+                    (volume, hz * 4, duration / 4),
+                    (volume, 20, duration / 2),
+                    (volume, hz * 4, duration / 4),
+                    (volume, 20, duration / 2),
+                ]
+            )
             self.display.display_msg("CONTACT YOUR ADMIN")
         time.sleep(2)
         self.showing_on_display = False
