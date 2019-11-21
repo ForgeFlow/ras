@@ -1,0 +1,14 @@
+[Unit]
+Description=Oddoor CB service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=python3 /home/pi/ras/launcher.py
+
+[Install]
+WantedBy=multi-user.target

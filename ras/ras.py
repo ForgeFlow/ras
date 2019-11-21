@@ -3,7 +3,7 @@ import os
 import time
 
 import psutil
-from oot import Field, OotAmqp, api
+from oot import Field, OotMultiProcessing, api
 from oot.connection import OdooConnectionXMLRPC
 
 from .button import Button
@@ -15,7 +15,7 @@ duration = 0.1
 hz = 440
 
 
-class RasLauncher(OotAmqp):
+class RasLauncher(OotMultiProcessing):
     template = "eficent.ras"
     oot_input = "rfid_read"
     connection_class = OdooConnectionXMLRPC
@@ -117,9 +117,11 @@ class RasLauncher(OotAmqp):
             self.display.display_msg("Connecting...")
             if self.function:
                 return self.function(key, **kwargs)
-            return self.connection.execute_action(
+            result = self.connection.execute_action(
                 key, model="hr.employee", function="register_attendance"
-            )
+            ) or {}
+            _logger.info(result)
+            return result
         if kwargs.get("button", False):
             return {"status": "ok", "button": key}
         return {}
