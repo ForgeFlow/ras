@@ -104,8 +104,12 @@ class Tasks:
                 _logger.debug('Updating Firmware')
                 self.Disp.display_msg('update')
                 os.chdir(self.workdir)
-                os.system('sudo git fetch origin v1.2-release')
-                os.system('sudo git reset --hard origin/v1.2-release')
+                os.system('sudo git fetch origin v1.3-release')
+                os.system('sudo git reset --hard origin/v1.3-release')
+                os.system('sudo pip3 uninstall -y spi')
+                os.system('sudo pip3 install -r requirements.txt')
+                os.chdir('/home/pi/ras/src/spi-py')
+                os.system('sudo python3 setup.py install')
                 self.Buzz.Play('OK')
                 time.sleep(0.5)
                 self.reboot = True
@@ -213,3 +217,25 @@ class Tasks:
         self.reboot = True
         self.Disp.clear_display()
 # _________________________________________________________
+    def upgrade_new_branch(self):
+        def new_configuration():
+            os.system('cp -f /home/pi/ras-image-setup/config.txt /boot/')
+            os.system('cp -f /home/pi/ras-image-setup/modules /etc/')
+            os.system('cp -f /home/pi/ras-image-setup/rc.local /etc/')
+            os.system('cp -f /home/pi/ras-image-setup/bcm2835-wdt.conf /etc/modprobe.d/bcm2835-wdt.conf')
+            os.system('cp -f /home/pi/ras-image-setup/system.conf /etc/systemd/system.conf')
+            os.system('cp -f /home/pi/ras-image-setup/watchdog.conf /etc/watchdog.conf')
+            os.system('cp -f /home/pi/ras-image-setup/ras-launcher.service /lib/systemd/system/')
+        while not self.wifi_active() \
+            or not self.Odoo.can_connect("https://github.com"):
+            self.Disp.display_msg('configure_wifi')
+            os.system('sudo rm -R /etc/NetworkManager/system-connections/*')
+            os.system('sudo wifi-connect --portal-ssid ' + SSID_reset)
+            Disp.display_msg('update')
+            time.sleep(5)
+        os.chdir('/home/pi/ras-image-setup')
+        os.system('sudo git fetch origin v1.3-release')
+        os.system('sudo git reset --hard origin/v1.3-release')
+        new_configuration()
+        self.update_firmware()
+        os.system('sudo systemctl daemon-reload')
