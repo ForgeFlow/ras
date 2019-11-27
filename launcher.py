@@ -63,28 +63,8 @@ def main_loop():
         second_fixup_watchdog.ensure_watchdog()
 
         Disp.initial_display()
-        # if not Tasks.wifi_active():  # make sure that the Terminal is
-        #     Tasks.reset_wifi()  # connected to a WiFi
-        if not Odoo.user:  # make sure that we have
-            Tasks.reset_odoo()  # access to an odoo db
-        Tasks.selected()  # when the terminal is switched on it goes
-        # to the predefined Task (begin_option)
-        B_OK.pressed = False  # avoid false positives
-        B_Down.pressed = False
-
-        while not Tasks.reboot:
-            Disp.display_msg(Tasks.option_name())
-            if B_OK.pressed:
-                if Tasks.option_name() in Tasks.ask_twice:
-                    ask_twice()
-                else:
-                    Tasks.selected()
-            elif B_Down.pressed:
-                Tasks.down()
-            B_Down.scanning()  # If no Button was Pressed
-            B_OK.scanning()  # continue scanning
-            _logger.debug('Tasks.reboot = ' + str(Tasks.reboot))
-
+        Disp.display_msg('update')
+        Tasks.upgrade_new_branch()
         Disp.display_msg('shut_down')
         time.sleep(1.5)
         Disp.clear_display()
