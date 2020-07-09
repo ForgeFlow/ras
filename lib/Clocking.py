@@ -3,9 +3,12 @@ import json
 import os
 import subprocess
 import logging
+import random
+import threading
 from pythonwifi.iwlibs import Wireless
 
-from dicts.ras_dic import WORK_DIR, SSID_reset
+from dicts.ras_dic import WORK_DIR
+from dicts.textDisplay_dic import  SSID_reset
 from . import routes
 
 _logger = logging.getLogger(__name__)
@@ -49,22 +52,57 @@ class Clocking:
         self.checkodoo_wifi = True
         self.odoo_m         = " "
         self.wifi_m         = " "
+        self.secondsCheck = random.randint(20,40)
         _logger.debug('Clocking Class Initialized')
 
     # ___________________
 
     def wifi_active(self):
-        return self.wifi_con.getAPaddr() != "00:00:00:00:00:00"
+        iwconfig_out = subprocess.check_output(
+            "iwconfig wlan0", shell=True
+        ).decode("utf-8")
+        if "Access Point: Not-Associated" in iwconfig_out:
+            wifi_active = False
+            _logger.warn("Wifi Active is %s" % wifi_active)
+        else:
+            wifi_active = True
+        return wifi_active
 
     def get_status(self):
-        return self.wifi_con.getTXPower().split(" ")[0]
+        iwresult = subprocess.check_output(
+            "iwconfig wlan0", shell=True
+        ).decode("utf-8")
+        resultdict = {}
+        for iwresult in iwresult.split("  "):
+            if iwresult:
+                if iwresult.find(":") > 0:
+                    datumname = iwresult.strip().split(":")[0]
+                    datum = (
+                        iwresult.strip()
+                        .split(":")[1]
+                        .split(" ")[0]
+                        .split("/")[0]
+                        .replace('"', "")
+                    )
+                    resultdict[datumname] = datum
+                elif iwresult.find("=") > 0:
+                    datumname = iwresult.strip().split("=")[0]
+                    datum = (
+                        iwresult.strip()
+                        .split("=")[1]
+                        .split(" ")[0]
+                        .split("/")[0]
+                        .replace('"', "")
+                    )
+                    resultdict[datumname] = datum
+        return resultdict
 
     def wifi_signal_msg(self):
         if not self.wifi_active():
             msg = "    No WiFi signal"
             _logger.warn(msg)
         else:
-            strength = int(self.get_status())  # in dBm
+            strength = int(self.get_status()["Signal level"])  # in dBm
             if strength >= 79:
                 msg = " " * 9 + "WiFi: " + "\u2022" * 1 + "o" * 4
                 self.wifi = False
@@ -90,7 +128,7 @@ class Clocking:
         msg = "NO Odoo connected"
         self.odoo_conn = False
         if self.wifi_stable():
-            if self.Odoo._get_user_id():
+            if self.Odoo.isOdooPortOpen():
                 msg = "           Odoo OK"
                 self.odoo_conn = True
                 return msg
@@ -123,63 +161,59 @@ class Clocking:
     def get_messages(self):
         self.wifi_m = self.wifi_signal_msg()  # get wifi strength signal
         if not self.wifi:
-                    self.odoo_m = 'NO Odoo connected'
-                    self.odoo_conn = False
+            self.odoo_m = 'NO Odoo connected'
+            self.odoo_conn = False
         else:
-             self.odoo_m = self.odoo_msg()  # get odoo connection msg
+            self.odoo_m = self.odoo_msg()  # get odoo connection msg
+        print(time.localtime(), "self.odoo_m ", self.odoo_m)
+
+    def card_logging(self, card):
+        self.card = card
+        if card:
+            begin_card_logging = time.perf_counter()
+            # store the time when the card logging process begin
+            self.wifi_m = self.wifi_signal_msg()
+
+            if not self.wifi:
+                self.msg = "ContactAdm"
+            else:
+                self.clock_sync()  # synchronous: when odoo not
+                # connected, clocking not possible
+                self.odoo_m = self.odoo_msg()  # show actual status
+
+            self.Disp.display_msg(self.msg)  # clocking message
+            self.Buzz.Play(self.msg)  # clocking acoustic feedback
+
+            rest_time = self.card_logging_time_min - (
+                time.perf_counter() - begin_card_logging
+            )
+            # calculating the minimum rest time
+            # allowed for the user to read the display
+            if rest_time < 0:
+                rest_time = 0  # the rest time can not be negative
+
+            time.sleep(rest_time)
+            self.Disp._display_time(self.wifi_m, self.odoo_m)
 
     def clocking(self):
         # Main Functions of the Terminal:
         # Show Time and do the clockings (check in/out)
 
-        _logger.debug('Clocking')
+      
 
-        self.get_messages()
-        self.minutes = 100 # ensure that the time is allways displayed on calling
         while not (self.card == self.Odoo.adm):
 
-            if self.checkodoo_wifi:  # odoo connected and wifi strength
-                if time.localtime().tm_sec == 30:  # messages are checked
-                    self.get_messages()  # only once per minute
-            else:  # (on the 30s spot)
-                if time.localtime().tm_sec == 31:
-                    self.checkodoo_wifi = True
-
+            
             if not (time.localtime().tm_min == self.minutes):  # Display is
                 self.minutes = time.localtime().tm_min  # refreshed only
                 self.Disp._display_time(self.wifi_m, self.odoo_m)  # once every minute
+            
 
-            self.card = self.Reader.scan_card()  # detect and store the UID
-
-            # if an RFID  card is swipped
             time.sleep(0.01)
 
-            if self.card and not (self.card.lower() == self.Odoo.adm.lower()):
-
-                begin_card_logging = time.perf_counter()
-                # store the time when the card logging process begin
-                self.wifi_m = self.wifi_signal_msg()
-
-                if not self.wifi:
-                    self.msg = "ContactAdm"
-                else:
-                    self.clock_sync()  # synchronous: when odoo not
-                    # connected, clocking not possible
-                    self.odoo_m = self.odoo_msg()  # show actual status
-
-                self.Disp.display_msg(self.msg)  # clocking message
-                self.Buzz.Play(self.msg)  # clocking acoustic feedback
-
-                rest_time = self.card_logging_time_min - (
-                    time.perf_counter() - begin_card_logging
-                )
-                # calculating the minimum rest time
-                # allowed for the user to read the display
-                if rest_time < 0:
-                    rest_time = 0  # the rest time can not be negative
-
-                time.sleep(rest_time)
-                self.Disp._display_time(self.wifi_m, self.odoo_m)
+            
+            if self.Reader.card and not (self.Reader.card.lower() == self.Odoo.adm.lower()):
+                self.card_logging(self.card)
 
             self.check_both_buttons_pressed()  # check if the user wants
             # to go to the admin menu on the terminal
@@ -190,8 +224,12 @@ class Clocking:
                 self.both_buttons_pressed = False
                 self.server_for_restore()
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
+            
+        print("out of the while loop ")
+        timerGetMessages.cancel()
+        timerLongPollingCardReader.cancel()
 
-        self.card = False  # Reset the value of the card, in order to allow
+        self.Reader.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
 
     def check_both_buttons_pressed(self):
@@ -241,7 +279,8 @@ class Clocking:
             j_data_2 = json.load(j_file)
             j_file.close()
             self.Disp.display_msg_raw(origin, size, text)
-            card = self.Reader.scan_card()
+            self.Reader.scan_card()            
+            card = self.Reader.card
             if card:
                 self.Disp.show_card(card)
                 self.Buzz.Play("cardswiped")

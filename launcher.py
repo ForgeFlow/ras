@@ -95,10 +95,17 @@ class RASFormatter(logging.Formatter):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
+log_file = '/var/log/ras.log'
+
+if not os.path.isfile(log_file):
+    os.system("sudo touch "+log_file)
+
+os.system("sudo chmod 777 "+log_file)
 
 handler = logging.handlers.TimedRotatingFileHandler(
-    filename="/var/log/ras.log", when="D", interval=1, backupCount=30
+    filename = log_file, when="D", interval=1, backupCount=30
 )
+
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
 main_loop()

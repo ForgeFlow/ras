@@ -2,6 +2,7 @@ import os
 import time
 import json
 import logging
+import socket
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
@@ -41,6 +42,7 @@ class OdooXMLrpc:
             self.tz = False
             self.https_on = False
             self.url_template = False
+            self.odooIpPort = False
             self.uid = False
         else:
             self.db = self.j_data["db"][0]
@@ -70,8 +72,9 @@ class OdooXMLrpc:
                     self.url_template = "http://%s:%s" % (self.host, self.port)
                 else:
                     self.url_template = "http://%s" % self.host
-
+            self.odooIpPort = (self.host, int(self.port))
             self.uid = self._get_user_id()
+            print("self.odooIpPort ", self.odooIpPort) #############################################################
 
     def _get_object_facade(self, url):
         try:
@@ -95,6 +98,21 @@ class OdooXMLrpc:
         except Exception as e:
             _logger.exception(e)
             return False
+    
+    def isOdooPortOpen(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            canConnectResult = s.connect_ex(self.odooIpPort)
+            print("canConnectResult ", canConnectResult)
+            if canConnectResult == 0:
+                isOpen = True
+            else:
+                isOpen = False
+        except:
+            isOpen = False
+        finally:
+            s.close()
+        return isOpen
 
     def check_attendance(self, card):
         try:

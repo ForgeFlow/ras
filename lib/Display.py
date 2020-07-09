@@ -4,7 +4,8 @@ import logging
 from PIL import Image, ImageFont
 from luma.core.render import canvas
 from .demo_opts import get_device
-from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
+from dicts.ras_dic import WORK_DIR, display_driver
+from dicts.textDisplay_dic import messages_dic
 
 
 _logger = logging.getLogger(__name__)
@@ -18,6 +19,7 @@ class Display:
         _logger.debug("Display Class Initialized")
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
+        self.language = "ES"
 
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
@@ -68,9 +70,12 @@ class Display:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
 
     def display_msg(self, param):
-        origin = messages_dic[param][0]
-        size = messages_dic[param][1]
-        text = messages_dic[param][2]
+        stepOne = messages_dic.get(param)
+        print(stepOne)
+        msg_translated = stepOne.get(self.language)
+        origin = msg_translated[0]
+        size = msg_translated[1]
+        text = msg_translated[2]
         self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
 

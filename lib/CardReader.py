@@ -130,7 +130,9 @@ class CardReader:
 #________________________________________________________________________-
 
   def __init__(self, dev='/dev/spidev0.0', spd=200):
+    self.card = False
     self.spi = spi.openSPI(device=dev,speed=spd)
+    print("after openSPI")
     self.MFRC522_Init()
 
   def Write_MFRC522(self, addr, val):
@@ -448,6 +450,7 @@ class CardReader:
     # in front of the CardReader Instance (Device)
     # It returns the uid of the card in hex code
     # If there is not a card swipped, returns False
+    
     card = False
 
     # Scan for cards
@@ -462,4 +465,5 @@ class CardReader:
         card = '{:02x}{:02x}{:02x}{:02x}'.format(
           uid[0], uid[1], uid[2], uid[3])
 
-    return card
+    self.card = card
+    print(time.localtime(), "self.card ", self.card)

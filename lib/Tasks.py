@@ -2,10 +2,52 @@ import time
 import os
 import shelve
 import logging
+import threading
+import signal
 from . import Clocking, routes
-from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR, FIRMWARE_VERSION
+from dicts.ras_dic import ask_twice, WORK_DIR, FIRMWARE_VERSION
+from dicts.textDisplay_dic import  SSID_reset
 
 _logger = logging.getLogger(__name__)
+
+class ExitThreads(Exception):
+    """
+    Custom exception which is used to trigger the clean exit
+    of all running threads and the main program.
+    """
+    pass
+
+class threadGetMessages(threading.Thread):
+    def __init__(self,clocking):
+        threading.Thread.__init__(self)
+        self.exitThreadFlag = threading.Event()
+        self.Clocking = clocking
+    def run(self):
+        print('Thread #%s started' % self.ident)
+        while not self.exitThreadFlag.is_set():
+            self.Clocking.get_messages()
+            time.sleep(60)
+        print('Thread #%s stopped' % self.ident)
+
+class threadPollingCardReader(threading.Thread):
+    def __init__(self,reader, clocking, adminCard):
+        threading.Thread.__init__(self)
+        self.exitThreadFlag = threading.Event()
+        self.Reader = reader
+        self.adminCard = adminCard
+        self.Clock = clocking
+    def run(self):
+        print('Thread #%s started' % self.ident)
+        while not self.exitThreadFlag.is_set():
+            self.Reader.scan_card()
+            if self.Reader.card:
+                if self.Reader.card.lower() == self.adminCard.lower():
+                    raise ExitThreads
+                else:
+                    self.Clock.card_logging(self.Reader.card)
+
+            time.sleep(0.25)
+        print('Thread #%s stopped' % self.ident)
 
 
 class Tasks:
@@ -48,7 +90,6 @@ class Tasks:
         self.optionmax = len(self.tasks_menu) - 1
         _logger.debug("Tasks Class Initialized")
 
-    # __________________________________
     def selected(self):
         self.Buzz.Play("OK")
         self.B_Down.poweroff()  # switch off Buttons
@@ -75,7 +116,6 @@ class Tasks:
     def option_name(self):
         return self.tasks_menu[self.option].__name__
 
-    # ___________________________________
     def back_to_begin_option(self):
         self.Disp.clear_display()
         self.option = self.begin_option
@@ -83,10 +123,26 @@ class Tasks:
         self.Disp.clear_display()
         _logger.debug("Back to begin option")
 
-    # _______________________________
-
     def clocking(self):
-        self.Clock.clocking()
+        _logger.debug('Clocking')
+
+        try:
+            getMessages     = threadGetMessages(self.Clock)
+            pollCardReader  = threadPollingCardReader(self.Reader, self.Clock, self.Odoo.adm)
+            getMessages.start()
+            pollCardReader.start()
+            while True:
+                time.sleep(1)
+ 
+        except ExitThreads:
+            getMessages.exitThreadFlag.set()
+            pollCardReader.exitThreadFlag.set()
+            getMessages.join()
+            pollCardReader.join()
+    
+        print('Exiting main program')
+
+
 
     def showRFID(self):
         _logger.debug("Show RFID reader")
@@ -138,8 +194,15 @@ class Tasks:
         self.back_to_begin_option()
     
     def is_wifi_configured(self):
-        _logger.debug("Looking for existing WIFI configurations")
-        return len(os.listdir('/etc/NetworkManager/system-connections')) > 0
+        _logger.debug("checking if wifi works")
+        hostname = "1.1.1.1"
+        response = os.system("ping -c 1 " + hostname)
+        if response == 0:
+            pingstatus = True
+        else:
+            pingstatus = False # ping returned an error
+
+        return pingstatus
 
     def odoo_config(self):
         _logger.debug("Configure Odoo on Flask app")
@@ -235,5 +298,3 @@ class Tasks:
         self.reboot = True
         self.Disp.clear_display()
 
-
-# _________________________________________________________
