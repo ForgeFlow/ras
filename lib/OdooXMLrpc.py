@@ -7,30 +7,55 @@ from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
 
 import xmlrpc.client as xmlrpclib
-from urllib.request import urlopen
+
+from . import Utils
 
 _logger = logging.getLogger(__name__)
 
-
 class OdooXMLrpc:
     def __init__(self):
-        self.workdir = WORK_DIR
-        self.datajson = self.workdir + "dicts/data.json"
+        self.workdir                    = WORK_DIR
+        self.datajson                   = self.workdir + "dicts/data.json"
+        self.fileDeviceCustomization    = self.workdir + "dicts/deviceCustomization.json"
         self.set_params()
         _logger.debug("Odoo XMLrpc Class Initialized")
 
     def set_params(self):
         _logger.debug("Params config is %s " % os.path.isfile(self.datajson))
-        try:
-            j_file = open(self.datajson)
-            self.j_data = json.load(j_file)
-            j_file.close()
-        except Exception as e:
-            _logger.exception(e)
-            if os.path.isfile(self.datajson):
-                os.system("sudo rm " + self.datajson)
-                # be sure that there is no data.json file
-                # if the data.json can not be loaded
+        self.j_data = Utils.getJsonData(self.datajson)
+        if self.j_data:
+            self.odooConnectedAtLeastOnce = True
+        else:
+            self.odooConnectedAtLeastOnce = False
+            self.getOdooParamsFromDeviceCustomizationFile()
+
+        if self.j_data:
+            self.db     = self.j_data["db"][0]
+            self.user   = self.j_data["user_name"][0]
+            self.pswd   = self.j_data["user_password"][0]
+            self.host   = self.j_data["odoo_host"][0]
+            self.port   = self.j_data["odoo_port"][0]
+            self.adm    = self.j_data["admin_id"][0]
+            self.tz     = self.j_data["timezone"][0]
+
+            os.environ["TZ"] = tz_dic.tz_dic[self.tz]
+            time.tzset()
+
+            if "https" not in self.j_data:
+                self.https_on = False
+                self.url_template = "http://%s" % self.host
+            else:
+                self.https_on = True
+                self.url_template = "https://%s" % self.host
+
+            if self.port:
+                self.url_template += ":%s" % self.port
+            
+            self.odooIpPort = (self.host, int(self.port))
+            self.uid = self._get_user_id()
+        else:
+            self.ensureNoDataJsonFile()
+
             self.j_data = False
             self.db = False
             self.user = False
@@ -41,46 +66,22 @@ class OdooXMLrpc:
             self.tz = False
             self.https_on = False
             self.url_template = False
+            self.odooIpPort = False
             self.uid = False
-        else:
-            self.db = self.j_data["db"][0]
-            self.user = self.j_data["user_name"][0]
-            self.pswd = self.j_data["user_password"][0]
-            self.host = self.j_data["odoo_host"][0]
-            self.port = self.j_data["odoo_port"][0]
+        
+        if self.uid and not self.odooConnectedAtLeastOnce:
+            self.odooConnectedAtLeastOnce = True
+            self.storeOdooParamsInDeviceCustomizationFile()
 
-            self.adm = self.j_data["admin_id"][0]
-            self.tz = self.j_data["timezone"][0]
-
-            os.environ["TZ"] = tz_dic.tz_dic[self.tz]
-            time.tzset()
-
-            if "https" not in self.j_data:
-                self.https_on = False
-            else:
-                self.https_on = True
-
-            if self.https_on:
-                if self.port:
-                    self.url_template = "https://%s:%s" % (self.host, self.port)
-                else:
-                    self.url_template = "https://%s" % self.host
-            else:
-                if self.port:
-                    self.url_template = "http://%s:%s" % (self.host, self.port)
-                else:
-                    self.url_template = "http://%s" % self.host
-
-            self.uid = self._get_user_id()
+        _logger.debug("After set params method, Odoo UID : ", self.uid)
 
     def _get_object_facade(self, url):
         try:
             object_facade = xmlrpclib.ServerProxy(self.url_template + str(url))
+            return object_facade
         except Exception as e:
             _logger.exception(e)
-            object_facade = False
-            raise e
-        return object_facade
+            return False
 
     def _get_user_id(self):
         try:
@@ -88,13 +89,16 @@ class OdooXMLrpc:
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
                 return user_id
-            return False
+            return None
         except ConnectionRefusedError:
             _logger.debug(ConnectionRefusedError)
-            return False
+            return None
         except Exception as e:
             _logger.exception(e)
-            return False
+            return None
+    
+    def isOdooPortOpen(self):
+        return Utils.isIpPortOpen(self.odooIpPort)
 
     def check_attendance(self, card):
         try:
@@ -113,14 +117,25 @@ class OdooXMLrpc:
             _logger.exception(e)
             return False
 
-    def can_connect(self, url):
-        # returns True if it can connect to url
-        try:
-            response = urlopen(url, timeout=10)
-            return True
-        except Exception as e:
-            _logger.exception(e)
-            return False
-
-    def reset(self):
-        pass
+    def ensureNoDataJsonFile(self):
+        if os.path.isfile(self.datajson):
+            os.system("sudo rm " + self.datajson)
+    
+    def storeOdooParamsInDeviceCustomizationFile(self):
+        deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
+        if deviceCustomizationData:
+            deviceCustomizationData["odooParameters"] = self.j_data
+            self.odooConnectedAtLeastOnce = True
+            deviceCustomizationData["odooConnectedAtLeastOnce"] = self.odooConnectedAtLeastOnce
+            Utils.storeJsonData(self.fileDeviceCustomization,deviceCustomizationData)
+            _logger.debug("wrote to deviceCustomizationData.json: ",self.j_data)
+    
+    def getOdooParamsFromDeviceCustomizationFile(self):
+        deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
+        if deviceCustomizationData:
+            self.j_data = deviceCustomizationData["odooParameters"]
+            self.odooConnectedAtLeastOnce = deviceCustomizationData["odooConnectedAtLeastOnce"]
+            Utils.storeJsonData(self.datajson, self.j_data)
+            _logger.debug("wrote to data.json: ",self.j_data)
+        else:
+            self.j_data = None

@@ -1,10 +1,14 @@
 import time
 import logging
+import copy
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
 from .demo_opts import get_device
-from dicts.ras_dic import messages_dic, WORK_DIR, display_driver
+from dicts.ras_dic import WORK_DIR, display_driver
+from dicts.textDisplay_dic import messages_dic
+from . import routes
+from . import Utils
 
 
 _logger = logging.getLogger(__name__)
@@ -18,7 +22,23 @@ class Display:
         _logger.debug("Display Class Initialized")
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
-
+        self.font3 = ImageFont.truetype(self.font_ttf, 22)
+        self.fileDeviceCustomization = WORK_DIR + "dicts/deviceCustomization.json"
+        self.getSettingsFromFile()
+    
+    def getSettingsFromFile(self):
+        data = Utils.getJsonData(self.fileDeviceCustomization)
+        if data:
+            self.language           = data["language"]
+            #print("language :", self.language)
+            self.showEmployeeName   = data["showEmployeeName"]
+            return True
+        else:
+            #print("no data :", data)
+            self.language           = "ENGLISH"
+            self.showEmployeeName   = "yes"
+            return False
+    
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
             hour = time.strftime("%H:%M", time.localtime())
@@ -36,15 +56,14 @@ class Display:
             draw.text((0, 0), wifi_quality, font=self.font2, fill="white")
             draw.text((0, 52), odoo_m, font=self.font2, fill="white")
 
-    def show_card(self, card_id):
-        c_font = ImageFont.truetype(self.font_ttf, 22)
+    def showCard(self,card):
         with canvas(self.device) as draw:
             try:
-                draw.text(15, 20, card_id, font=c_font, fill="white")
+                draw.text(15, 20, card, font=self.font3, fill="white")
             except BaseException:
-                draw.text((15, 20), card_id, font=c_font, fill="white")
+                draw.text((15, 20), card, font=self.font3, fill="white")
 
-    def _welcome_logo(self):
+    def displayLogo(self):
         logo = Image.open(self.img_path + "eficent.png").convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
@@ -55,26 +74,46 @@ class Display:
         background.paste(img, posn)
         self.device.display(background.convert(self.device.mode))
 
-    def initial_display(self):
-        self._welcome_logo()
-        time.sleep(1.5)
+    def displayGreetings(self):
+
+        self.displayLogo()
+        time.sleep(1.2)
         self.display_msg("welcome")
-        time.sleep(1.5)
+        time.sleep(1.2)
         self.clear_display()
 
-    def display_msg_raw(self, origin, size, text):
+    def displayMsgRaw(self, message):
+        origin = message[0]
+        size = message[1]
+        text = message[2]
         font = ImageFont.truetype(self.font_ttf, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
-
-    def display_msg(self, param):
-        origin = messages_dic[param][0]
-        size = messages_dic[param][1]
-        text = messages_dic[param][2]
-        self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
+
+    def getMsgTranslated(self, textKey):
+        dictWithAllLanguages = messages_dic.get(textKey)
+        msgTranslated = dictWithAllLanguages.get(self.language)       
+        return copy.deepcopy(msgTranslated)
+
+    def display_msg(self, textKey, employee_name = None):
+        message = self.getMsgTranslated(textKey)
+        if '-EmployeePlaceholder-' in message[2]:
+            if employee_name and self.showEmployeeName == "yes":
+                employeeName = employee_name.split(" ",1)
+                firstName = employeeName[0][0:14]
+                lastName = employeeName[1][0:14]         
+                message[2] = message[2].replace('-EmployeePlaceholder-',firstName+"\n"+lastName,1)
+            else:
+                message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
+        self.displayMsgRaw(message)
+    
+    def displayWithIP(self, textKey):
+        message = self.getMsgTranslated(textKey)
+        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
+        self.displayMsgRaw(message)
 
     def clear_display(self):
         with canvas(self.device) as draw:
-            draw.multiline_text((0, 0), " ")  # display shows nothing (blank)
+            draw.multiline_text((0, 0), " ")
             _logger.debug("Clear display")

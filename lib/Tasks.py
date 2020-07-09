@@ -1,239 +1,446 @@
 import time
 import os
-import shelve
+import sys
+#import shelve
 import logging
+import threading
+#import signal
+#from urllib.request import urlopen
 from . import Clocking, routes
-from dicts.ras_dic import ask_twice, SSID_reset, WORK_DIR, FIRMWARE_VERSION
+from dicts.ras_dic import ask_twice, WORK_DIR, FIRMWARE_VERSION
+from dicts.textDisplay_dic import  SSID_reset, listOfLanguages
+from . import Utils
+
 
 _logger = logging.getLogger(__name__)
 
-
 class Tasks:
-    def __init__(self, Odoo, Hardware):
-        self.card = False  # currently swipped card code
-        self.reboot = False  # Flag to signal the main Loop
-        # rebooting was chosen
-        self.Odoo = Odoo
-        self.Buzz = Hardware[0]  # Passive Buzzer
-        self.Disp = Hardware[1]  # Display
-        self.Reader = Hardware[2]  # Card Reader
-        self.B_Down = Hardware[3]  # Button Down
-        self.B_OK = Hardware[4]  # Button OK
+	def __init__(self, Odoo, Hardware):
+		self.card = False  # currently swipped card code
+		self.Odoo = Odoo
+		self.Buzz = Hardware[0]  # Passive Buzzer
+		self.Disp = Hardware[1]  # Display
+		self.Reader = Hardware[2]  # Card Reader
+		self.B_Down = Hardware[3]  # Button Down
+		self.B_OK = Hardware[4]  # Button OK
 
-        self.Clock = Clocking.Clocking(Odoo, Hardware)
-        self.workdir = WORK_DIR
-        self.ask_twice = ask_twice  # list of tasks to ask
-        # 'are you sure?' upon selection
-        self.get_ip = routes.get_ip
-        self.can_connect = Odoo.can_connect
-        self.wifi_active = self.Clock.wifi_active
-        self.wifi_stable = self.Clock.wifi_stable
+		self.Clock = Clocking.Clocking(Odoo, Hardware)
+		self.workdir = WORK_DIR
+		self.ask_twice = ask_twice  # list of tasks to ask 'are you sure?' upon selection
+		self.get_ip = routes.get_ip
 
-        # Menu vars
-        self.begin_option = 0  # the Terminal begins with this option
-        self.option = self.begin_option
+		self.wifiStable = self.Clock.wifiStable
 
-        self.tasks_menu = [  # The Tasks appear in the Menu
-            self.clocking,  # in the same order as here.
-            self.showRFID,
-            self.update_firmware,
-            self.reset_wifi,
-            self.reset_odoo,
-            #               self.toggle_sync,    # uncomment when implemented
-            self.show_version,
-            self.shutdown_safe,
-            self.rebooting,
-        ]
+		self.periodPollCardReader 							= 0.2  # second
+		self.periodCheckBothButtonsPressed     	= 1     # seconds
+		self.howLongShouldBeBothButtonsPressed 	= 7     # seconds (dont set higher, buttons will not react - issue with current hardware)
 
-        self.optionmax = len(self.tasks_menu) - 1
-        _logger.debug("Tasks Class Initialized")
+	 # ######### TASKS ----####################
+		self.defaultNextTask = "clocking"  # the Terminal begins with this option
+		self.nextTask = self.defaultNextTask
+		
+		self.dictOfTasks = {  
+				"clocking"				: self.clocking,
+				"chooseLanguage"	: self.chooseLanguage,  
+				"showRFID"				: self.showRFID,
+				"updateFirmware"	: self.updateFirmware,
+				"shouldEmployeeNameBeDisplayed": self.shouldEmployeeNameBeDisplayed,
+				"resetWifi"				: self.resetWifi,
+				"resetOdoo"				: self.getOdooUIDwithNewParameters,
+				"getNewAdminCard"	: self.getNewAdminCard,
+				"showVersion"			: self.showVersion,
+				"shutdownSafe"		: self.shutdownSafe,
+				"reboot"					: self.reboot,
+				"ensureWiFiAndOdoo": self.ensureWiFiAndOdoo
+		}
 
-    # __________________________________
-    def selected(self):
-        self.Buzz.Play("OK")
-        self.B_Down.poweroff()  # switch off Buttons
-        self.B_OK.poweroff()  # to keep the electronics cool
+		self.listOfTasksInMenu = [  # The Tasks appear in the Menu in the same order as here.
+				"clocking"				,
+				"chooseLanguage"	,  
+				"showRFID"				,
+				"updateFirmware"	,
+				"shouldEmployeeNameBeDisplayed",
+				"resetWifi"				,
+				"resetOdoo"				,
+				"getNewAdminCard"	,
+				"showVersion"			,
+				"shutdownSafe"		,
+				"reboot"				
+		]
 
-        self.tasks_menu[self.option]()
+		self.maxMenuOptions = len(self.listOfTasksInMenu) - 1
 
-        self.B_Down.poweron()  # switch the Buttons back on
-        self.B_OK.poweron()  # to detect what the user wants
-        self.B_Down.pressed = False  # avoid false positives
-        self.B_OK.pressed = False
-        self.Buzz.Play("back_to_menu")
-        _logger.debug("Button Selected")
+		self.currentMenuOption = 0
 
-    def down(self):
-        self.Buzz.Play("down")
-        time.sleep(0.4)  # allow time to take the finger
-        # away from the button
-        self.option += 1
-        if self.option > self.optionmax:
-            self.option = 0
-        _logger.debug("Button Down")
+		self.listOfYesNo =['yes', 'no']
 
-    def option_name(self):
-        return self.tasks_menu[self.option].__name__
+	 ########### LANGUAGES ####################
+		self.listOfLanguages = listOfLanguages
 
-    # ___________________________________
-    def back_to_begin_option(self):
-        self.Disp.clear_display()
-        self.option = self.begin_option
-        self.selected()
-        self.Disp.clear_display()
-        _logger.debug("Back to begin option")
+		self.maxLanguageOptions = len(self.listOfLanguages) - 1
 
-    # _______________________________
+		self.currentLanguageOption = 0		
 
-    def clocking(self):
-        self.Clock.clocking()
+		_logger.debug("Tasks Class Initialized")
 
-    def showRFID(self):
-        _logger.debug("Show RFID reader")
-        self.Disp.display_msg("swipecard")
-        while not (self.card == self.Odoo.adm):
-            self.card = self.Reader.scan_card()
-            if self.card and not (self.card == self.Odoo.adm):
-                self.Disp.show_card(self.card)
-                self.Buzz.Play("cardswiped")
-        self.card = False  # avoid closed loop
-        self.back_to_begin_option()
+	def executeNextTask(self):
+			self.Buzz.Play("OK")
+			taskToBeExecuted = self.nextTask
+			self.nextTask = None
+			self.dictOfTasks[taskToBeExecuted]()
+			self.Buzz.Play("back_to_menu")
 
-    def update_firmware(self):
-        if self.wifi_stable():
-            if self.can_connect("https://github.com"):
-                _logger.debug("Updating Firmware")
-                self.Disp.display_msg("update")
-                os.chdir(self.workdir)
-                os.system("sudo git fetch origin v1.3-release")
-                os.system("sudo git reset --hard origin/v1.3-release")
-                self.Buzz.Play("OK")
-                time.sleep(0.5)
-                self.reboot = True
-                _logger.debug("self reboot =  " + str(self.reboot))
-            else:
-                _logger.warn("Unable to Update Firmware")
-                self.Buzz.Play("FALSE")
-                self.Disp.display_msg("ERRUpdate")
-                time.sleep(2)
-                self.Disp.clear_display()
-                self.back_to_begin_option()
-        else:
-            self.Disp.display_msg("no_wifi")
-            self.Buzz.Play("FALSE")
-            time.sleep(0.5)
-            self.Buzz.Play("back_to_menu")
-            time.sleep(2)
-            self.back_to_begin_option()
+	def getNewAdminCard(self):  # opens a server to set a new AdminCard
 
-    def _reset_wifi(self):
-        _logger.debug("Reset WI-FI")
-        self.Disp.display_msg("configure_wifi")
-        os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
-        os.system("sudo wifi-connect --portal-ssid " + SSID_reset)
-        self.Buzz.Play("back_to_menu")
+		_logger.debug("Enter New Admin Card on Flask app")
 
-    def reset_wifi(self):
-        self._reset_wifi()
-        self.back_to_begin_option()
-    
-    def is_wifi_configured(self):
-        _logger.debug("Looking for existing WIFI configurations")
-        return len(os.listdir('/etc/NetworkManager/system-connections')) > 0
+		exitFlag = threading.Event()
+		exitFlag.clear()
 
-    def odoo_config(self):
-        _logger.debug("Configure Odoo on Flask app")
-        origin = (0, 0)
-        size = 14
-        text = (
-            "Browse to\n"
-            + self.get_ip()
-            + ":3000\n"
-            + "to introduce new\n"
-            + "Odoo parameters"
-        )
-        while not os.path.isfile(self.Odoo.datajson):
-            self.Disp.display_msg_raw(origin, size, text)
-            self.card = self.Reader.scan_card()
-            if self.card:
-                self.Disp.show_card(self.card)
-                self.Buzz.Play("cardswiped")
-                time.sleep(2)
-            self.Clock.check_both_buttons_pressed()  # check if the user wants
-            # to go to the admin menu on the terminal
-            # without admin card, only pressing both
-            # capacitive buttons longer than between
-            # 4*3 and 4*(3+3) seconds
-            if self.Clock.both_buttons_pressed:
-                return True
-        self.Odoo.set_params()
-        if not self.Odoo.uid:
-            self.Buzz.Play("FALSE")
-            self.Disp.display_msg("odoo_failed")
-            time.sleep(3)
-            self.Disp.clear_display()
+		self.Disp.displayWithIP('browseForNewAdminCard')
+		
+		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
 
-    def reset_odoo(self):
-        _logger.debug("Reset Odoo credentials")
-        if not self.wifi_active():  # is the Terminal
-            self.reset_wifi()  # connected to a WiFi
-        if self.wifi_stable():
-            routes.start_server()
-            self.Odoo.uid = False
-            while not self.Odoo.uid:
-                if os.path.isfile(self.Odoo.datajson):
-                    os.system("sudo rm " + self.Odoo.datajson)
-                self.odoo_config()
-                if self.Clock.both_buttons_pressed:
-                    break
-            routes.stop_server()
-            if self.Clock.both_buttons_pressed:
-                self.Clock.both_buttons_pressed = False
-                self._reset_wifi()
-                time.sleep(5)
-                self.reset_odoo()
-            self.Disp.display_msg("odoo_success")
-            self.Buzz.Play("back_to_menu")
-        else:
-            self.Disp.display_msg("no_wifi")
-            self.Buzz.Play("FALSE")
-        self.Buzz.Play("back_to_menu")
-        time.sleep(2)
-        self.back_to_begin_option()
+		routes.startServerAdminCard(exitFlag)
+		pollCardReader.start()
 
-    def toggle_sync(self):
-        _logger.warn("Toggle Sync")
-        file_sync_flag = self.Odoo.workdir + "dicts/sync_flag"
-        fs = shelve.open(file_sync_flag)
-        flag = fs["sync_flag"]
-        fs["sync_flag"] = not flag
-        self.Clock.sync = not flag
-        fs.close()
-        if self.Clock.sync:
-            self.Disp.display_msg("sync")
-        else:
-            self.Disp.display_msg("async")
-        time.sleep(1.5)
-        self.back_to_begin_option()
+		pollCardReader.join()
+		self.Disp.display_msg("newAdmCardDefined")
+		routes.stop_server()
 
-    def show_version(self):
-        origin = (34, 20)
-        size = 24
-        text = FIRMWARE_VERSION
-        self.Disp.display_msg_raw(origin, size, text)
-        time.sleep(1)
+		data = Utils.getJsonData(WORK_DIR + "dicts/data.json")
+		self.Odoo.adm = data["admin_id"][0]
+		self.Buzz.Play("back_to_menu")
 
-    def shutdown_safe(self):
-        _logger.debug("Shutting down safe")
-        time.sleep(0.5)
-        self.Disp.clear_display()
-        os.system("sudo shutdown now")
+		self.card = False  # avoid closed loop
+		self.nextTask = self.defaultNextTask
 
-    def rebooting(self):
-        _logger.debug("Rebooting")
-        time.sleep(1)
-        self.reboot = True
-        self.Disp.clear_display()
+		time.sleep(1.3)
 
+	def displayCard_and_Buzz(self):
+		self.Disp.showCard(self.Reader.card)
+		self.Buzz.Play("cardswiped")
 
-# _________________________________________________________
+	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
+		_logger.debug('Thread Poll Card Reader started')
+		while not exitFlag.isSet():
+			self.Reader.scan_card()
+			if self.Reader.card:
+				if self.Reader.card.lower() == self.Odoo.adm.lower():
+					_logger.debug("ADMIN CARD was swipped\n")
+					self.nextTask = None
+					self.Reader.card = False    # Reset the value of the card, in order to allow
+																			# to enter in the loop again (avoid closed loop)
+					exitFlag.set()
+				else:
+					whatToDoWithCard()			
+			exitFlag.wait(period)
+		_logger.debug('Thread Poll Card Reader stopped')
+
+	def threadCheckBothButtonsPressed(self, period, howLong, exitFlag):
+		_logger.debug('Thread CheckBothButtonsPressed started')
+		while not exitFlag.isSet():
+			if Utils.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
+				self.nextTask = "getNewAdminCard"
+				exitFlag.set()
+		_logger.debug('Thread CheckBothButtonsPressed stopped')        
+
+	def clocking(self):
+		_logger.debug('Entering Clocking Option')
+
+		def threadEvaluateReachability(period):
+				_logger.debug('Thread Get Messages started')
+				while not exitFlag.isSet():
+						self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
+						exitFlag.wait(period)
+				_logger.debug('Thread Get Messages stopped')
+
+		def threadDisplayClock(period):
+			self.Clock.odooReachable() 
+			_logger.debug('Thread Display Clock started')
+			minutes = False
+			while not exitFlag.isSet():
+				if not (time.localtime().tm_min == minutes): 
+					minutes = time.localtime().tm_min 
+					self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
+				exitFlag.wait(period)
+			_logger.debug('Thread Display Clock stopped')
+ 
+		exitFlag = threading.Event()
+		exitFlag.clear()
+
+		periodEvaluateReachability          = 60    # seconds		
+		periodDisplayClock                  = 1     # seconds
+
+		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
+		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
+		displayClock            = threading.Thread(target=threadDisplayClock, args=(periodDisplayClock,))
+		checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
+															self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
+
+		evaluateReachability.start()
+		pollCardReader.start()
+		displayClock.start()
+		checkBothButtonsPressed.start()
+
+		evaluateReachability.join()
+		pollCardReader.join()
+		displayClock.join()
+		checkBothButtonsPressed.join()
+
+		_logger.debug('Exiting Clocking Option')
+
+	def chooseLanguage(self):
+		def goOneLanguageDownInTheMenu():
+			self.Buzz.Play("down")
+			self.currentLanguageOption  += 1
+			if self.currentLanguageOption  > self.maxLanguageOptions:
+					self.currentLanguageOption  = 0
+			_logger.debug("Button Down in Language Menu")
+
+		_logger.debug("choose Language")
+
+		textPositionOrigin = (0,6)
+		textSize = 15
+		banner = "-"*18
+		self.currentLanguageOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
+			text = banner +"\n" + currentLanguageOption +"\n"+ banner
+			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			if self.B_OK.pressed:
+				self.Buzz.Play("OK")
+				self.Disp.language = currentLanguageOption
+				Utils.storeOptionInJsonFile(self.Disp.fileDeviceCustomization,"language",currentLanguageOption)
+			elif self.B_Down.pressed:
+				goOneLanguageDownInTheMenu()
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
+
+	def showRFID(self):
+
+		_logger.debug("Show RFID reader")
+		self.Disp.display_msg("swipecard")
+		exitFlag = threading.Event()
+		exitFlag.clear()
+		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+
+		pollCardReader.start()
+
+		pollCardReader.join()
+
+		self.card = False  # avoid closed loop
+		self.nextTask = self.defaultNextTask
+
+	def updateFirmware(self):
+		def doFirmwareUpdate():
+			_logger.debug("Updating Firmware")
+			self.Disp.display_msg("update")
+			os.chdir(self.workdir)
+			os.system("sudo git fetch origin v1.4-release")
+			os.system("sudo git reset --hard origin/v1.4-release")
+			self.Buzz.Play("OK")
+			time.sleep(0.5)
+			_logger.debug("Next Task set to  " + str(self.nextTask))
+		
+		def warnGithubNotPingable():
+			_logger.warn("Github not pingable: Unable to Update Firmware")
+			self.Buzz.Play("FALSE")
+			self.Disp.display_msg("ERRUpdate")
+			time.sleep(2)
+			self.Disp.clear_display()
+
+		def warnNoWiFiSignal():
+			self.Disp.display_msg("no_wifi")
+			self.Buzz.Play("FALSE")
+			time.sleep(0.5)
+			self.Buzz.Play("back_to_menu")
+			time.sleep(2)			
+
+		if self.wifiStable():
+			if Utils.isPingable("github.com"):
+				doFirmwareUpdate()
+				self.nextTask = "reboot"
+			else:
+				warnGithubNotPingable()
+				self.nextTask = self.defaultNextTask
+		else:
+			warnNoWiFiSignal()
+			self.nextTask = self.defaultNextTask
+
+	def resetWifi(self):
+		_logger.debug("Reset WI-FI")
+		self.Disp.display_msg("configure_wifi")
+		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
+		os.system("sudo wifi-connect --portal-ssid " + SSID_reset)
+		self.Buzz.Play("back_to_menu")
+		self.nextTask = self.defaultNextTask
+
+	def isWifiWorking(self):
+		_logger.debug("checking if wifi works, i.e. if 1.1.1.1 pingable")
+		return Utils.isPingable("1.1.1.1")
+
+	def getOdooUIDwithNewParameters(self):
+		_logger.debug("getOdooUIDwithNewParameters")
+		#self.ensureThatWifiWorks()
+		if self.wifiStable():
+			self.Disp.displayWithIP('browseForNewOdooParams')
+
+			self.Odoo.ensureNoDataJsonFile()
+			self.Odoo.uid = False
+
+			exitFlag = threading.Event()
+			exitFlag.clear()
+
+			pollCardReader 					= threading.Thread(target=self.threadPollCardReader, args=(
+																self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+			checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
+																self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
+
+			pollCardReader.start()
+			checkBothButtonsPressed.start()
+			routes.startServerOdooParams(exitFlag)
+
+			checkBothButtonsPressed.join()
+			pollCardReader.join()
+			routes.stop_server()
+
+			self.Odoo.set_params()
+
+			if self.Odoo.uid:
+				self.Disp.display_msg("gotOdooUID")
+				self.Buzz.Play("OK")
+				self.Odoo.storeOdooParamsInDeviceCustomizationFile()
+				self.nextTask = self.defaultNextTask
+			else:
+				self.Disp.display_msg("noOdooUID")
+				self.Buzz.Play("FALSE")
+				self.nextTask = "resetOdoo"
+
+		else:
+			self.Disp.display_msg("no_wifi")
+			self.Buzz.Play("FALSE")
+			self.nextTask = "ensureWiFiAndOdoo"
+
+		time.sleep(3)
+		self.Disp.clear_display()
+		self.Buzz.Play("back_to_menu")
+
+	def showVersion(self):
+			origin = (34, 20)
+			size = 24
+			text = FIRMWARE_VERSION
+			message = [origin,size,text]
+			self.Disp.displayMsgRaw(message)
+			time.sleep(2)
+			self.nextTask = self.defaultNextTask
+
+	def shutdownSafe(self):
+			_logger.debug("Shutting down safe")
+			time.sleep(0.2)
+			self.Disp.display_msg("shuttingDown")
+			time.sleep(3)
+			self.Disp.clear_display()
+			os.system("sudo shutdown now")
+			time.sleep(60)
+			sys,exit(0)
+
+	def reboot(self):
+		_logger.debug("Rebooting")
+		time.sleep(0.2)
+		self.Disp.display_msg("rebooting")
+		time.sleep(3)
+		self.Disp.clear_display()
+		os.system("sudo reboot")
+		time.sleep(60)
+		sys,exit(0)
+
+	def chooseTaskFromMenu(self):
+
+		def setNextTask():
+			self.nextTask =  self.listOfTasksInMenu[self.currentMenuOption]
+			#self.Buzz.Play("back_to_menu")
+
+		def askTwice():
+			self.Disp.display_msg("sure?")
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			if self.B_OK.pressed: 
+				setNextTask()
+			else:
+				self.Buzz.Play("down")
+
+		def checkAskTwice_and_eventuallySetNextTask():
+			self.Buzz.Play("OK")
+			if self.listOfTasksInMenu[self.currentMenuOption] in self.ask_twice:
+				_logger.debug("Task in ask twice list")
+				askTwice()
+			else:
+				setNextTask()
+
+		def goOneOptionDownInTheMenu():
+				self.Buzz.Play("down")
+				self.currentMenuOption  += 1
+				if self.currentMenuOption  > self.maxMenuOptions:
+						self.currentMenuOption  = 0
+				_logger.debug("Button Down in Main Menu")
+
+		self.nextTask = None
+		self.currentMenuOption = 0
+		while not self.nextTask:
+			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			if self.B_OK.pressed:		
+				_logger.debug("OK pressed - current Menu Option is: ", self.listOfTasksInMenu[self.currentMenuOption])
+				checkAskTwice_and_eventuallySetNextTask()
+			elif self.B_Down.pressed:
+				goOneOptionDownInTheMenu()
+
+	def ensureThatWifiWorks(self):
+		if not self.isWifiWorking(): 
+			self.resetWifi()
+
+	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+		_logger.debug("odooConnectedAtLeastOnce? is ", self.Odoo.odooConnectedAtLeastOnce)
+		if not self.Odoo.odooConnectedAtLeastOnce:
+			_logger.debug("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+			while not self.Odoo.uid:
+				self.getOdooUIDwithNewParameters()
+		
+		self.nextTask = self.defaultNextTask
+
+	def ensureWiFiAndOdoo(self):
+		self.ensureThatWifiWorks()
+		self.ensureThatOdooHasBeenReachedAtLeastOnce()
+
+	def shouldEmployeeNameBeDisplayed(self):
+		def goOneDownInTheMenu(currentOption):
+			self.Buzz.Play("down")
+			currentOption  += 1
+			if currentOption  > len(self.listOfYesNo)-1:
+					currentOption  = 0
+			return currentOption
+
+		_logger.debug("shouldEmployeeNameBeDisplayed")
+
+		currentOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			textCurrentOption = self.listOfYesNo[currentOption]
+			message = self.Disp.getMsgTranslated(textCurrentOption)
+			self.Disp.displayMsgRaw(message)
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+
+			if self.B_Down.pressed:
+				currentOption = goOneDownInTheMenu(currentOption)
+
+		self.Buzz.Play("OK")
+		self.Disp.showEmployeeName = textCurrentOption
+		Utils.storeOptionInJsonFile(self.Disp.fileDeviceCustomization,"showEmployeeName",textCurrentOption)
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
