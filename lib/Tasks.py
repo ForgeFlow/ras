@@ -22,10 +22,12 @@ class threadGetMessages(threading.Thread):
         threading.Thread.__init__(self)
         self.exitThreadFlag = threading.Event()
         self.Clocking = clocking
+        self.Clocking.odooReachable()
     def run(self):
         print('Thread #%s started' % self.ident)
         while not self.exitThreadFlag.is_set():
-            self.Clocking.get_messages()
+            self.Clocking.odooReachable()   # When checking Odoo Reachability
+                                            #the Odoo and Wifi Status Messages are updated
             time.sleep(60)
         print('Thread #%s stopped' % self.ident)
 
@@ -42,6 +44,7 @@ class threadPollCardReader(threading.Thread):
             self.Reader.scan_card()
             if self.Reader.card:
                 if self.Reader.card.lower() == self.adminCard.lower():
+                    print("ADMIN CARD \n"*5)
                     raise ExitThreads
                 else:
                     self.Clock.card_logging(self.Reader.card)
@@ -84,7 +87,7 @@ class Tasks:
         self.get_ip = routes.get_ip
         self.can_connect = Odoo.can_connect
         self.wifi_active = self.Clock.wifi_active
-        self.wifi_stable = self.Clock.wifi_stable
+        self.wifi_stable = self.Clock.wifiStable
 
         # Menu vars
         self.begin_option = 0  # the Terminal begins with this option

@@ -58,20 +58,16 @@ class Clocking:
     # ___________________
 
     def wifi_active(self):
-        iwconfig_out = subprocess.check_output(
-            "iwconfig wlan0", shell=True
-        ).decode("utf-8")
+        iwconfig_out = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
         if "Access Point: Not-Associated" in iwconfig_out:
             wifi_active = False
-            _logger.warn("Wifi Active is %s" % wifi_active)
+            _logger.warn("No Access Point Associated, i.e. no WiFi connected." % wifi_active)
         else:
             wifi_active = True
         return wifi_active
 
     def get_status(self):
-        iwresult = subprocess.check_output(
-            "iwconfig wlan0", shell=True
-        ).decode("utf-8")
+        iwresult = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
         resultdict = {}
         for iwresult in iwresult.split("  "):
             if iwresult:
@@ -97,43 +93,40 @@ class Clocking:
                     resultdict[datumname] = datum
         return resultdict
 
-    def wifi_signal_msg(self):
-        if not self.wifi_active():
-            msg = "    No WiFi signal"
-            _logger.warn(msg)
-        else:
+    def wifiStable(self):
+        if self.wifi_active():
             strength = int(self.get_status()["Signal level"])  # in dBm
             if strength >= 79:
-                msg = " " * 9 + "WiFi: " + "\u2022" * 1 + "o" * 4
+                self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 1 + "o" * 4
                 self.wifi = False
             elif strength >= 75:
-                msg = " " * 9 + "WiFi: " + "\u2022" * 2 + "o" * 3
+                self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 2 + "o" * 3
                 self.wifi = True
             elif strength >= 65:
-                msg = " " * 9 + "WiFi: " + "\u2022" * 3 + "o" * 2
+                self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 3 + "o" * 2
                 self.wifi = True
             elif strength >= 40:
-                msg = " " * 9 + "WiFi: " + "\u2022" * 4 + "o" * 1
+                self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 4 + "o" * 1
                 self.wifi = True
             else:
-                msg = " " * 9 + "WiFi: " + "\u2022" * 5
+                self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 5
                 self.wifi = True
-        return msg
-
-    def wifi_stable(self):
-        msg = self.wifi_signal_msg()
+        else:
+            self.wifi_m  = "    No WiFi signal"
+            self.wifi = False
+        
         return self.wifi
 
-    def odoo_msg(self):
-        msg = "NO Odoo connected"
-        self.odoo_conn = False
-        if self.wifi_stable():
-            if self.Odoo.isOdooPortOpen():
-                msg = "           Odoo OK"
-                self.odoo_conn = True
-                return msg
-        _logger.warn(msg)
-        return msg
+    def odooReachable(self):
+        if self.wifiStable() and self.Odoo.isOdooPortOpen():
+            self.odoo_m = "           Odoo OK"
+            self.odoo_conn = True
+        else:
+            self.odoo_m = "NO Odoo connected"
+            self.odoo_conn = False
+            _logger.warn(msg)
+        print(time.localtime(), "\n self.odoo_m ", self.odoo_m, "\n self.wifi_m ", self.wifi_m)        
+        return self.odoo_conn
 
     def clock_sync(self):
         if not self.Odoo.uid:
@@ -158,28 +151,17 @@ class Clocking:
             self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
         _logger.info("Clocking sync returns: %s" % self.msg)
 
-    def get_messages(self):
-        self.wifi_m = self.wifi_signal_msg()  # get wifi strength signal
-        if not self.wifi:
-            self.odoo_m = 'NO Odoo connected'
-            self.odoo_conn = False
-        else:
-            self.odoo_m = self.odoo_msg()  # get odoo connection msg
-        print(time.localtime(), "self.odoo_m ", self.odoo_m)
-
     def card_logging(self, card):
         self.card = card
         if card:
             begin_card_logging = time.perf_counter()
             # store the time when the card logging process begin
-            self.wifi_m = self.wifi_signal_msg()
 
-            if not self.wifi:
-                self.msg = "ContactAdm"
+            if self.wifiStable():
+                self.clock_sync()
+                self.odooReachable()                
             else:
-                self.clock_sync()  # synchronous: when odoo not
-                # connected, clocking not possible
-                self.odoo_m = self.odoo_msg()  # show actual status
+                self.msg = "ContactAdm"
 
             self.Disp.display_msg(self.msg)  # clocking message
             self.Buzz.Play(self.msg)  # clocking acoustic feedback
@@ -204,17 +186,6 @@ class Clocking:
         while not (self.card == self.Odoo.adm):
 
             
-            if not (time.localtime().tm_min == self.minutes):  # Display is
-                self.minutes = time.localtime().tm_min  # refreshed only
-                self.Disp._display_time(self.wifi_m, self.odoo_m)  # once every minute
-            
-
-            time.sleep(0.01)
-
-            
-            if self.Reader.card and not (self.Reader.card.lower() == self.Odoo.adm.lower()):
-                self.card_logging(self.card)
-
             self.check_both_buttons_pressed()  # check if the user wants
             # to go to the admin menu on the terminal
             # without admin card, only pressing both
@@ -224,10 +195,6 @@ class Clocking:
                 self.both_buttons_pressed = False
                 self.server_for_restore()
                 self.Disp._display_time(self.wifi_m, self.odoo_m)
-            
-        print("out of the while loop ")
-        timerGetMessages.cancel()
-        timerLongPollingCardReader.cancel()
 
         self.Reader.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
