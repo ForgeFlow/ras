@@ -49,7 +49,7 @@ class threadPollCardReader(threading.Thread):
             time.sleep(0.25)
         print('Thread #%s stopped' % self.ident)
 
-class threadClockDisplay(threading.Thread):
+class threadDisplayClock(threading.Thread):
     def __init__(self, clocking, display):
         threading.Thread.__init__(self)
         self.exitThreadFlag = threading.Event()
