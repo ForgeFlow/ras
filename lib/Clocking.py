@@ -39,6 +39,7 @@ class Clocking:
         # shown in the display
 
         self.msg = False
+        self.employee_name = False
         # Message that is used to Play a Melody or
         # Display which kind of Event happened: for example check in,
         # check out, communication with odoo not possible ...
@@ -98,6 +99,7 @@ class Clocking:
         return msg
 
     def clock_sync(self):
+        self.employee_name = False
         if not self.Odoo.uid:
             self.Odoo.set_params()  # be sure that always uid is set to
             # the last Odoo status (if connected)
@@ -106,6 +108,8 @@ class Clocking:
             try:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
+                    if self.Odoo.employee_name:
+                        self.employee_name = res["employee_name"]
                     self.msg = res["action"]
                     _logger.debug(res)
                 else:
@@ -168,6 +172,8 @@ class Clocking:
                     self.odoo_m = self.odoo_msg()  # show actual status
 
                 self.Disp.display_msg(self.msg)  # clocking message
+                if self.employee_name:
+                    self.Disp.display_msg_with_employee_name(self.msg, self.employee_name)
                 self.Buzz.Play(self.msg)  # clocking acoustic feedback
 
                 rest_time = self.card_logging_time_min - (

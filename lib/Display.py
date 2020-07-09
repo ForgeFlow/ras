@@ -74,6 +74,12 @@ class Display:
         self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
 
+    def display_msg_with_employee_name(self, param, employee_name)
+        origin = messages_dic[param][0]
+        size = messages_dic[param][1]
+        text = messages_dic[param][2] + '\n' + employee_name
+        self.display_msg_raw(origin, size, text)
+
     def clear_display(self):
         with canvas(self.device) as draw:
             draw.multiline_text((0, 0), " ")  # display shows nothing (blank)

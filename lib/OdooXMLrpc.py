@@ -42,15 +42,18 @@ class OdooXMLrpc:
             self.https_on = False
             self.url_template = False
             self.uid = False
+            self.employee_name = False
         else:
             self.db = self.j_data["db"][0]
             self.user = self.j_data["user_name"][0]
             self.pswd = self.j_data["user_password"][0]
             self.host = self.j_data["odoo_host"][0]
             self.port = self.j_data["odoo_port"][0]
-
+            
             self.adm = self.j_data["admin_id"][0]
             self.tz = self.j_data["timezone"][0]
+
+            self.employee_name = self.j_data["employee_name"][0]
 
             os.environ["TZ"] = tz_dic.tz_dic[self.tz]
             time.tzset()
