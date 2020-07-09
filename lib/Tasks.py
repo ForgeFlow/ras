@@ -29,7 +29,7 @@ class threadGetMessages(threading.Thread):
             time.sleep(60)
         print('Thread #%s stopped' % self.ident)
 
-class threadPollingCardReader(threading.Thread):
+class threadPollCardReader(threading.Thread):
     def __init__(self,reader, clocking, adminCard):
         threading.Thread.__init__(self)
         self.exitThreadFlag = threading.Event()
@@ -49,6 +49,21 @@ class threadPollingCardReader(threading.Thread):
             time.sleep(0.25)
         print('Thread #%s stopped' % self.ident)
 
+class threadClockDisplay(threading.Thread):
+    def __init__(self, clocking, display):
+        threading.Thread.__init__(self)
+        self.exitThreadFlag = threading.Event()
+        self.Disp = display
+        self.Clock = clocking
+    def run(self):
+        print('Thread #%s started' % self.ident)
+        minutes = False
+        while not self.exitThreadFlag.is_set():
+            if not (time.localtime().tm_min == minutes): 
+                minutes = time.localtime().tm_min 
+                self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
+            time.sleep(1)
+        print('Thread #%s stopped' % self.ident)
 
 class Tasks:
     def __init__(self, Odoo, Hardware):
@@ -128,17 +143,21 @@ class Tasks:
 
         try:
             getMessages     = threadGetMessages(self.Clock)
-            pollCardReader  = threadPollingCardReader(self.Reader, self.Clock, self.Odoo.adm)
+            pollCardReader  = threadPollCardReader(self.Reader, self.Clock, self.Odoo.adm)
+            displayClock    = threadDisplayClock(self.Clock,self.Disp)
             getMessages.start()
             pollCardReader.start()
+            displayClock.start()
             while True:
-                time.sleep(1)
+                time.sleep(0.5)
  
         except ExitThreads:
             getMessages.exitThreadFlag.set()
             pollCardReader.exitThreadFlag.set()
+            displayClock.exitThreadFlag.set()
             getMessages.join()
             pollCardReader.join()
+            displayClock.join()
     
         print('Exiting main program')
 
