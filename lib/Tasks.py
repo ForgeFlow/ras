@@ -1,72 +1,15 @@
 import time
 import os
-import shelve
+#import shelve
 import logging
 import threading
-import signal
+#import signal
+from urllib.request import urlopen
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, WORK_DIR, FIRMWARE_VERSION
 from dicts.textDisplay_dic import  SSID_reset
 
 _logger = logging.getLogger(__name__)
-
-class ExitThreads(Exception):
-    """
-    Custom exception which is used to trigger the clean exit
-    of all running threads and the main program.
-    """
-    pass
-
-class threadGetMessages(threading.Thread):
-    def __init__(self,clocking):
-        threading.Thread.__init__(self)
-        self.exitThreadFlag = threading.Event()
-        self.Clocking = clocking
-        self.Clocking.odooReachable()
-    def run(self):
-        print('Thread #%s started' % self.ident)
-        while not self.exitThreadFlag.is_set():
-            self.Clocking.odooReachable()   # When checking Odoo Reachability
-                                            #the Odoo and Wifi Status Messages are updated
-            time.sleep(60)
-        print('Thread #%s stopped' % self.ident)
-
-class threadPollCardReader(threading.Thread):
-    def __init__(self,reader, clocking, adminCard):
-        threading.Thread.__init__(self)
-        self.exitThreadFlag = threading.Event()
-        self.Reader = reader
-        self.adminCard = adminCard
-        self.Clock = clocking
-    def run(self):
-        print('Thread #%s started' % self.ident)
-        while not self.exitThreadFlag.is_set():
-            self.Reader.scan_card()
-            if self.Reader.card:
-                if self.Reader.card.lower() == self.adminCard.lower():
-                    print("ADMIN CARD \n"*5)
-                    raise ExitThreads
-                else:
-                    self.Clock.card_logging(self.Reader.card)
-
-            time.sleep(0.25)
-        print('Thread #%s stopped' % self.ident)
-
-class threadDisplayClock(threading.Thread):
-    def __init__(self, clocking, display):
-        threading.Thread.__init__(self)
-        self.exitThreadFlag = threading.Event()
-        self.Disp = display
-        self.Clock = clocking
-    def run(self):
-        print('Thread #%s started' % self.ident)
-        minutes = False
-        while not self.exitThreadFlag.is_set():
-            if not (time.localtime().tm_min == minutes): 
-                minutes = time.localtime().tm_min 
-                self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
-            time.sleep(1)
-        print('Thread #%s stopped' % self.ident)
 
 class Tasks:
     def __init__(self, Odoo, Hardware):
@@ -85,7 +28,7 @@ class Tasks:
         self.ask_twice = ask_twice  # list of tasks to ask
         # 'are you sure?' upon selection
         self.get_ip = routes.get_ip
-        self.can_connect = Odoo.can_connect
+
         self.wifi_active = self.Clock.wifi_active
         self.wifi_stable = self.Clock.wifiStable
 
@@ -99,7 +42,6 @@ class Tasks:
             self.update_firmware,
             self.reset_wifi,
             self.reset_odoo,
-            #               self.toggle_sync,    # uncomment when implemented
             self.show_version,
             self.shutdown_safe,
             self.rebooting,
@@ -134,37 +76,70 @@ class Tasks:
     def option_name(self):
         return self.tasks_menu[self.option].__name__
 
-    def back_to_begin_option(self):
+    def back_to_begin_option(self): 
         self.Disp.clear_display()
         self.option = self.begin_option
         self.selected()
         self.Disp.clear_display()
         _logger.debug("Back to begin option")
 
-    def clocking(self):
-        _logger.debug('Clocking')
-
-        try:
-            getMessages     = threadGetMessages(self.Clock)
-            pollCardReader  = threadPollCardReader(self.Reader, self.Clock, self.Odoo.adm)
-            displayClock    = threadDisplayClock(self.Clock,self.Disp)
-            getMessages.start()
-            pollCardReader.start()
-            displayClock.start()
-            while True:
-                time.sleep(0.5)
- 
-        except ExitThreads:
-            getMessages.exitThreadFlag.set()
-            pollCardReader.exitThreadFlag.set()
-            displayClock.exitThreadFlag.set()
-            getMessages.join()
-            pollCardReader.join()
-            displayClock.join()
+    def threadEvaluateReachability(self, period):
+        print('Thread Get Messages started')
+        while not self.exitFlag.isSet():
+            self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
+            self.exitFlag.wait(period)
+        print('Thread Get Messages stopped')
     
-        print('Exiting main program')
+    def threadPollCardReader(self, period):
+        print('Thread Poll Card Reader started')
+        while not self.exitFlag.isSet():
+            self.Reader.scan_card()
+            if self.Reader.card:
+                if self.Reader.card.lower() == self.Odoo.adm.lower():
+                    print("ADMIN CARD was swipped\n")
+                    self.exitFlag.set()
+                else:
+                    self.Clock.card_logging(self.Reader.card)
+            self.exitFlag.wait(period)
+        print('Thread Poll Card Reader stopped')
+
+    def threadDisplayClock(self, period):
+        self.Clock.odooReachable() 
+        print('Thread Display Clock started')
+        minutes = False
+        while not self.exitFlag.isSet():
+            if not (time.localtime().tm_min == minutes): 
+                minutes = time.localtime().tm_min 
+                self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
+            self.exitFlag.wait(period)
+        print('Thread Display Clock stopped')
+
+    def clocking(self):
+        _logger.debug('Entering Clocking Option')
+
+        self.exitFlag = threading.Event()
+        self.exitFlag.clear()
+
+        periodEvaluateReachability  = 60    # seconds
+        periodPollCardReader        = 0.25  # seconds
+        periodDisplayClock          = 1     # seconds
+
+        evaluateReachability    = threading.Thread(target=self.threadEvaluateReachability, args=(periodEvaluateReachability,))
+        pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(periodPollCardReader,))
+        displayClock            = threading.Thread(target=self.threadDisplayClock, args=(periodDisplayClock,))
+
+        evaluateReachability.start()
+        pollCardReader.start()
+        displayClock.start()
 
 
+        evaluateReachability.join()
+        pollCardReader.join()
+        displayClock.join()
+        self.Reader.card = False    # Reset the value of the card, in order to allow
+                                    # to enter in the loop again (avoid closed loop)
+    
+        print('Exiting Clocking Option')
 
     def showRFID(self):
         _logger.debug("Show RFID reader")
@@ -176,6 +151,14 @@ class Tasks:
                 self.Buzz.Play("cardswiped")
         self.card = False  # avoid closed loop
         self.back_to_begin_option()
+
+    def can_connect(self, url):
+        try:
+            response = urlopen(url, timeout=10)
+            return True
+        except Exception as e:
+            _logger.exception(e)
+            return False
 
     def update_firmware(self):
         if self.wifi_stable():

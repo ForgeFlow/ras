@@ -466,4 +466,5 @@ class CardReader:
           uid[0], uid[1], uid[2], uid[3])
 
     self.card = card
-    print(time.localtime(), "self.card ", self.card)
+    if card:
+      print(time.localtime(), "self.card ", self.card)

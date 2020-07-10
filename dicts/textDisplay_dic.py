@@ -29,46 +29,46 @@ messages_dic = {
 
     'wait':
         {
-          "EN": [(1, 1), 20, 'Please'+'\n'+'wait'+'\n' +' '],
+          "EN": [(1, 1), 18, 'Please'+'\n'+'wait'+'\n' +' '],
           "ES": [(1, 1), 18, 'Espere'+'\n'+'por favor'+'\n' +' ']
         },
 
     'check_in':
         {
           "EN": [(10, 5), 18,' ' + '\n' +'CHECKED IN' + '\n' +' '],
-          "ES": [(15, 5), 20,' ' + '\n' +'  Entrada' + '\n' +' ']
+          "ES": [(15, 5), 18,' ' + '\n' +'  Entrada' + '\n' +' ']
         },
 
 
     'check_out':
         {
           "EN": [(1, 5), 18,' ' + '\n' + 'CHECKED OUT' + '\n' +' '],
-          "ES": [(15, 5), 20,' ' + '\n' + '  Salida' + '\n' +' ']
+          "ES": [(15, 5), 18,' ' + '\n' + '  Salida' + '\n' +' ']
         },
 
     'FALSE':
         {
-          "EN": [(1, 16), 20,'NOT' + '\n' +'AUTHORIZED'],
-          "ES": [(1, 16), 20,' NO' + '\n' +'AUTORIZADO']
+          "EN": [(1, 16), 18,'NOT' + '\n' +'AUTHORIZED'],
+          "ES": [(1, 16), 18,' NO' + '\n' +'AUTORIZADO']
         },
 
 
     'ContactAdm':
         {
-          "EN": [(26, 1), 20, 'Contact' + '\n' +'your' + '\n' +'ADMIN'],
+          "EN": [(26, 1), 18, 'Contact' + '\n' +'your' + '\n' +'ADMIN'],
           "ES": [(24, 16), 18,'Alerte' + '\n' +'a su' + '\n' +'Informático']
         },
 
     'connecting':
         {
-          "EN": [(1, 1), 20,' ' + '\n' + 'Connecting...' + '\n' +' '],
+          "EN": [(1, 1), 18,' ' + '\n' + 'Connecting...' + '\n' +' '],
           "ES": [(1, 5), 18,' ' + '\n' + 'Conectando...' + '\n' +' ']
         },
 
 
     'comm_failed':
         {
-          "EN": [(9, 0), 16,'Error while' + '\n' +'communicating' + '\n' +
+          "EN": [(9, 0), 14,'Error while' + '\n' +'communicating' + '\n' +
                 'with Odoo'],
           "ES": [(9, 0), 14,'Error mientras' + '\n' +'comunicando' + '\n' +
                 'con Odoo'],
@@ -125,10 +125,10 @@ messages_dic = {
          'your CARD'],
 
     'clocking':
-        [(18, 5), 18,
-         'press OK' + '\n' +
-         'to begin' + '\n' +
-         'CLOCKING'],
+        {
+          "EN": [(18, 5), 15,'press OK\nto begin\nCLOCKING'],
+          "ES": [(18, 5), 15,'pulse OK\npara empezar\na fichar']
+        },
 
     'showRFID':
         [(18, 5), 18,

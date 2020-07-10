@@ -5,7 +5,7 @@ import subprocess
 import logging
 import random
 import threading
-from pythonwifi.iwlibs import Wireless
+#from pythonwifi.iwlibs import Wireless
 
 from dicts.ras_dic import WORK_DIR
 from dicts.textDisplay_dic import  SSID_reset
@@ -30,7 +30,7 @@ class Clocking:
         self.both_buttons_pressed = False
 
         self.wifi = False
-        self.wifi_con = Wireless("wlan0")
+        #self.wifi_con = Wireless("wlan0")
 
         self.card_logging_time_min = 1.5
         # minimum amount of seconds allowed for
@@ -46,13 +46,9 @@ class Clocking:
         # Display which kind of Event happened: for example check in,
         # check out, communication with odoo not possible ...
 
-        self.can_connect = odoo.can_connect
-
-        self.minutes = 99
         self.checkodoo_wifi = True
         self.odoo_m         = " "
         self.wifi_m         = " "
-        self.secondsCheck = random.randint(20,40)
         _logger.debug('Clocking Class Initialized')
 
     # ___________________
@@ -132,7 +128,7 @@ class Clocking:
         if not self.Odoo.uid:
             self.Odoo.set_params()  # be sure that always uid is set to
             # the last Odoo status (if connected)
-        if self.can_connect(self.Odoo.url_template):
+        if self.Odoo.isOdooPortOpen:
             self.Disp.display_msg("connecting")
             try:
                 res = self.Odoo.check_attendance(self.card)
@@ -178,10 +174,7 @@ class Clocking:
             self.Disp._display_time(self.wifi_m, self.odoo_m)
 
     def clocking(self):
-        # Main Functions of the Terminal:
-        # Show Time and do the clockings (check in/out)
-
-      
+       
 
         while not (self.card == self.Odoo.adm):
 

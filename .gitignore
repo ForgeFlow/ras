@@ -9,3 +9,5 @@ dicts/credentials.json
 dicts/data.json
 attendances.*
 sync_flag.*
+test.py
+src/pip-delete-this-directory.txt

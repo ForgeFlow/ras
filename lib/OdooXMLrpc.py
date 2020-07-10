@@ -8,7 +8,7 @@ from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
 
 import xmlrpc.client as xmlrpclib
-from urllib.request import urlopen
+
 
 _logger = logging.getLogger(__name__)
 
@@ -103,7 +103,6 @@ class OdooXMLrpc:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             canConnectResult = s.connect_ex(self.odooIpPort)
-            print("canConnectResult ", canConnectResult)
             if canConnectResult == 0:
                 isOpen = True
             else:
@@ -112,6 +111,7 @@ class OdooXMLrpc:
             isOpen = False
         finally:
             s.close()
+        print("is Odoo Port Open ", canConnectResult)
         return isOpen
 
     def check_attendance(self, card):
@@ -127,15 +127,6 @@ class OdooXMLrpc:
                     card,
                 )
             return res
-        except Exception as e:
-            _logger.exception(e)
-            return False
-
-    def can_connect(self, url):
-        # returns True if it can connect to url
-        try:
-            response = urlopen(url, timeout=10)
-            return True
         except Exception as e:
             _logger.exception(e)
             return False
