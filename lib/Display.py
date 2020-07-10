@@ -69,13 +69,19 @@ class Display:
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
 
-    def display_msg(self, param):
+    def display_msg(self, param, employee_name = None):
         stepOne = messages_dic.get(param)
         print(stepOne)
         msg_translated = stepOne.get(self.language)
         origin = msg_translated[0]
         size = msg_translated[1]
         text = msg_translated[2]
+        if employee_name:
+            employee_name= employee_name.replace(" ","\n")
+            origin = (0,5)
+            size = 16
+            text = text.replace("\n","")
+            text = text + "\n"+ employee_name
         self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
 

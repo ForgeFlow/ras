@@ -9,6 +9,7 @@ format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
+from lib.Utils import waitUntilOneButtonIsPressed
 import traceback
 from io import StringIO
 
@@ -22,32 +23,20 @@ B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
 Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 
-Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
+Odoo = OdooXMLrpc.OdooXMLrpc()  
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
 
 def ask_twice():
-    # user asked twice before executing -'are you sure?'
     Buz.Play("OK")
     Disp.display_msg("sure?")
-    B_OK.pressed = False  # avoid false positives
-    B_Down.pressed = False
-    time.sleep(0.4)  # allow time to take the finger
-    # away from the button
-    while not (B_OK.pressed or B_Down.pressed):  # wait answer
-        pass
-
-    if B_OK.pressed:  # OK pressed for a second time
-
-        Tasks.selected()  # The selected Task is run.
-        # When the Admin Card is swiped
-        # the Program returns here again.
+    time.sleep(0.4)  # allow time to take the finger away from the button
+    waitUntilOneButtonIsPressed(B_OK, B_Down)
+    if B_OK.pressed: 
+        Tasks.executeCurrentTask()  # When the Admin Card is swiped the Program returns here again.
     else:
         Buz.Play("down")
-        time.sleep(0.4)  # allow time to take the finger
-        # away from the button
-        B_OK.pressed = False  # avoid false positives
-        B_Down.pressed = False
+        time.sleep(0.4)  # allow time to take the finger away from the button
 
 
 def main_loop():
@@ -57,27 +46,25 @@ def main_loop():
     # can be selected using the OK and Down Buttons.
     try:
         Disp.initial_display()
-        if not Tasks.is_wifi_configured():  # make sure that the Terminal is
+        if not Tasks.isWifiWorking():  # make sure that the Terminal is
             Tasks.reset_wifi()  # connected to a WiFi
         if not Odoo.user:  # make sure that we have
             Tasks.reset_odoo()  # access to an odoo db
-        Tasks.selected()  # when the terminal is switched on it goes
-        # to the predefined Task (begin_option)
-        B_OK.pressed = False  # avoid false positives
-        B_Down.pressed = False
+
+        Tasks.executeCurrentTask()  # when the terminal is switched on it goes
+        # to the predefined Task (defaultCurrrentTask)
 
         while not Tasks.reboot:
-            Disp.display_msg(Tasks.option_name())
+            Disp.display_msg(Tasks.getNameCurrentTask())
+            waitUntilOneButtonIsPressed(B_OK, B_Down)
             if B_OK.pressed:
-                if Tasks.option_name() in Tasks.ask_twice:
+                if Tasks.getNameCurrentTask() in Tasks.ask_twice:
                     ask_twice()
                 else:
-                    Tasks.selected()
+                    Tasks.executeCurrentTask()
             elif B_Down.pressed:
                 Tasks.down()
             _logger.debug("Tasks.reboot = " + str(Tasks.reboot))
-            B_OK.pressed = False
-            B_Down.pressed = False
 
         Disp.display_msg("shut_down")
         time.sleep(1.5)
@@ -108,4 +95,5 @@ handler = logging.handlers.TimedRotatingFileHandler(
 
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
+
 main_loop()

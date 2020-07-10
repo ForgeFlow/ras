@@ -24,7 +24,9 @@ import time
 
 #import RPi.GPIO as GPIO
 import spi
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class CardReader:
 #  NRSTPD = 22
@@ -467,4 +469,4 @@ class CardReader:
 
     self.card = card
     if card:
-      print(time.localtime(), "self.card ", self.card)
+      _logger.debug(time.localtime(), "self.card ", self.card)

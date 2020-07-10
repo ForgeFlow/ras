@@ -36,14 +36,14 @@ messages_dic = {
     'check_in':
         {
           "EN": [(10, 5), 18,' ' + '\n' +'CHECKED IN' + '\n' +' '],
-          "ES": [(15, 5), 18,' ' + '\n' +'  Entrada' + '\n' +' ']
+          "ES": [(15, 5), 18,' ' + '\n' +'>> Entrada ....' + '\n' +' ']
         },
 
 
     'check_out':
         {
           "EN": [(1, 5), 18,' ' + '\n' + 'CHECKED OUT' + '\n' +' '],
-          "ES": [(15, 5), 18,' ' + '\n' + '  Salida' + '\n' +' ']
+          "ES": [(15, 5), 18,' ' + '\n' + '.... Salida >>>' + '\n' +' ']
         },
 
     'FALSE':
@@ -82,41 +82,41 @@ messages_dic = {
          'the parameters'],
 
     'no_wifi':
-        [(26, 1), 20,
-         'No' + '\n' +
-         'WiFi' + '\n' +
-         'Signal'],
+        {
+          "EN": [(26, 1), 20, 'No' + '\n' +'WiFi' + '\n' +'Signal'],
+          "ES": [(26, 1), 20, 'No hay' + '\n' +'Señal' + '\n' +'WiFi'],
+        },
 
     'odoo_success':
-        [(12, 0), 14,
-         'Communication' + '\n' +
-         'with Odoo' + '\n' +
-         'established'],
+        {
+          "EN": [(12, 0), 14,'Communication' + '\n' +'with Odoo' + '\n' +'established'],
+          "ES": [(12, 0), 14,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'],  
+        },
 
     'configure_wifi':
-        [(12, 0), 14,
-         '1. Connect to AP' + '\n' +
-         SSID_reset + '\n' +
-         '2. Browse to ' + '\n' +
-         '192.168.42.1'],
+        {
+          "EN": [(12, 0), 14, '1. Connect to AP' + '\n' + SSID_reset + '\n' + '2. Browse to ' + '\n' + '192.168.42.1'],
+          "ES": [(12, 0), 14, '1. Conéctese al AP' + '\n' + SSID_reset + '\n' + '2. Navege a ' + '\n' + '192.168.42.1'], 
+        },
 
     'shut_down':
-        [(1, 1), 21,
-         ' ' + '\n' +
-         'REBOOTING' + '\n' +
-         ' '],
+        {
+          "EN": [(1, 1), 21, ' ' + '\n' + 'REBOOTING' + '\n' + ' '],
+          "ES": [(1, 1), 16, 'Reinicializando' + '\n' + 'el' + '\n' + 'Sistema'], 
+        },
 
     'ERRUpdate':
-        [(1, 1), 15,
-         'Unable to update,' + '\n' +
-         'GitHub connection' + '\n' +
-         'refused'],
+        {
+          "EN": [(1, 1), 15,'Unable to update,' + '\n' + 'GitHub connection' + '\n' +'refused'],
+          "ES": [(1, 1), 15,'Update no es' + '\n' + 'posible, Github' + '\n' +'sin conexión'],
+        },
+
 
     'update':
-        [(22, 1), 16,
-         'Updating' + '\n' +
-         ' ' + '\n' +
-         'FIRMWARE'],
+        {
+          "EN": [(22, 1), 16,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'],
+          "ES": [(18, 1), 15,'Actualizando' + '\n' + 'el' + '\n' + 'FIRMWARE'],
+        },
 
     'swipecard':
         [(14, 1), 20,
@@ -154,12 +154,6 @@ messages_dic = {
          'RESET the Odoo' + '\n' +
          'parameters'],
 
-    'toggle_sync':
-        [(8, 5), 18,
-         'press OK to' + '\n' +
-         'to toggle the' + '\n' +
-         'sync mode'],
-
     'show_version':
         [(7, 5), 16,
          'press OK to see' + '\n' +
@@ -188,5 +182,5 @@ messages_dic = {
         [(16, 0), 16,
          'New Admin' + '\n' +
          'RFID Card' + '\n' +
-         ' defined']
+         'defined']
 }

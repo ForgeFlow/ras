@@ -32,7 +32,7 @@ class Clocking:
         self.wifi = False
         #self.wifi_con = Wireless("wlan0")
 
-        self.card_logging_time_min = 1.5
+        self.card_logging_time_min = 2
         # minimum amount of seconds allowed for
         # the card logging process
         # making this time smaller means the terminal
@@ -50,8 +50,6 @@ class Clocking:
         self.odoo_m         = " "
         self.wifi_m         = " "
         _logger.debug('Clocking Class Initialized')
-
-    # ___________________
 
     def wifi_active(self):
         iwconfig_out = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
@@ -133,6 +131,8 @@ class Clocking:
             try:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
+                    print("response odoo - check attendance ", res)
+                    self.employee_name = res["employee_name"]
                     self.msg = res["action"]
                     _logger.debug(res)
                 else:
@@ -159,7 +159,7 @@ class Clocking:
             else:
                 self.msg = "ContactAdm"
 
-            self.Disp.display_msg(self.msg)  # clocking message
+            self.Disp.display_msg(self.msg, self.employee_name)  # clocking message
             self.Buzz.Play(self.msg)  # clocking acoustic feedback
 
             rest_time = self.card_logging_time_min - (

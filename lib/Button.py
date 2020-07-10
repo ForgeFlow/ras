@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class Button:
     def __init__(self, pins):
-
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BOARD)  # Sets GPIO pins to Board GPIO numbering
         self.pin_signal = pins[0]
         self.pin_power = pins[1]
@@ -16,25 +16,8 @@ class Button:
         GPIO.setup(self.pin_power, GPIO.OUT)
         GPIO.output(self.pin_power, 0)
         self.pressed = False
-        GPIO.add_event_detect(
-            self.pin_signal, GPIO.FALLING, callback=self.scanning, bouncetime=400
-        )
         _logger.debug("Button Class Initialized")
-
-    def scanning(self, channel):
-        if channel:
-            GPIO.output(self.pin_power, 1)
-            self.pressed = True
-            _logger.debug("Button Pressed")
-        else:
-            if not self.pressed and GPIO.input(self.pin_signal) == GPIO.HIGH:
-                self.pressed = True
-                _logger.debug('Button Pressed')
-            elif self.pressed and GPIO.input(self.pin_signal) == GPIO.LOW:
-                self.pressed = False
-                _logger.debug('Button Unpressed')
-        time.sleep(0.02)
-
+    
     def poweroff(self):
         GPIO.output(self.pin_power, 0)
         _logger.debug("Button Power off")
@@ -42,3 +25,31 @@ class Button:
     def poweron(self):
         GPIO.output(self.pin_power, 1)
         _logger.debug("Button Power on")
+
+    def scan(self):
+        if not self.pressed and GPIO.input(self.pin_signal) == GPIO.HIGH:
+            self.pressed = True
+            #_logger.debug('Button Pressed')
+            print('Button Pressed')
+        elif self.pressed and GPIO.input(self.pin_signal) == GPIO.LOW:
+            self.pressed = False
+            #_logger.debug('Button not pressed')
+            print('Button not pressed')
+        time.sleep(0.02)
+    
+
+    def threadWaitTilPressed(self, exitFlag, period):
+        self.pressed = False
+        self.poweron()
+        while not exitFlag.isSet():
+            if GPIO.input(self.pin_signal) == GPIO.HIGH:
+                self.pressed= True
+                _logger.debug('Button Pressed')
+                exitFlag.set()
+            exitFlag.wait(period)
+        self.poweroff()
+
+        
+
+
+

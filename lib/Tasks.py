@@ -8,6 +8,7 @@ from urllib.request import urlopen
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, WORK_DIR, FIRMWARE_VERSION
 from dicts.textDisplay_dic import  SSID_reset
+from . import Utils
 
 _logger = logging.getLogger(__name__)
 
@@ -33,8 +34,8 @@ class Tasks:
         self.wifi_stable = self.Clock.wifiStable
 
         # Menu vars
-        self.begin_option = 0  # the Terminal begins with this option
-        self.option = self.begin_option
+        self.defaultCurrentTask = 0  # the Terminal begins with this option
+        self.option = self.defaultCurrentTask
 
         self.tasks_menu = [  # The Tasks appear in the Menu
             self.clocking,  # in the same order as here.
@@ -50,7 +51,7 @@ class Tasks:
         self.optionmax = len(self.tasks_menu) - 1
         _logger.debug("Tasks Class Initialized")
 
-    def selected(self):
+    def executeCurrentTask(self):
         self.Buzz.Play("OK")
         self.B_Down.poweroff()  # switch off Buttons
         self.B_OK.poweroff()  # to keep the electronics cool
@@ -73,69 +74,84 @@ class Tasks:
             self.option = 0
         _logger.debug("Button Down")
 
-    def option_name(self):
+    def getNameCurrentTask(self):
         return self.tasks_menu[self.option].__name__
 
-    def back_to_begin_option(self): 
+    def back_to_defaultCurrentTask(self): 
         self.Disp.clear_display()
-        self.option = self.begin_option
-        self.selected()
+        self.option = self.defaultCurrentTask
+        self.executeSelectedTask()
         self.Disp.clear_display()
-        _logger.debug("Back to begin option")
-
-    def threadEvaluateReachability(self, period):
-        print('Thread Get Messages started')
-        while not self.exitFlag.isSet():
-            self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
-            self.exitFlag.wait(period)
-        print('Thread Get Messages stopped')
-    
-    def threadPollCardReader(self, period):
-        print('Thread Poll Card Reader started')
-        while not self.exitFlag.isSet():
-            self.Reader.scan_card()
-            if self.Reader.card:
-                if self.Reader.card.lower() == self.Odoo.adm.lower():
-                    print("ADMIN CARD was swipped\n")
-                    self.exitFlag.set()
-                else:
-                    self.Clock.card_logging(self.Reader.card)
-            self.exitFlag.wait(period)
-        print('Thread Poll Card Reader stopped')
-
-    def threadDisplayClock(self, period):
-        self.Clock.odooReachable() 
-        print('Thread Display Clock started')
-        minutes = False
-        while not self.exitFlag.isSet():
-            if not (time.localtime().tm_min == minutes): 
-                minutes = time.localtime().tm_min 
-                self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
-            self.exitFlag.wait(period)
-        print('Thread Display Clock stopped')
+        _logger.debug("Back to default task")
 
     def clocking(self):
         _logger.debug('Entering Clocking Option')
 
-        self.exitFlag = threading.Event()
-        self.exitFlag.clear()
+        def threadEvaluateReachability(period):
+            print('Thread Get Messages started')
+            while not exitFlag.isSet():
+                self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
+                exitFlag.wait(period)
+            print('Thread Get Messages stopped')
+
+        def threadPollCardReader(period):
+            print('Thread Poll Card Reader started')
+            while not exitFlag.isSet():
+                self.Reader.scan_card()
+                if self.Reader.card:
+                    if self.Reader.card.lower() == self.Odoo.adm.lower():
+                        print("ADMIN CARD was swipped\n")
+                        exitFlag.set()
+                    else:
+                        self.Clock.card_logging(self.Reader.card)
+                exitFlag.wait(period)
+            print('Thread Poll Card Reader stopped')
+
+        def threadDisplayClock(period):
+            self.Clock.odooReachable() 
+            print('Thread Display Clock started')
+            minutes = False
+            while not exitFlag.isSet():
+                if not (time.localtime().tm_min == minutes): 
+                    minutes = time.localtime().tm_min 
+                    self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
+                exitFlag.wait(period)
+            print('Thread Display Clock stopped')
+
+        def threadCheckBothButtonsPressed(period, howLong):
+            print('Thread CheckBothButtonsPressed started')
+            while not exitFlag.isSet():
+                #Utils.waitUntilOneButtonIsPressed(self.B_Down, self.B_OK, exitFlag)
+                #print("one Button was pressed")
+                if Utils.bothButtonsPressed(self.B_Down, self.B_OK, exitFlag, period,howLong):
+                    print("SERVER FOR RESTORE")
+            print('Thread CheckBothButtonsPressed stopped')        
+
+        exitFlag = threading.Event()
+        exitFlag.clear()
 
         periodEvaluateReachability  = 60    # seconds
         periodPollCardReader        = 0.25  # seconds
         periodDisplayClock          = 1     # seconds
+        periodCheckBothButtonsPressed = 4   # seconds
+        howLongShouldBeBothButtonsPressed =12 # seconds
 
-        evaluateReachability    = threading.Thread(target=self.threadEvaluateReachability, args=(periodEvaluateReachability,))
-        pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(periodPollCardReader,))
-        displayClock            = threading.Thread(target=self.threadDisplayClock, args=(periodDisplayClock,))
+        evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
+        pollCardReader          = threading.Thread(target=threadPollCardReader, args=(periodPollCardReader,))
+        displayClock            = threading.Thread(target=threadDisplayClock, args=(periodDisplayClock,))
+        checkBothButtonsPressed = threading.Thread(target=threadCheckBothButtonsPressed, args=(periodCheckBothButtonsPressed, howLongShouldBeBothButtonsPressed, ))
 
         evaluateReachability.start()
         pollCardReader.start()
         displayClock.start()
-
+        checkBothButtonsPressed.start()
 
         evaluateReachability.join()
         pollCardReader.join()
         displayClock.join()
+        checkBothButtonsPressed.join()
+
+
         self.Reader.card = False    # Reset the value of the card, in order to allow
                                     # to enter in the loop again (avoid closed loop)
     
@@ -150,7 +166,7 @@ class Tasks:
                 self.Disp.show_card(self.card)
                 self.Buzz.Play("cardswiped")
         self.card = False  # avoid closed loop
-        self.back_to_begin_option()
+        self.back_to_defaultCurrentTask()
 
     def can_connect(self, url):
         try:
@@ -178,14 +194,14 @@ class Tasks:
                 self.Disp.display_msg("ERRUpdate")
                 time.sleep(2)
                 self.Disp.clear_display()
-                self.back_to_begin_option()
+                self.back_to_defaultCurrentTask()
         else:
             self.Disp.display_msg("no_wifi")
             self.Buzz.Play("FALSE")
             time.sleep(0.5)
             self.Buzz.Play("back_to_menu")
             time.sleep(2)
-            self.back_to_begin_option()
+            self.back_to_defaultCurrentTask()
 
     def _reset_wifi(self):
         _logger.debug("Reset WI-FI")
@@ -196,9 +212,9 @@ class Tasks:
 
     def reset_wifi(self):
         self._reset_wifi()
-        self.back_to_begin_option()
+        self.back_to_defaultCurrentTask()
     
-    def is_wifi_configured(self):
+    def isWifiWorking(self):
         _logger.debug("checking if wifi works")
         hostname = "1.1.1.1"
         response = os.system("ping -c 1 " + hostname)
@@ -267,7 +283,7 @@ class Tasks:
             self.Buzz.Play("FALSE")
         self.Buzz.Play("back_to_menu")
         time.sleep(2)
-        self.back_to_begin_option()
+        self.back_to_defaultCurrentTask()
 
     def toggle_sync(self):
         _logger.warn("Toggle Sync")
@@ -282,7 +298,7 @@ class Tasks:
         else:
             self.Disp.display_msg("async")
         time.sleep(1.5)
-        self.back_to_begin_option()
+        self.back_to_defaultCurrentTask()
 
     def show_version(self):
         origin = (34, 20)
