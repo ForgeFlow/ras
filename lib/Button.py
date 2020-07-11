@@ -44,10 +44,36 @@ class Button:
         while not exitFlag.isSet():
             if GPIO.input(self.pin_signal) == GPIO.HIGH:
                 self.pressed= True
-                _logger.debug('Button Pressed')
                 exitFlag.set()
             exitFlag.wait(period)
         self.poweroff()
+
+    def isButtonPressed(self, period, exitFlag = None):
+        if exitFlag:
+            exitFlag.wait(period)
+        else:
+            time.sleep(period)
+
+        if GPIO.input(self.pin_signal) == GPIO.HIGH:
+            self.pressed = True
+            print('INSIDE THREAD: Button Pressed')
+        else:
+            self.pressed = False
+        
+        return self.pressed
+
+    def waitUntilButtonReleased (self, period, exitFlag = None):
+        def customWait(period):
+            if exitFlag:
+                exitFlag.wait(period)
+            else:
+                time.sleep(period)
+
+        while GPIO.input(self.pin_signal) == GPIO.HIGH:
+            self.pressed = True
+            customWait(period)
+        
+        return 
 
         
 
