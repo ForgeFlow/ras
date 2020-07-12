@@ -123,7 +123,9 @@ class Tasks:
             while not exitFlag.isSet():
                 #Utils.waitUntilOneButtonIsPressed(self.B_Down, self.B_OK, exitFlag)
                 #print("one Button was pressed")
-                if Utils.bothButtonsPressed(self.B_Down, self.B_OK, exitFlag, period,howLong):
+                if Utils.bothButtonsPressedLongEnough (self.B_Down, self.B_OK, period, howLong, exitFlag):
+                    self.B_Down.poweroff()
+                    self.B_OK.poweroff()
                     print("SERVER FOR RESTORE")
             print('Thread CheckBothButtonsPressed stopped')        
 
@@ -133,8 +135,8 @@ class Tasks:
         periodEvaluateReachability  = 60    # seconds
         periodPollCardReader        = 0.25  # seconds
         periodDisplayClock          = 1     # seconds
-        periodCheckBothButtonsPressed = 4   # seconds
-        howLongShouldBeBothButtonsPressed =12 # seconds
+        periodCheckBothButtonsPressed = 1   # seconds
+        howLongShouldBeBothButtonsPressed = 7 # seconds
 
         evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
         pollCardReader          = threading.Thread(target=threadPollCardReader, args=(periodPollCardReader,))
@@ -283,21 +285,6 @@ class Tasks:
             self.Buzz.Play("FALSE")
         self.Buzz.Play("back_to_menu")
         time.sleep(2)
-        self.back_to_defaultCurrentTask()
-
-    def toggle_sync(self):
-        _logger.warn("Toggle Sync")
-        file_sync_flag = self.Odoo.workdir + "dicts/sync_flag"
-        fs = shelve.open(file_sync_flag)
-        flag = fs["sync_flag"]
-        fs["sync_flag"] = not flag
-        self.Clock.sync = not flag
-        fs.close()
-        if self.Clock.sync:
-            self.Disp.display_msg("sync")
-        else:
-            self.Disp.display_msg("async")
-        time.sleep(1.5)
         self.back_to_defaultCurrentTask()
 
     def show_version(self):

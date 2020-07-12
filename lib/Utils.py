@@ -1,12 +1,34 @@
 import threading
+import time
 
+class Timer:
+  def __init__(self, howLong):
+    self.reset()
+    self.howLong = howLong
 
-def waitUntilOneButtonIsPressed(button1, button2, externalFlag = None):
-  if externalFlag:
-    exitFlag= externalFlag
+  def reset(self):
+    self.startTime = time.perf_counter()
+
+  def elapsedTime(self):
+    return (time.perf_counter()- self.startTime)
+
+  def isElapsed(self):
+    if self.elapsedTime() > self.howLong:
+      return True
+    return False
+
+def returnAlwaysValidFlag(externalExitFlag = None):
+  if externalExitFlag:
+    exitFlag= externalExitFlag
   else:
     exitFlag = threading.Event()
     exitFlag.clear()
+  
+  return exitFlag
+
+def waitUntilOneButtonIsPressed(button1, button2, externalExitFlag = None):
+   
+  exitFlag = returnAlwaysValidFlag(externalExitFlag)
 
   periodScan = 0.2 # seconds
 
@@ -19,33 +41,21 @@ def waitUntilOneButtonIsPressed(button1, button2, externalFlag = None):
   waitTilButtonOnePressed.join()
   waitTilButtonTwoPressed.join() 
 
-def bothButtonsPressed(button1, button2, exitFlag, period, howLong):
+def bothButtonsPressedLongEnough (button1, button2, periodCheck, howLong, externalExitFlag = None):
+  
+  exitFlag = returnAlwaysValidFlag(externalExitFlag)
+
+  ourTimer = Timer(howLong)
   button1.poweron()
   button2.poweron()
-  print("period ", period)
+  
+  exitFlag.wait(periodCheck) # we have to wait, the buttons dont work inmediately after power on
 
-  for i in range(int(howLong/period)):
-    button1.pressed = False
-    button1.scan()
-    if button1.pressed:
-      button2.pressed = False
-      button2.scan()
-      if button2.pressed:
-        print("both pressed detected - ", i, )
-        exitFlag.wait(period)
-      else:
-        print("not detected - ", i)
-        exitFlag.wait(period)
-        button1.poweroff()
-        button2.poweroff()
-        return False
-    else:
-      print("not detected - ", i)
-      exitFlag.wait(period)
-      button1.poweroff()
-      button2.poweroff()
-      return False
+  while not exitFlag.isSet():
+    while button1.isPressed() and button2.isPressed():
+      exitFlag.wait(periodCheck)
+      if ourTimer.isElapsed():
+        return True
+    ourTimer.reset()
 
-  button1.poweroff()
-  button2.poweroff()
-  return True
+  return False # this should never happen

@@ -9,19 +9,20 @@ print(sys.path)
 
 from ras_dic import PinsBuzzer, PinsDown, PinsOK
 import Button
-from Utils import waitUntilOneButtonIsPressed
+from Utils import bothButtonsPressedLongEnough
 
 B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
 B_Down.poweron()
 B_OK.poweron()
 
-period = 0.4 # seconds
+periodCheck = 2 # seconds
+howLong = 6 # seconds
 
-try:
-  while True:
-    if B_Down.isButtonPressed(period):
-      print("Button Down pressed")
-except:
-  B_Down.poweroff()
-  B_OK.poweroff()
+#try:
+while True:
+  if bothButtonsPressedLongEnough(B_Down, B_OK, periodCheck, howLong):
+    print("Both Buttons Pressed for ", howLong, "seconds")
+# except:
+#   B_Down.poweroff()
+#   B_OK.poweroff()
