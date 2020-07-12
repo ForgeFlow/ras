@@ -121,8 +121,6 @@ class Tasks:
         def threadCheckBothButtonsPressed(period, howLong):
             print('Thread CheckBothButtonsPressed started')
             while not exitFlag.isSet():
-                #Utils.waitUntilOneButtonIsPressed(self.B_Down, self.B_OK, exitFlag)
-                #print("one Button was pressed")
                 if Utils.bothButtonsPressedLongEnough (self.B_Down, self.B_OK, period, howLong, exitFlag):
                     self.B_Down.poweroff()
                     self.B_OK.poweroff()
