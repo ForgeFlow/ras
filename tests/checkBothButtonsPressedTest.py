@@ -19,10 +19,10 @@ B_OK.poweron()
 periodCheck = 2 # seconds
 howLong = 6 # seconds
 
-#try:
-while True:
-  if bothButtonsPressedLongEnough(B_Down, B_OK, periodCheck, howLong):
-    print("Both Buttons Pressed for ", howLong, "seconds")
-# except:
-#   B_Down.poweroff()
-#   B_OK.poweroff()
+try:
+  while True:
+    if bothButtonsPressedLongEnough(B_Down, B_OK, periodCheck, howLong):
+      print("Both Buttons Pressed for ", howLong, "seconds")
+except:
+  B_Down.poweroff()
+  B_OK.poweroff()

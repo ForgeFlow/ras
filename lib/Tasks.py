@@ -130,11 +130,11 @@ class Tasks:
         exitFlag = threading.Event()
         exitFlag.clear()
 
-        periodEvaluateReachability  = 60    # seconds
-        periodPollCardReader        = 0.25  # seconds
-        periodDisplayClock          = 1     # seconds
-        periodCheckBothButtonsPressed = 1   # seconds
-        howLongShouldBeBothButtonsPressed = 7 # seconds
+        periodEvaluateReachability          = 60    # seconds
+        periodPollCardReader                = 0.25  # seconds
+        periodDisplayClock                  = 1     # seconds
+        periodCheckBothButtonsPressed       = 1     # seconds
+        howLongShouldBeBothButtonsPressed   = 7     # seconds (dont set higher beacause of hardware-buttons)
 
         evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
         pollCardReader          = threading.Thread(target=threadPollCardReader, args=(periodPollCardReader,))
