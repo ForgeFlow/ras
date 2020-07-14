@@ -68,18 +68,15 @@ messages_dic = {
 
     'comm_failed':
         {
-          "EN": [(9, 0), 14,'Error while' + '\n' +'communicating' + '\n' +
-                'with Odoo'],
-          "ES": [(9, 0), 14,'Error mientras' + '\n' +'comunicando' + '\n' +
-                'con Odoo'],
+          "EN": [(9, 0), 14,'Error while\ncommunicating\nwith Odoo'],
+          "ES": [(9, 0), 14,'Error mientras\ncomunicando\ncon Odoo'],
         },
 
     'odoo_failed':
-        [(0, 0), 14,
-         'Communication' + '\n' +
-         'with Odoo FAILED,' + '\n' +
-         'please check' + '\n' +
-         'the parameters'],
+        {
+          "EN": [(9, 0), 14,'Communication\nwith Odoo FAILED,\nplease check\nthe parameters'],
+          "ES": [(9, 0), 14,'La comunicación\ncon Odoo ha fallado\nfor favor, revise\nlos parámetros'],
+        },
 
     'no_wifi':
         {
@@ -114,73 +111,91 @@ messages_dic = {
 
     'update':
         {
-          "EN": [(22, 1), 16,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'],
+          "EN": [(18, 1), 15,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'],
           "ES": [(18, 1), 15,'Actualizando' + '\n' + 'el' + '\n' + 'FIRMWARE'],
         },
 
     'swipecard':
-        [(14, 1), 20,
-         'Please' + '\n' +
-         'swipe' + '\n' +
-         'your CARD'],
-
-    'clocking':
         {
-          "EN": [(18, 5), 15,'press OK\nto begin\nCLOCKING'],
-          "ES": [(18, 5), 15,'pulse OK\npara empezar\na fichar']
+          "EN": [(22, 1), 15,'Please' + '\n' + 'swipe' + '\n' + 'your CARD'],
+          "ES": [(18, 1), 15,'Por favor' + '\n' + 'pase la' + '\n' + 'TARJETA'],
         },
 
+    'clocking':
+      {
+        "EN": [(18, 5), 15,'press OK\nto begin\nCLOCKING'],
+        "ES": [(18, 5), 15,'pulse OK\npara empezar\na fichar']
+      },
+
+    'chooseLanguage':
+      {
+        "EN": [(18, 5), 15,'press OK\nto change\nLANGUAGE'],
+        "ES": [(18, 5), 15,'pulse OK\npara cambiar\nel IDIOMA']
+      },
+
     'showRFID':
-        [(18, 5), 18,
-         'press OK' + '\n' +
-         'to read' + '\n' +
-         'RFID codes'],
+      {
+        "EN": [(18, 5), 15,'press OK\nto read\nRFID codes'],
+        "ES": [(18, 5), 15,'pulse OK para\nleer los\ncódigos RFID']
+      },
 
-    'update_firmware':
-        [(8, 5), 18,
-         'press OK' + '\n' +
-         'to UPDATE' + '\n' +
-         'the firmware'],
+    'updateFirmware':
+      {
+        "EN": [(18, 5), 15,'press OK\nto UPDATE\nthe firmware'],
+        "ES": [(18, 5), 15,'pulse OK para\nactualizar\nel firmware']
+      },
 
-    'reset_wifi':
-        [(7, 5), 16,
-         'press OK to' + '\n' +
-         'RESET the WiFi' + '\n' +
-         'parameters'],
+    'resetWifi':
+      {
+        "EN": [(18, 5), 15,'press OK to\nRESET the WiFi\nparameters'],
+        "ES": [(18, 5), 15,'pulse OK para\nresetear la\nconexión WiFi']
+      },    
 
-    'reset_odoo':
-        [(7, 5), 16,
-         'press OK to' + '\n' +
-         'RESET the Odoo' + '\n' +
-         'parameters'],
+    'resetOdoo':
+      {
+        "EN": [(18, 5), 15,'press OK to\nRESET the Odoo\nparameters'],
+        "ES": [(18, 5), 15,'pulse OK para\nresetear los\nparámetros de Odoo']
+      },  
 
-    'show_version':
-        [(7, 5), 16,
-         'press OK to see' + '\n' +
-         'the firmware' + '\n' +
-         'VERSION'],
+    'getNewAdminCard':
+      {
+        "EN": [(18, 5), 15,'press OK to\nchange the\nADMIN CARD'],
+        "ES": [(18, 5), 15,'pulse OK para\ncambiar\nla tarjeta ADMIN']
+      },  
 
-    'shutdown_safe':
-        [(22, 1), 16,
-         'press OK' + '\n' +
-         'to safe' + '\n' +
-         'SHUTDOWN'],
+    'showVersion':
+      {
+        "EN": [(18, 5), 15,'press OK to see\nRESET the firmware\nVERSION'],
+        "ES": [(18, 5), 15,'pulse OK para\nver la VERSION\ndel firmware']
+      },     
+
+    'shutdownSafe':
+      {
+        "EN": [(18, 5), 15,'press OK to safe\nSHUTDOWN\n----------'],
+        "ES": [(18, 5), 15,'pulse OK para\n---- APAGAR ----\nel terminal\n(SHUTDOWN)']
+      }, 
 
     'rebooting':
-        [(22, 1), 20,
-         'press OK' + '\n' +
-         'to' + '\n' +
-         'REBOOT'],
+      {
+        "EN": [(18, 5), 15,'press OK to\nREBOOT\n----------'],
+        "ES": [(18, 5), 15,'pulse OK para\n---- REINICIAR ----\nel terminal\n(REBOOT)']
+      }, 
 
     'sure?':
-        [(5, 5), 15,
-         'ARE YOU SURE?' + '\n' +
-         'Press OK again' + '\n' +
-         'if you are sure'],
+      {
+        "EN": [(5, 5), 15,'ARE YOU SURE?\nPress OK again\nif you are sure'],
+        "ES": [(5, 5), 15,'Está usted seguro?\nPulse OK\notra vez\nsi está seguro']
+      },     
 
-    'new_adm_card':
-        [(16, 0), 16,
-         'New Admin' + '\n' +
-         'RFID Card' + '\n' +
-         'defined']
+    'newAdmCardDefined':
+        {
+          "EN": [(16, 0), 16,'New Admin\nRFID Card\ndefined'],
+          "ES": [(16, 0), 14,'Nueva Tarjeta\nAdmin\nregistrada'],
+        },      
+
+    'browseForNewAdminCard':
+        {
+          "EN": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nAdmin Card RFID'],
+          "ES": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir la\nnueva tarjeta Admin'],
+        },    
 }

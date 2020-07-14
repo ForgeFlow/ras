@@ -1,11 +1,9 @@
 # FIRMWARE Version
-FIRMWARE_VERSION = "v1.3.1"
+FIRMWARE_VERSION = "v1.4.1"
 
 # reference to find different files in
 # the memory of the device
 WORK_DIR = "/home/pi/ras/"
-
-
 
 # driver to be used by luma.core
 display_driver = "sh1106"
@@ -30,9 +28,10 @@ PinsOK = (PinSignalOK, PinPowerOK)
 # on the menu of the Terminal, will be asked twice before
 # execution ('are you sure?' Question)
 ask_twice = [
-    "update_firmware",
-    "reset_wifi",
-    "reset_odoo",
-    "shutdown_safe",
+    "updateFirmware",
+    "resetWifi",
+    "resetOdoo",
+    "getNewAdminCard",
+    "shutdownSafe",
     "rebooting",
 ]

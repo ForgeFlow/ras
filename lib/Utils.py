@@ -1,5 +1,6 @@
 import threading
 import time
+import json
 
 class Timer:
   def __init__(self, howLong):
@@ -59,3 +60,11 @@ def bothButtonsPressedLongEnough (button1, button2, periodCheck, howLong, extern
     ourTimer.reset()
 
   return False # this should never happen
+
+def getJsonData(filePath):
+  try:
+    with open(filePath) as f:
+      data = json.load(f)
+    return data
+  except:
+    return None

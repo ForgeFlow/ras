@@ -1,5 +1,5 @@
 import time
-import json
+import json # needed?
 import os
 import subprocess
 import logging
@@ -178,12 +178,6 @@ class Clocking:
 
         while not (self.card == self.Odoo.adm):
 
-            
-            self.check_both_buttons_pressed()  # check if the user wants
-            # to go to the admin menu on the terminal
-            # without admin card, only pressing both
-            # capacitive buttons longer than between
-            # 4*3 and 4*(3+3) seconds
             if self.both_buttons_pressed:
                 self.both_buttons_pressed = False
                 self.server_for_restore()
@@ -192,25 +186,6 @@ class Clocking:
         self.Reader.card = False  # Reset the value of the card, in order to allow
         # to enter in the loop again (avoid closed loop)
 
-    def check_both_buttons_pressed(self):
-        if time.localtime().tm_sec % 4 == 0:
-            self.B_OK.pressed = False  # avoid false positives
-            self.B_OK.scanning(False)
-            if self.B_OK.pressed:
-                self.B_Down.pressed = False
-                self.B_Down.scanning(False)
-                if self.B_Down.pressed:
-                    self.buttons_counter += 1
-                    if self.buttons_counter > 3:
-                        self.B_OK.pressed = False  # avoid false positives
-                        self.B_Down.pressed = False
-                        self.both_buttons_pressed = True  # both buttons
-                        # were pressed for a long time
-                        self.buttons_counter = 0
-                else:
-                    self.buttons_counter = 0
-            else:
-                self.buttons_counter = 0
 
     def server_for_restore(self):  # opens a server and waits for input
         # this can be aborted by pressing

@@ -6,6 +6,7 @@ from luma.core.render import canvas
 from .demo_opts import get_device
 from dicts.ras_dic import WORK_DIR, display_driver
 from dicts.textDisplay_dic import messages_dic
+from . import routes
 
 
 _logger = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class Display:
             except BaseException:
                 draw.text((15, 20), card_id, font=c_font, fill="white")
 
-    def _welcome_logo(self):
+    def _displayLogo(self):
         logo = Image.open(self.img_path + "eficent.png").convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
@@ -58,32 +59,41 @@ class Display:
         self.device.display(background.convert(self.device.mode))
 
     def initial_display(self):
-        self._welcome_logo()
-        time.sleep(1.5)
+        self._displayLogo()
+        time.sleep(1.2)
         self.display_msg("welcome")
-        time.sleep(1.5)
+        time.sleep(1.2)
         self.clear_display()
 
-    def display_msg_raw(self, origin, size, text):
+    def displayMsgRaw(self, message):
+        origin = message[0]
+        size = message[1]
+        text = message[2]
         font = ImageFont.truetype(self.font_ttf, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
-
-    def display_msg(self, param, employee_name = None):
-        stepOne = messages_dic.get(param)
-        print(stepOne)
-        msg_translated = stepOne.get(self.language)
-        origin = msg_translated[0]
-        size = msg_translated[1]
-        text = msg_translated[2]
-        if employee_name:
-            employee_name= employee_name.replace(" ","\n")
-            origin = (0,5)
-            size = 16
-            text = text.replace("\n","")
-            text = text + "\n"+ employee_name
-        self.display_msg_raw(origin, size, text)
         _logger.debug("Displaying message: " + text)
+
+    def getMsgTranslated(self, textKey):
+        dictWithAllLanguages = messages_dic.get(textKey)
+        print(dictWithAllLanguages)
+        msgTranslated = dictWithAllLanguages.get(self.language)       
+        return msgTranslated
+
+    def display_msg(self, textKey, employee_name = None):
+        message = self.getMsgTranslated(textKey)
+        if employee_name:
+            employee_name= employee_name.replace(" ","\n",1)
+            message[0] = (0,5)
+            message[1] = 16
+            text = text.replace("\n","")
+            message[2] = text + "\n"+ employee_name
+        self.displayMsgRaw(message)
+    
+    def displayWithIP(self, textKey):
+        message = self.getMsgTranslated(textKey)
+        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
+        self.displayMsgRaw(message)
 
     def clear_display(self):
         with canvas(self.device) as draw:
