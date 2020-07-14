@@ -63,6 +63,9 @@ class Tasks:
 		]
 
 		self.optionMax = len(self.listOfTasksInMenu) - 1
+
+		self.periodPollCardReader           = 0.25  # seconds
+
 		_logger.debug("Tasks Class Initialized")
 
 	def executeNextTask(self):
@@ -108,6 +111,28 @@ class Tasks:
 		self.Buzz.Play("back_to_menu")
 		time.sleep(2)
 
+	def displayCard_and_Buzz(self):
+		self.Disp.showCard(self.Reader.card)
+		self.Buzz.Play("cardswiped")
+
+	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
+		print('Thread Poll Card Reader started')
+
+		while not exitFlag.isSet():
+			self.Reader.scan_card()
+			if self.Reader.card:
+				if self.Reader.card.lower() == self.Odoo.adm.lower():
+					print("ADMIN CARD was swipped\n")
+					self.nextTask = None
+					self.Reader.card = False    # Reset the value of the card, in order to allow
+																			# to enter in the loop again (avoid closed loop)
+					exitFlag.set()
+				else:
+					whatToDoWithCard()
+				
+			exitFlag.wait(period)
+		print('Thread Poll Card Reader stopped')
+
 	def clocking(self):
 		_logger.debug('Entering Clocking Option')
 
@@ -117,23 +142,6 @@ class Tasks:
 						self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
 						exitFlag.wait(period)
 				print('Thread Get Messages stopped')
-
-		def threadPollCardReader(period):
-			print('Thread Poll Card Reader started')
-			while not exitFlag.isSet():
-				self.Reader.scan_card()
-				if self.Reader.card:
-					if self.Reader.card.lower() == self.Odoo.adm.lower():
-						print("ADMIN CARD was swipped\n")
-						self.nextTask = None
-						self.Reader.card = False    # Reset the value of the card, in order to allow
-																				# to enter in the loop again (avoid closed loop)
-						exitFlag.set()
-					else:
-						self.Clock.card_logging(self.Reader.card)
-					
-				exitFlag.wait(period)
-			print('Thread Poll Card Reader stopped')
 
 		def threadDisplayClock(period):
 			self.Clock.odooReachable() 
@@ -157,14 +165,13 @@ class Tasks:
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		periodEvaluateReachability          = 60    # seconds
-		periodPollCardReader                = 0.25  # seconds
+		periodEvaluateReachability          = 60    # seconds		
 		periodDisplayClock                  = 1     # seconds
 		periodCheckBothButtonsPressed       = 1     # seconds
 		howLongShouldBeBothButtonsPressed   = 7     # seconds (dont set higher, buttons will not react - issue with current hardware)
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
-		pollCardReader          = threading.Thread(target=threadPollCardReader, args=(periodPollCardReader,))
+		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
 		displayClock            = threading.Thread(target=threadDisplayClock, args=(periodDisplayClock,))
 		checkBothButtonsPressed = threading.Thread(target=threadCheckBothButtonsPressed, args=(periodCheckBothButtonsPressed, howLongShouldBeBothButtonsPressed, ))
 
@@ -184,14 +191,17 @@ class Tasks:
 		pass
 
 	def showRFID(self):
+
 		_logger.debug("Show RFID reader")
 		self.Disp.display_msg("swipecard")
-		self.card = False
-		while not (self.card == self.Odoo.adm):
-				self.card = self.Reader.scan_card()
-				if self.card and not (self.card == self.Odoo.adm):
-						self.Disp.show_card(self.card)
-						self.Buzz.Play("cardswiped")
+		exitFlag = threading.Event()
+		exitFlag.clear()
+		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+
+		pollCardReader.start()
+
+		pollCardReader.join()
+
 		self.card = False  # avoid closed loop
 		self.nextTask = self.defaultNextTask
 

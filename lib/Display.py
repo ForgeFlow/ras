@@ -20,6 +20,7 @@ class Display:
         _logger.debug("Display Class Initialized")
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
+        self.font3 = ImageFont.truetype(self.font_ttf, 22)
         self.language = "ES"
 
     def _display_time(self, wifi_quality, odoo_m):
@@ -39,13 +40,12 @@ class Display:
             draw.text((0, 0), wifi_quality, font=self.font2, fill="white")
             draw.text((0, 52), odoo_m, font=self.font2, fill="white")
 
-    def show_card(self, card_id):
-        c_font = ImageFont.truetype(self.font_ttf, 22)
+    def showCard(self,card):
         with canvas(self.device) as draw:
             try:
-                draw.text(15, 20, card_id, font=c_font, fill="white")
+                draw.text(15, 20, card, font=self.font3, fill="white")
             except BaseException:
-                draw.text((15, 20), card_id, font=c_font, fill="white")
+                draw.text((15, 20), card, font=self.font3, fill="white")
 
     def displayLogo(self):
         logo = Image.open(self.img_path + "eficent.png").convert("RGBA")

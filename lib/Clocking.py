@@ -147,9 +147,9 @@ class Clocking:
             self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
         _logger.info("Clocking sync returns: %s" % self.msg)
 
-    def card_logging(self, card):
-        self.card = card
-        if card:
+    def card_logging(self):
+        self.card = self.Reader.card
+        if self.card:
             begin_card_logging = time.perf_counter()
             # store the time when the card logging process begin
 
