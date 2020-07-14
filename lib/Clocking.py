@@ -51,14 +51,14 @@ class Clocking:
         self.wifi_m         = " "
         _logger.debug('Clocking Class Initialized')
 
-    def wifi_active(self):
+    def wifiActive(self):
         iwconfig_out = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
         if "Access Point: Not-Associated" in iwconfig_out:
-            wifi_active = False
-            _logger.warn("No Access Point Associated, i.e. no WiFi connected." % wifi_active)
+            wifiActive = False
+            _logger.warn("No Access Point Associated, i.e. no WiFi connected." % wifiActive)
         else:
-            wifi_active = True
-        return wifi_active
+            wifiActive = True
+        return wifiActive
 
     def get_status(self):
         iwresult = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
@@ -88,7 +88,7 @@ class Clocking:
         return resultdict
 
     def wifiStable(self):
-        if self.wifi_active():
+        if self.wifiActive():
             strength = int(self.get_status()["Signal level"])  # in dBm
             if strength >= 79:
                 self.wifi_m  = " " * 9 + "WiFi: " + "\u2022" * 1 + "o" * 4
@@ -172,20 +172,6 @@ class Clocking:
 
             time.sleep(rest_time)
             self.Disp._display_time(self.wifi_m, self.odoo_m)
-
-    def clocking(self):
-       
-
-        while not (self.card == self.Odoo.adm):
-
-            if self.both_buttons_pressed:
-                self.both_buttons_pressed = False
-                self.server_for_restore()
-                self.Disp._display_time(self.wifi_m, self.odoo_m)
-
-        self.Reader.card = False  # Reset the value of the card, in order to allow
-        # to enter in the loop again (avoid closed loop)
-
 
     def server_for_restore(self):  # opens a server and waits for input
         # this can be aborted by pressing

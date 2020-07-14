@@ -47,7 +47,7 @@ class Display:
             except BaseException:
                 draw.text((15, 20), card_id, font=c_font, fill="white")
 
-    def _displayLogo(self):
+    def displayLogo(self):
         logo = Image.open(self.img_path + "eficent.png").convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
@@ -58,8 +58,9 @@ class Display:
         background.paste(img, posn)
         self.device.display(background.convert(self.device.mode))
 
-    def initial_display(self):
-        self._displayLogo()
+    def displayGreetings(self):
+        
+        self.displayLogo()
         time.sleep(1.2)
         self.display_msg("welcome")
         time.sleep(1.2)
@@ -97,5 +98,5 @@ class Display:
 
     def clear_display(self):
         with canvas(self.device) as draw:
-            draw.multiline_text((0, 0), " ")  # display shows nothing (blank)
+            draw.multiline_text((0, 0), " ")
             _logger.debug("Clear display")

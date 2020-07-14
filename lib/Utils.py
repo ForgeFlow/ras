@@ -1,6 +1,7 @@
 import threading
 import time
 import json
+import os
 
 class Timer:
   def __init__(self, howLong):
@@ -68,3 +69,11 @@ def getJsonData(filePath):
     return data
   except:
     return None
+
+def isPingable(address):
+  response = os.system("ping -c 1 " + address)
+  if response == 0:
+      pingstatus = True
+  else:
+      pingstatus = False # ping returned an error
+  return pingstatus

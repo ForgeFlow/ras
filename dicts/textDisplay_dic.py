@@ -91,22 +91,28 @@ messages_dic = {
         },
 
     'configure_wifi':
-        {
-          "EN": [(12, 0), 14, '1. Connect to AP' + '\n' + SSID_reset + '\n' + '2. Browse to ' + '\n' + '192.168.42.1'],
-          "ES": [(12, 0), 14, '1. Conéctese al AP' + '\n' + SSID_reset + '\n' + '2. Navege a ' + '\n' + '192.168.42.1'], 
-        },
+      {
+        "EN": [(12, 0), 14, '1. Connect to AP' + '\n' + SSID_reset + '\n' + '2. Browse to ' + '\n' + '192.168.42.1'],
+        "ES": [(12, 0), 14, '1. Conéctese al AP' + '\n' + SSID_reset + '\n' + '2. Navege a ' + '\n' + '192.168.42.1'], 
+      },
 
-    'shut_down':
-        {
-          "EN": [(1, 1), 21, ' ' + '\n' + 'REBOOTING' + '\n' + ' '],
-          "ES": [(1, 1), 16, 'Reinicializando' + '\n' + 'el' + '\n' + 'Sistema'], 
-        },
+    'rebooting':
+      {
+        "EN": [(1, 1), 21, ' ' + '\n' + 'REBOOTING' + '\n' + ' '],
+        "ES": [(1, 1), 16, 'Reinicializando' + '\n' + 'el Terminal' + '\n' + '(rebooting)'], 
+      },
+
+    'shuttingDown':
+      {
+        "EN": [(1, 1), 16, ' ' + '\n' + 'SHUTTING DOWN' + '\n' + ' '],
+        "ES": [(1, 1), 16, 'Apagando' + '\n' + 'el Terminal' + '\n' + '(shutting down)'], 
+      },
 
     'ERRUpdate':
-        {
-          "EN": [(1, 1), 15,'Unable to update,' + '\n' + 'GitHub connection' + '\n' +'refused'],
-          "ES": [(1, 1), 15,'Update no es' + '\n' + 'posible, Github' + '\n' +'sin conexión'],
-        },
+      {
+        "EN": [(1, 1), 15,'Unable to update,' + '\n' + 'GitHub not' + '\n' +'pingable'],
+        "ES": [(1, 1), 15,'Update no es' + '\n' + 'posible, Github' + '\n' +'no responde'],
+      },
 
 
     'update':
@@ -175,7 +181,7 @@ messages_dic = {
         "ES": [(18, 5), 15,'pulse OK para\n---- APAGAR ----\nel terminal\n(SHUTDOWN)']
       }, 
 
-    'rebooting':
+    'reboot':
       {
         "EN": [(18, 5), 15,'press OK to\nREBOOT\n----------'],
         "ES": [(18, 5), 15,'pulse OK para\n---- REINICIAR ----\nel terminal\n(REBOOT)']

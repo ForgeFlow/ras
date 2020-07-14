@@ -26,19 +26,18 @@ Hardware = [Buz, Disp, Reader, B_Down, B_OK]
 Odoo = OdooXMLrpc.OdooXMLrpc()  
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
-def main_loop():
+def mainLoop():
     try:
-        Disp.initial_display()
+        Disp.displayGreetings()
 
-        if not Tasks.isWifiWorking(): 
-            Tasks.reset_wifi()
-            
-        if not Odoo.user:  # make sure that we have access to an odoo db
-            Tasks.reset_odoo()  
+        Tasks.ensureThatWifiWorks()
+        
+        Tasks.ensureThatOdooHasBeenReachedAtLeastOnce() 
 
         Tasks.currentTask = "clocking"
 
         while True:
+            
             if Tasks.currentTask:
                 Tasks.executeCurrentTask()
             else:
@@ -71,4 +70,4 @@ handler = logging.handlers.TimedRotatingFileHandler(
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
 
-main_loop()
+mainLoop()
