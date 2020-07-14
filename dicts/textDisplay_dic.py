@@ -124,7 +124,7 @@ messages_dic = {
     'swipecard':
         {
           "EN": [(22, 1), 15,'Please' + '\n' + 'swipe' + '\n' + 'your CARD'],
-          "ES": [(18, 1), 15,'Por favor' + '\n' + 'pase la' + '\n' + 'TARJETA'],
+          "ES": [(18, 1), 15,'Por favor' + '\n' + 'pase una' + '\n' + '---TARJETA---'],
         },
 
     'clocking':
@@ -154,19 +154,19 @@ messages_dic = {
     'resetWifi':
       {
         "EN": [(18, 5), 15,'press OK to\nRESET the WiFi\nparameters'],
-        "ES": [(18, 5), 15,'pulse OK para\nresetear la\nconexión WiFi']
+        "ES": [(0, 0), 15,'pulse OK para\nresetear la\nconexión WiFi']
       },    
 
     'resetOdoo':
       {
         "EN": [(18, 5), 15,'press OK to\nRESET the Odoo\nparameters'],
-        "ES": [(18, 5), 15,'pulse OK para\nresetear los\nparámetros de Odoo']
+        "ES": [(18, 0), 14,'pulse OK para\nresetear los\nparámetros\nde Odoo']
       },  
 
     'getNewAdminCard':
       {
         "EN": [(18, 5), 15,'press OK to\nchange the\nADMIN CARD'],
-        "ES": [(18, 5), 15,'pulse OK para\ncambiar\nla tarjeta ADMIN']
+        "ES": [(18, 5), 15,'pulse OK para\ncambiar la\ntarjeta ADMIN']
       },  
 
     'showVersion':
@@ -178,13 +178,13 @@ messages_dic = {
     'shutdownSafe':
       {
         "EN": [(18, 5), 15,'press OK to safe\nSHUTDOWN\n----------'],
-        "ES": [(18, 5), 15,'pulse OK para\n---- APAGAR ----\nel terminal\n(SHUTDOWN)']
+        "ES": [(18, 0), 14,'pulse OK para\n-- APAGAR --\nel terminal\n(SHUTDOWN)']
       }, 
 
     'reboot':
       {
         "EN": [(18, 5), 15,'press OK to\nREBOOT\n----------'],
-        "ES": [(18, 5), 15,'pulse OK para\n---- REINICIAR ----\nel terminal\n(REBOOT)']
+        "ES": [(18, 0), 14,'pulse OK para\n-- REINICIAR --\nel terminal\n(REBOOT)']
       }, 
 
     'sure?':

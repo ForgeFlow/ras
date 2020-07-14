@@ -59,7 +59,7 @@ class Display:
         self.device.display(background.convert(self.device.mode))
 
     def displayGreetings(self):
-        
+
         self.displayLogo()
         time.sleep(1.2)
         self.display_msg("welcome")
@@ -83,13 +83,18 @@ class Display:
 
     def display_msg(self, textKey, employee_name = None):
         message = self.getMsgTranslated(textKey)
+
         if employee_name:
-            employee_name= employee_name.replace(" ","\n",1)
-            message[0] = (0,5)
-            message[1] = 16
-            text = text.replace("\n","")
-            message[2] = text + "\n"+ employee_name
-        self.displayMsgRaw(message)
+            employeeNameInTwoLines= employee_name.replace(" ","\n",1)
+            messageToBeDisplayed = [(0,5), 16, ""]
+            standardMessageInOneLine = message[2].replace("\n","")
+            messageToBeDisplayed[2] = standardMessageInOneLine + "\n"+ employeeNameInTwoLines
+        else:
+            messageToBeDisplayed = message
+
+        self.displayMsgRaw(messageToBeDisplayed)
+
+
     
     def displayWithIP(self, textKey):
         message = self.getMsgTranslated(textKey)

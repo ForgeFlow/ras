@@ -32,8 +32,8 @@ class Tasks:
 		self.wifiStable = self.Clock.wifiStable
 
 		# Menu vars
-		self.defaultCurrentTask = "clocking"  # the Terminal begins with this option
-		self.currentTask = self.defaultCurrentTask
+		self.defaultNextTask = "clocking"  # the Terminal begins with this option
+		self.nextTask = self.defaultNextTask
 		self.currentMenuOption = 0
 
 		self.dictOfTasks = {  # The Tasks appear in the Menu in the same order as here.
@@ -65,10 +65,10 @@ class Tasks:
 		self.optionMax = len(self.listOfTasksInMenu) - 1
 		_logger.debug("Tasks Class Initialized")
 
-	def executeCurrentTask(self):
+	def executeNextTask(self):
 			self.Buzz.Play("OK")
-			taskToBeExecuted = self.currentTask
-			self.currentTask = None
+			taskToBeExecuted = self.nextTask
+			self.nextTask = None
 			self.dictOfTasks[taskToBeExecuted]()
 			self.Buzz.Play("back_to_menu")
 
@@ -80,13 +80,13 @@ class Tasks:
 
 		loop_ended = False
 		
-		checkBothButtonsPressed = threading.Thread(target=NEWNEW, args=(1, 7, ))
-		scanAndShowCard =  threading.Thread(target=NEWNEW, args=(, ))
+		# checkBothButtonsPressed = threading.Thread(target=NEWNEW, args=(1, 7, ))
+		# scanAndShowCard =  threading.Thread(target=NEWNEW, args=(, ))
 		
 
 		data = Utils.getJsonData(WORK_DIR + "dicts/data.json")
 		data2 = data
-		while j_data["admin_id"] == j_data_2["admin_id"] and not loop_ended:
+		while data["admin_id"] == data2["admin_id"] and not loop_ended:
 
 			data2 = Utils.getJsonData(WORK_DIR + "dicts/data.json")
 
@@ -97,13 +97,13 @@ class Tasks:
 					self.Disp.show_card(card)
 					self.Buzz.Play("cardswiped")
 					time.sleep(2)
-			self.check_both_buttons_pressed()
-			if self.both_buttons_pressed:
-					self.both_buttons_pressed = False
-					loop_ended = True
+			# self.check_both_buttons_pressed()
+			# if self.both_buttons_pressed:
+			# 		self.both_buttons_pressed = False
+			# 		loop_ended = True
 
 		routes.stop_server()
-		self.Odoo.adm = j_data_2["admin_id"][0]
+		self.Odoo.adm = data2["admin_id"][0]
 		self.Disp.display_msg("newAdmCardDefined")
 		self.Buzz.Play("back_to_menu")
 		time.sleep(2)
@@ -125,7 +125,7 @@ class Tasks:
 				if self.Reader.card:
 					if self.Reader.card.lower() == self.Odoo.adm.lower():
 						print("ADMIN CARD was swipped\n")
-						self.currentTask = None
+						self.nextTask = None
 						self.Reader.card = False    # Reset the value of the card, in order to allow
 																				# to enter in the loop again (avoid closed loop)
 						exitFlag.set()
@@ -150,7 +150,7 @@ class Tasks:
 			print('Thread CheckBothButtonsPressed started')
 			while not exitFlag.isSet():
 				if Utils.bothButtonsPressedLongEnough (self.B_Down, self.B_OK, period, howLong, exitFlag):
-					self.currentTask = "getNewAdminCard"
+					self.nextTask = "getNewAdminCard"
 					exitFlag.set()
 			print('Thread CheckBothButtonsPressed stopped')        
 
@@ -193,7 +193,7 @@ class Tasks:
 						self.Disp.show_card(self.card)
 						self.Buzz.Play("cardswiped")
 		self.card = False  # avoid closed loop
-		self.currentTask = self.defaultCurrentTask
+		self.nextTask = self.defaultNextTask
 
 	def updateFirmware(self):
 		def doFirmwareUpdate():
@@ -204,7 +204,7 @@ class Tasks:
 			os.system("sudo git reset --hard origin/v1.3-release")
 			self.Buzz.Play("OK")
 			time.sleep(0.5)
-			_logger.debug("CURRENT TASK SET TO  " + str(self.currentTask))
+			_logger.debug("Next Task set to  " + str(self.nextTask))
 		
 		def warnGithubNotPingable():
 			_logger.warn("Github not pingable: Unable to Update Firmware")
@@ -223,13 +223,13 @@ class Tasks:
 		if self.wifiStable():
 			if Utils.isPingable("github.com"):
 				doFirmwareUpdate()
-				self.currentTask = "reboot"
+				self.nextTask = "reboot"
 			else:
 				warnGithubNotPingable()
-				self.currentTask = self.defaultCurrentTask
+				self.nextTask = self.defaultNextTask
 		else:
 			warnNoWiFiSignal()
-			self.currentTask = self.defaultCurrentTask
+			self.nextTask = self.defaultNextTask
 
 	def resetWifi(self):
 		_logger.debug("Reset WI-FI")
@@ -237,7 +237,7 @@ class Tasks:
 		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
 		os.system("sudo wifi-connect --portal-ssid " + SSID_reset)
 		self.Buzz.Play("back_to_menu")
-		self.currentTask = self.defaultCurrentTask
+		self.nextTask = self.defaultNextTask
 
 	def isWifiWorking(self):
 		_logger.debug("checking if wifi works, i.e. if 1.1.1.1 pingable")
@@ -301,7 +301,7 @@ class Tasks:
 			self.Buzz.Play("FALSE")
 		self.Buzz.Play("back_to_menu")
 		time.sleep(2)
-		self.currentTask = self.defaultCurrentTask
+		self.nextTask = self.defaultNextTask
 
 	def showVersion(self):
 			origin = (34, 20)
@@ -322,50 +322,50 @@ class Tasks:
 			sys,exit(0)
 
 	def reboot(self):
-        _logger.debug("Rebooting")
-        time.sleep(0.2)
-				self.Disp.display_msg("rebooting")
-        time.sleep(3)
-        self.Disp.clear_display()
-        os.system("sudo reboot")
-				time.sleep(60)
-				sys,exit(0)
+		_logger.debug("Rebooting")
+		time.sleep(0.2)
+		self.Disp.display_msg("rebooting")
+		time.sleep(3)
+		self.Disp.clear_display()
+		os.system("sudo reboot")
+		time.sleep(60)
+		sys,exit(0)
 
 	def chooseTaskFromMenu(self):
 
-		def setCurrentTask()
-			self.currentTask =  self.listOfTasksInMenu[self.currentMenuOption]
+		def setNextTask():
+			self.nextTask =  self.listOfTasksInMenu[self.currentMenuOption]
 			self.Buzz.Play("back_to_menu")
 
 		def askTwice():
 			self.Disp.display_msg("sure?")
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed: 
-				setCurrentTask()
+				setNextTask()
 			else:
 				self.Buzz.Play("down")
 
-		def checkAskTwice_and_eventuallySetCurrentTask():
+		def checkAskTwice_and_eventuallySetNextTask():
 			self.Buzz.Play("OK")
-			if self.currentTask in self.ask_twice:
+			if self.nextTask in self.ask_twice:
 				askTwice()
 			else:
-				setCurrentTask()
+				setNextTask()
 
 		def goOneOptionDownInTheMenu():
 				self.Buzz.Play("down")
 				self.currentMenuOption  += 1
-				if self.currentMenuOption  > self.optionmax:
+				if self.currentMenuOption  > self.optionMax:
 						self.currentMenuOption  = 0
 				_logger.debug("Button Down in Menu")
 
-		self.currentTask = None
+		self.nextTask = None
 		self.currentMenuOption = 0
-		while not self.currentTask:
+		while not self.nextTask:
 			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
-			Utils.waitUntilOneButtonIsPressed(B_OK, B_Down)
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:
-				checkAskTwice_and_eventuallySetCurrentTask()
+				checkAskTwice_and_eventuallySetNextTask()
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
 

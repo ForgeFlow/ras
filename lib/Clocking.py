@@ -1,9 +1,9 @@
 import time
-import json # needed?
+#import json # needed?
 import os
 import subprocess
 import logging
-import random
+#import random
 import threading
 #from pythonwifi.iwlibs import Wireless
 
@@ -173,45 +173,3 @@ class Clocking:
             time.sleep(rest_time)
             self.Disp._display_time(self.wifi_m, self.odoo_m)
 
-    def server_for_restore(self):  # opens a server and waits for input
-        # this can be aborted by pressing
-        # both capacitive buttons long enough
-        _logger.debug("Enter New Admin Card on Flask app")
-        origin = (0, 0)
-        size = 14
-        text = (
-            "Browse to"
-            + "\n"
-            + routes.get_ip()
-            + ":3000\n"
-            + "to introduce new"
-            + "\n"
-            + "Admin Card RFID"
-        )
-        routes.start_server()
-        loop_ended = False
-        datajson = WORK_DIR + "dicts/data.json"
-        j_file = open(datajson)
-        j_data = json.load(j_file)
-        j_data_2 = j_data
-        j_file.close()
-        while j_data["admin_id"] == j_data_2["admin_id"] and not loop_ended:
-            j_file = open(datajson)
-            j_data_2 = json.load(j_file)
-            j_file.close()
-            self.Disp.display_msg_raw(origin, size, text)
-            self.Reader.scan_card()            
-            card = self.Reader.card
-            if card:
-                self.Disp.show_card(card)
-                self.Buzz.Play("cardswiped")
-                time.sleep(2)
-            self.check_both_buttons_pressed()
-            if self.both_buttons_pressed:
-                self.both_buttons_pressed = False
-                loop_ended = True
-        routes.stop_server()
-        self.Odoo.adm = j_data_2["admin_id"][0]
-        self.Disp.display_msg("new_adm_card")
-        self.Buzz.Play("back_to_menu")
-        time.sleep(2)

@@ -9,7 +9,7 @@ format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
 from lib import OdooXMLrpc, Tasks
-from lib.Utils import waitUntilOneButtonIsPressed
+
 import traceback
 from io import StringIO
 
@@ -34,12 +34,12 @@ def mainLoop():
         
         Tasks.ensureThatOdooHasBeenReachedAtLeastOnce() 
 
-        Tasks.currentTask = "clocking"
+        Tasks.nextTask = "clocking"
 
         while True:
-            
-            if Tasks.currentTask:
-                Tasks.executeCurrentTask()
+
+            if Tasks.nextTask:
+                Tasks.executeNextTask()
             else:
                 Tasks.chooseTaskFromMenu()
 
