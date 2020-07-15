@@ -1,5 +1,6 @@
 import time
 import logging
+import json
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
@@ -21,7 +22,28 @@ class Display:
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
         self.font3 = ImageFont.truetype(self.font_ttf, 22)
-        self.language = "ES"
+        self.fileDeviceCustomization = WORK_DIR + "dicts/deviceCustomization.json"
+        self.language = "ENGLISH"
+        self.setLanguageFromFile()
+    
+    def setLanguageFromFile(self):
+        try:
+            with open(self.fileDeviceCustomization) as f:
+                data = json.load(f)
+            self.language = data["language"]
+        except:
+            self.language = "ENGLISH"
+    
+    def storeLanguageInFile(self):
+        try:
+            with open(self.fileDeviceCustomization) as f:
+                data = json.load(f)
+            data["language"] = self.language
+            with open(self.fileDeviceCustomization, 'w+') as f:
+                json.dump(data,f, sort_keys=True, indent=2)
+        except:
+            _logger.debug("exception in method storeLanguageInFile")
+
 
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:

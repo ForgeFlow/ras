@@ -62,6 +62,10 @@ def bothButtonsPressedLongEnough (button1, button2, periodCheck, howLong, extern
 
   return False # this should never happen
 
+def setButtonsToNotPressed(button1,button2):
+  if button1: button1.pressed=False
+  if button2: button2.pressed=False
+
 def getJsonData(filePath):
   try:
     with open(filePath) as f:

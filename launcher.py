@@ -16,12 +16,12 @@ from io import StringIO
 
 _logger = logging.getLogger(__name__)
 
-Buz = PasBuz.PasBuz(PinsBuzzer)
+Buzz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
 Reader = CardReader.CardReader()
 B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
-Hardware = [Buz, Disp, Reader, B_Down, B_OK]
+Hardware = [Buzz, Disp, Reader, B_Down, B_OK]
 
 Odoo = OdooXMLrpc.OdooXMLrpc()  
 Tasks = Tasks.Tasks(Odoo, Hardware)
@@ -35,6 +35,8 @@ def mainLoop():
         Tasks.ensureThatOdooHasBeenReachedAtLeastOnce() 
 
         Tasks.nextTask = "clocking"
+
+        Buzz.Play("OK")
 
         while True:
 

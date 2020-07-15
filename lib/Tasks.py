@@ -8,7 +8,7 @@ import threading
 #from urllib.request import urlopen
 from . import Clocking, routes
 from dicts.ras_dic import ask_twice, WORK_DIR, FIRMWARE_VERSION
-from dicts.textDisplay_dic import  SSID_reset
+from dicts.textDisplay_dic import  SSID_reset, listOfLanguages
 from . import Utils
 
 
@@ -30,13 +30,13 @@ class Tasks:
 		self.get_ip = routes.get_ip
 
 		self.wifiStable = self.Clock.wifiStable
+		self.periodPollCardReader = 0.35  # second
 
-		# Menu vars
+	# ######### TASKS ----####################
 		self.defaultNextTask = "clocking"  # the Terminal begins with this option
 		self.nextTask = self.defaultNextTask
-		self.currentMenuOption = 0
-
-		self.dictOfTasks = {  # The Tasks appear in the Menu in the same order as here.
+		
+		self.dictOfTasks = {  
 				"clocking"				: self.clocking,
 				"chooseLanguage"	: self.chooseLanguage,  
 				"showRFID"				: self.showRFID,
@@ -62,9 +62,16 @@ class Tasks:
 				"reboot"				
 		]
 
-		self.optionMax = len(self.listOfTasksInMenu) - 1
+		self.maxMenuOptions = len(self.listOfTasksInMenu) - 1
 
-		self.periodPollCardReader           = 0.25  # seconds
+		self.currentMenuOption = 0
+
+	########### LANGUAGES ####################
+		self.listOfLanguages = listOfLanguages
+
+		self.maxLanguageOptions = len(self.listOfLanguages) - 1
+
+		self.currentLanguageOption = 0		
 
 		_logger.debug("Tasks Class Initialized")
 
@@ -188,7 +195,34 @@ class Tasks:
 		print('Exiting Clocking Option')
 
 	def chooseLanguage(self):
-		pass
+		def goOneLanguageDownInTheMenu():
+			self.Buzz.Play("down")
+			self.currentLanguageOption  += 1
+			if self.currentLanguageOption  > self.maxLanguageOptions:
+					self.currentLanguageOption  = 0
+			_logger.debug("Button Down in Language Menu")
+
+		_logger.debug("choose Language")
+
+		textPositionOrigin = (0,6)
+		textSize = 15
+		banner = "-"*18
+		self.currentLanguageOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
+			text = banner +"\n" + currentLanguageOption +"\n"+ banner
+			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			if self.B_OK.pressed:
+				self.Buzz.Play("OK")
+				self.Disp.language = currentLanguageOption
+				self.Disp.storeLanguageInFile()
+			elif self.B_Down.pressed:
+				goOneLanguageDownInTheMenu()
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 	def showRFID(self):
 
@@ -365,9 +399,9 @@ class Tasks:
 		def goOneOptionDownInTheMenu():
 				self.Buzz.Play("down")
 				self.currentMenuOption  += 1
-				if self.currentMenuOption  > self.optionMax:
+				if self.currentMenuOption  > self.maxMenuOptions:
 						self.currentMenuOption  = 0
-				_logger.debug("Button Down in Menu")
+				_logger.debug("Button Down in Main Menu")
 
 		self.nextTask = None
 		self.currentMenuOption = 0
