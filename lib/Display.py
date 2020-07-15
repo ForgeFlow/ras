@@ -1,6 +1,5 @@
 import time
 import logging
-import json
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
@@ -8,6 +7,7 @@ from .demo_opts import get_device
 from dicts.ras_dic import WORK_DIR, display_driver
 from dicts.textDisplay_dic import messages_dic
 from . import routes
+from . import Utils
 
 
 _logger = logging.getLogger(__name__)
@@ -27,23 +27,24 @@ class Display:
         self.setLanguageFromFile()
     
     def setLanguageFromFile(self):
-        try:
-            with open(self.fileDeviceCustomization) as f:
-                data = json.load(f)
+        data = Utils.getJsonData(self.fileDeviceCustomization)
+        if data:
             self.language = data["language"]
-        except:
+            return True
+        else:
             self.language = "ENGLISH"
+            return False
     
     def storeLanguageInFile(self):
-        try:
-            with open(self.fileDeviceCustomization) as f:
-                data = json.load(f)
+        data = Utils.getJsonData(self.fileDeviceCustomization)
+        if data:
             data["language"] = self.language
-            with open(self.fileDeviceCustomization, 'w+') as f:
-                json.dump(data,f, sort_keys=True, indent=2)
-        except:
-            _logger.debug("exception in method storeLanguageInFile")
-
+            if Utils.storeJsonData(self.fileDeviceCustomization, data):
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
@@ -115,8 +116,6 @@ class Display:
             messageToBeDisplayed = message
 
         self.displayMsgRaw(messageToBeDisplayed)
-
-
     
     def displayWithIP(self, textKey):
         message = self.getMsgTranslated(textKey)

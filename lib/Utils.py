@@ -74,6 +74,14 @@ def getJsonData(filePath):
   except:
     return None
 
+def storeJsonData(filePath,data):
+  try:
+    with open(filePath, 'w+') as f:
+      json.dump(data,f, sort_keys=True, indent=2)
+    return True
+  except:
+    return False
+
 def isPingable(address):
   response = os.system("ping -c 1 " + address)
   if response == 0:

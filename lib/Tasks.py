@@ -30,9 +30,9 @@ class Tasks:
 		self.get_ip = routes.get_ip
 
 		self.wifiStable = self.Clock.wifiStable
-		self.periodPollCardReader = 0.35  # second
+		self.periodPollCardReader = 0.2  # second
 
-	# ######### TASKS ----####################
+	 # ######### TASKS ----####################
 		self.defaultNextTask = "clocking"  # the Terminal begins with this option
 		self.nextTask = self.defaultNextTask
 		
@@ -66,7 +66,7 @@ class Tasks:
 
 		self.currentMenuOption = 0
 
-	########### LANGUAGES ####################
+	 ########### LANGUAGES ####################
 		self.listOfLanguages = listOfLanguages
 
 		self.maxLanguageOptions = len(self.listOfLanguages) - 1
@@ -82,40 +82,31 @@ class Tasks:
 			self.dictOfTasks[taskToBeExecuted]()
 			self.Buzz.Play("back_to_menu")
 
-	def getNewAdminCard(self):  # opens a server and waits for input
-		# this can be aborted by pressing both capacitive buttons long enough
-		_logger.debug("Enter New Admin Card on Flask app")
-		
-		routes.start_server()
+	def getNewAdminCard(self):  # opens a server to set a new AdminCard
 
-		loop_ended = False
+		_logger.debug("Enter New Admin Card on Flask app")
+
+		exitFlag = threading.Event()
+		exitFlag.clear()
+
+		self.Disp.displayWithIP('browseForNewAdminCard')
 		
-		# checkBothButtonsPressed = threading.Thread(target=NEWNEW, args=(1, 7, ))
-		# scanAndShowCard =  threading.Thread(target=NEWNEW, args=(, ))
-		
+		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+
+		routes.start_server(exitFlag)
+		pollCardReader.start()
+
+		pollCardReader.join()
+		self.Disp.display_msg("newAdmCardDefined")
+		routes.stop_server()
 
 		data = Utils.getJsonData(WORK_DIR + "dicts/data.json")
-		data2 = data
-		while data["admin_id"] == data2["admin_id"] and not loop_ended:
-
-			data2 = Utils.getJsonData(WORK_DIR + "dicts/data.json")
-
-			self.Disp.displayWithIP('browseForNewAdminCard')
-			self.Reader.scan_card()            
-			card = self.Reader.card
-			if card:
-					self.Disp.show_card(card)
-					self.Buzz.Play("cardswiped")
-					time.sleep(2)
-			# self.check_both_buttons_pressed()
-			# if self.both_buttons_pressed:
-			# 		self.both_buttons_pressed = False
-			# 		loop_ended = True
-
-		routes.stop_server()
-		self.Odoo.adm = data2["admin_id"][0]
-		self.Disp.display_msg("newAdmCardDefined")
+		self.Odoo.adm = data["admin_id"][0]
 		self.Buzz.Play("back_to_menu")
+
+		self.card = False  # avoid closed loop
+		self.nextTask = self.defaultNextTask
+
 		time.sleep(2)
 
 	def displayCard_and_Buzz(self):
@@ -223,6 +214,7 @@ class Tasks:
 				goOneLanguageDownInTheMenu()
 		
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
 
 	def showRFID(self):
 

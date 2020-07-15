@@ -14,7 +14,7 @@ tz_dic = {
     "-02:00": "Etc/GMT-2",
     "-01:00": "Atlantic/Azores",
     "+00:00": "Europe/London",
-    "+01:00": "Europe/Madrid",
+    "+01:00": "Europe/Barcelona",
     "+02:00": "Europe/Kaliningrad",
     "+03:00": "Asia/Baghdad",
     "+03:50": "Asia/Tehran",
