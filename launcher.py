@@ -30,16 +30,9 @@ def mainLoop():
     try:
         Disp.displayGreetings()
 
-        Tasks.ensureThatWifiWorks()
-        
-        Tasks.ensureThatOdooHasBeenReachedAtLeastOnce() 
-
-        Tasks.nextTask = "clocking"
-
-        Buzz.Play("OK")
+        Tasks.nextTask = "ensureWiFiAndOdoo"
 
         while True:
-
             if Tasks.nextTask:
                 Tasks.executeNextTask()
             else:

@@ -30,7 +30,10 @@ class Tasks:
 		self.get_ip = routes.get_ip
 
 		self.wifiStable = self.Clock.wifiStable
-		self.periodPollCardReader = 0.2  # second
+
+		self.periodPollCardReader 							= 0.2  # second
+		self.periodCheckBothButtonsPressed     	= 1     # seconds
+		self.howLongShouldBeBothButtonsPressed 	= 7     # seconds (dont set higher, buttons will not react - issue with current hardware)
 
 	 # ######### TASKS ----####################
 		self.defaultNextTask = "clocking"  # the Terminal begins with this option
@@ -46,7 +49,8 @@ class Tasks:
 				"getNewAdminCard"	: self.getNewAdminCard,
 				"showVersion"			: self.showVersion,
 				"shutdownSafe"		: self.shutdownSafe,
-				"reboot"					: self.reboot
+				"reboot"					: self.reboot,
+				"ensureWiFiAndOdoo": self.ensureWiFiAndOdoo
 		}
 
 		self.listOfTasksInMenu = [  # The Tasks appear in the Menu in the same order as here.
@@ -93,7 +97,7 @@ class Tasks:
 		
 		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
 
-		routes.start_server(exitFlag)
+		routes.startServerAdminCard(exitFlag)
 		pollCardReader.start()
 
 		pollCardReader.join()
@@ -107,71 +111,68 @@ class Tasks:
 		self.card = False  # avoid closed loop
 		self.nextTask = self.defaultNextTask
 
-		time.sleep(2)
+		time.sleep(1.3)
 
 	def displayCard_and_Buzz(self):
 		self.Disp.showCard(self.Reader.card)
 		self.Buzz.Play("cardswiped")
 
 	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
-		print('Thread Poll Card Reader started')
-
+		_logger.debug('Thread Poll Card Reader started')
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
 				if self.Reader.card.lower() == self.Odoo.adm.lower():
-					print("ADMIN CARD was swipped\n")
+					_logger.debug("ADMIN CARD was swipped\n")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
 																			# to enter in the loop again (avoid closed loop)
 					exitFlag.set()
 				else:
-					whatToDoWithCard()
-				
+					whatToDoWithCard()			
 			exitFlag.wait(period)
-		print('Thread Poll Card Reader stopped')
+		_logger.debug('Thread Poll Card Reader stopped')
+
+	def threadCheckBothButtonsPressed(self, period, howLong, exitFlag):
+		_logger.debug('Thread CheckBothButtonsPressed started')
+		while not exitFlag.isSet():
+			if Utils.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
+				self.nextTask = "getNewAdminCard"
+				exitFlag.set()
+		_logger.debug('Thread CheckBothButtonsPressed stopped')        
 
 	def clocking(self):
 		_logger.debug('Entering Clocking Option')
 
 		def threadEvaluateReachability(period):
-				print('Thread Get Messages started')
+				_logger.debug('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.odooReachable()   # Odoo and Wifi Status Messages are updated
 						exitFlag.wait(period)
-				print('Thread Get Messages stopped')
+				_logger.debug('Thread Get Messages stopped')
 
 		def threadDisplayClock(period):
 			self.Clock.odooReachable() 
-			print('Thread Display Clock started')
+			_logger.debug('Thread Display Clock started')
 			minutes = False
 			while not exitFlag.isSet():
 				if not (time.localtime().tm_min == minutes): 
 					minutes = time.localtime().tm_min 
 					self.Disp._display_time(self.Clock.wifi_m, self.Clock.odoo_m) 
 				exitFlag.wait(period)
-			print('Thread Display Clock stopped')
-
-		def threadCheckBothButtonsPressed(period, howLong):
-			print('Thread CheckBothButtonsPressed started')
-			while not exitFlag.isSet():
-				if Utils.bothButtonsPressedLongEnough (self.B_Down, self.B_OK, period, howLong, exitFlag):
-					self.nextTask = "getNewAdminCard"
-					exitFlag.set()
-			print('Thread CheckBothButtonsPressed stopped')        
-
+			_logger.debug('Thread Display Clock stopped')
+ 
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
 		periodEvaluateReachability          = 60    # seconds		
 		periodDisplayClock                  = 1     # seconds
-		periodCheckBothButtonsPressed       = 1     # seconds
-		howLongShouldBeBothButtonsPressed   = 7     # seconds (dont set higher, buttons will not react - issue with current hardware)
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
 		displayClock            = threading.Thread(target=threadDisplayClock, args=(periodDisplayClock,))
-		checkBothButtonsPressed = threading.Thread(target=threadCheckBothButtonsPressed, args=(periodCheckBothButtonsPressed, howLongShouldBeBothButtonsPressed, ))
+		checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
+															self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
 
 		evaluateReachability.start()
 		pollCardReader.start()
@@ -316,28 +317,42 @@ class Tasks:
 		_logger.debug("Reset Odoo credentials")
 		self.ensureThatWifiWorks()
 		if self.wifiStable():
+
+			exitFlag = threading.Event()
+			exitFlag.clear()
+
+			pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+
+			pollCardReader.start()
 			routes.start_server()
+
 			self.Odoo.uid = False
+
 			while not self.Odoo.uid:
 					if os.path.isfile(self.Odoo.datajson):
 							os.system("sudo rm " + self.Odoo.datajson)
-					self.odoo_config()
+					self.odooConfig()
 					if self.Clock.both_buttons_pressed:
 							break
+
+			pollCardReader.join()
 			routes.stop_server()
+
 			if self.Clock.both_buttons_pressed:
 					self.Clock.both_buttons_pressed = False
 					self._reset_wifi()
 					time.sleep(5)
 					self.reset_odoo()
+
 			self.Disp.display_msg("odoo_success")
 			self.Buzz.Play("back_to_menu")
+			self.nextTask = self.defaultNextTask
 		else:
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
+			self.nextTask = "ensureWiFiAndOdoo"
 		self.Buzz.Play("back_to_menu")
-		time.sleep(2)
-		self.nextTask = self.defaultNextTask
+		time.sleep(1)
 
 	def showVersion(self):
 			origin = (34, 20)
@@ -407,8 +422,15 @@ class Tasks:
 
 	def ensureThatWifiWorks(self):
 		if not self.isWifiWorking(): 
-			self.reset_wifi()
+			self.resetWifi()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
 		if not self.Odoo.user:  
-			self.resetOdoo() 
+			self.resetOdoo()
+		else:
+			self.nextTask = self.defaultNextTask
+
+	def ensureWiFiAndOdoo(self):
+		self.ensureThatWifiWorks()
+		self.ensureThatOdooHasBeenReachedAtLeastOnce()
+

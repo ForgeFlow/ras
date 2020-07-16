@@ -71,7 +71,8 @@ def getJsonData(filePath):
     with open(filePath) as f:
       data = json.load(f)
     return data
-  except:
+  except Exception as e:
+      #_logger.exception(e):
     return None
 
 def storeJsonData(filePath,data):
