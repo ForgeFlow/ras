@@ -2,7 +2,6 @@ import os
 import time
 import json
 import logging
-import socket
 
 from dicts import tz_dic
 from dicts.ras_dic import WORK_DIR
@@ -48,9 +47,8 @@ class OdooXMLrpc:
             self.odooIpPort = (self.host, int(self.port))
             self.uid = self._get_user_id()
         else:
-            if os.path.isfile(self.datajson):
-                os.system("sudo rm " + self.datajson) # be sure that there is no data.json file
-                                                      # if the data.json can not be loaded
+            self.ensureNoDataJsonFile()
+
             self.j_data = False
             self.db = False
             self.user = False
@@ -62,7 +60,7 @@ class OdooXMLrpc:
             self.https_on = False
             self.url_template = False
             self.odooIpPort = False
-            self.uid = None
+            self.uid = False
 
     def _get_object_facade(self, url):
         try:
@@ -86,20 +84,8 @@ class OdooXMLrpc:
             _logger.exception(e)
             return None
     
-    def isOdooPortOpen(self): # you can not ping ports, you have to use connect_ex for ports
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            canConnectResult = s.connect_ex(self.odooIpPort)
-            if canConnectResult == 0:
-                isOpen = True
-            else:
-                isOpen = False
-        except:
-            isOpen = False
-        finally:
-            s.close()
-        print("is Odoo Port Open ", canConnectResult)
-        return isOpen
+    def isOdooPortOpen(self):
+        return Utils.isIpPortOpen(self.odooIpPort)
 
     def check_attendance(self, card):
         try:
@@ -118,5 +104,6 @@ class OdooXMLrpc:
             _logger.exception(e)
             return False
 
-    def reset(self):
-        pass
+    def ensureNoDataJsonFile(self):
+        if os.path.isfile(self.datajson):
+            os.system("sudo rm " + self.datajson)

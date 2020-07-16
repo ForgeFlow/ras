@@ -33,5 +33,5 @@ ask_twice = [
     "resetOdoo",
     "getNewAdminCard",
     "shutdownSafe",
-    "rebooting",
+    "reboot",
 ]

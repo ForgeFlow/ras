@@ -2,6 +2,7 @@ import threading
 import time
 import json
 import os
+import socket
 
 class Timer:
   def __init__(self, howLong):
@@ -90,3 +91,17 @@ def isPingable(address):
   else:
       pingstatus = False # ping returned an error
   return pingstatus
+
+def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        canConnectResult = s.connect_ex(ipPort)
+        if canConnectResult == 0:
+            isOpen = True
+        else:
+            isOpen = False
+    except:
+        isOpen = False
+    finally:
+        s.close()
+    return isOpen

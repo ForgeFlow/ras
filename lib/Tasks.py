@@ -282,14 +282,11 @@ class Tasks:
 
 	def getOdooUIDwithNewParameters(self):
 		_logger.debug("getOdooUIDwithNewParameters")
-		self.ensureThatWifiWorks()
+		#self.ensureThatWifiWorks()
 		if self.wifiStable():
-
 			self.Disp.displayWithIP('browseForNewOdooParams')
 
-			if os.path.isfile(self.Odoo.datajson):
-				os.system("sudo rm " + self.Odoo.datajson)
-
+			self.Odoo.ensureNoDataJsonFile()
 			self.Odoo.uid = False
 
 			exitFlag = threading.Event()
@@ -361,7 +358,7 @@ class Tasks:
 
 		def setNextTask():
 			self.nextTask =  self.listOfTasksInMenu[self.currentMenuOption]
-			self.Buzz.Play("back_to_menu")
+			#self.Buzz.Play("back_to_menu")
 
 		def askTwice():
 			self.Disp.display_msg("sure?")
@@ -373,7 +370,8 @@ class Tasks:
 
 		def checkAskTwice_and_eventuallySetNextTask():
 			self.Buzz.Play("OK")
-			if self.nextTask in self.ask_twice:
+			if self.listOfTasksInMenu[self.currentMenuOption] in self.ask_twice:
+				print("Task in ask twice list")
 				askTwice()
 			else:
 				setNextTask()
@@ -390,7 +388,8 @@ class Tasks:
 		while not self.nextTask:
 			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
-			if self.B_OK.pressed:
+			if self.B_OK.pressed:		
+				print("OK ", self.listOfTasksInMenu[self.currentMenuOption])
 				checkAskTwice_and_eventuallySetNextTask()
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
@@ -404,7 +403,6 @@ class Tasks:
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 		else:
-			
 			self.nextTask = self.defaultNextTask
 
 	def ensureWiFiAndOdoo(self):

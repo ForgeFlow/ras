@@ -94,8 +94,8 @@ messages_dic = {
 
     'noOdooUID':
         {
-          "ENGLISH": [(0, 6), 14,"-"*18 + '\n' + 'Unable to get' + '\n' +'an Odoo UID' + '\n' +"-"*18],
-          "ESPAÑOL": [(0,6), 14,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'],  
+          "ENGLISH": [(0, 6), 14,"-"*18 + '\n' + 'Couldn''t get' + '\n' +'an Odoo UID' + '\n' +"-"*18],
+          "ESPAÑOL": [(0,6), 14,"-"*18 + '\n' +'No fué posible' + '\n' +'conseguir una' + '\n' +'UID en Odoo'+ '\n' +"-"*18],  
         },
 
     'configure_wifi':
