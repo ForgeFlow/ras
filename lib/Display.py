@@ -23,16 +23,17 @@ class Display:
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
         self.font3 = ImageFont.truetype(self.font_ttf, 22)
         self.fileDeviceCustomization = WORK_DIR + "dicts/deviceCustomization.json"
-        self.language = "ENGLISH"
-        self.setLanguageFromFile()
+        self.getSettingsFromFile()
     
-    def setLanguageFromFile(self):
+    def getSettingsFromFile(self):
         data = Utils.getJsonData(self.fileDeviceCustomization)
         if data:
-            self.language = data["language"]
+            self.language           = data["language"]
+            self.showEmployeeName   = data["showEmployeeName"]
             return True
         else:
-            self.language = "ENGLISH"
+            self.language           = "ENGLISH"
+            self.showEmployeeName   = "Yes"
             return False
     
     def storeLanguageInFile(self):
@@ -106,15 +107,15 @@ class Display:
 
     def display_msg(self, textKey, employee_name = None):
         message = self.getMsgTranslated(textKey)
-
-        if employee_name:
-            employeeNameInTwoLines= employee_name.replace(" ","\n",1)
-            messageToBeDisplayed = [(0,5), 16, ""]
-            standardMessageInOneLine = message[2].replace("\n","")
-            messageToBeDisplayed[2] = standardMessageInOneLine + "\n"+ employeeNameInTwoLines
-        else:
-            messageToBeDisplayed = message
-
+        messageToBeDisplayed = message
+        if '-EmployeePlaceholder-' in message[2]:
+            if employee_name and self.showEmployeeName == "Yes":
+                employeeNameInTwoLines= employee_name.replace(" ","\n",1)
+                messageToBeDisplayed = [(0,5), 16, ""]
+                standardMessageInOneLine = message[2].replace("\n","")          
+                messageToBeDisplayed[2] = standardMessageInOneLine.replace('-EmployeePlaceholder-',"\n"+employeeNameInTwoLines,1)
+            else:
+                messageToBeDisplayed[2] = message[2].replace('-EmployeePlaceholder-',"")
         self.displayMsgRaw(messageToBeDisplayed)
     
     def displayWithIP(self, textKey):

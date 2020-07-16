@@ -31,34 +31,34 @@ messages_dic = {
 
     'wait':
         {
-          "ENGLISH": [(1, 1), 18, 'Please'+'\n'+'wait'+'\n' +' '],
-          "ESPAÑOL": [(1, 1), 18, 'Espere'+'\n'+'por favor'+'\n' +' ']
+          "ENGLISH": [(0, 0), 18, 'Please'+'\n'+'wait'+'\n' +'\n'+"-"*12],
+          "ESPAÑOL": [(0, 0), 18, 'Espere'+'\n'+'por favor'+'\n' +'\n'+"-"*12]
         },
 
     'check_in':
         {
-          "ENGLISH": [(10, 5), 18,' ' + '\n' +'CHECKED IN' + '\n' +' '],
-          "ESPAÑOL": [(15, 5), 18,' ' + '\n' +'>> Entrada ....' + '\n' +' ']
+          "ENGLISH": [(0, 0), 16,'\n' +'>> CHECK IN' + '\n' + '-EmployeePlaceholder-'],
+          "ESPAÑOL": [(0, 0), 16,' ' + '\n' +'>> Entrada ....' + '\n' +'-EmployeePlaceholder-']
         },
 
 
     'check_out':
         {
-          "ENGLISH": [(1, 5), 18,' ' + '\n' + 'CHECKED OUT' + '\n' +' '],
-          "ESPAÑOL": [(15, 5), 18,' ' + '\n' + '.... Salida >>>' + '\n' +' ']
+          "ENGLISH": [(0, 0), 16,'\n' + 'CHECK OUT >>' + '\n' + '-EmployeePlaceholder-'],
+          "ESPAÑOL": [(0, 0), 16,'\n' + '.... Salida >>>' + '\n' + '-EmployeePlaceholder-']
         },
 
     'FALSE':
         {
-          "ENGLISH": [(1, 16), 18,'NOT' + '\n' +'AUTHORIZED'],
-          "ESPAÑOL": [(1, 16), 18,' NO' + '\n' +'AUTORIZADO']
+          "ENGLISH": [(0, 0), 18,"-"*14 + '\n' +'NOT' + '\n' +'AUTHORIZED'],
+          "ESPAÑOL": [(0, 0), 18,"-"*14 + '\n' +' NO' + '\n' +'AUTORIZADO']
         },
 
 
     'ContactAdm':
         {
-          "ENGLISH": [(26, 1), 18, 'Contact' + '\n' +'your' + '\n' +'ADMIN'],
-          "ESPAÑOL": [(24, 16), 18,'Alerte' + '\n' +'a su' + '\n' +'Informático']
+          "ENGLISH": [(0, 6), 15, 'Contact' + '\n' +'your' + '\n' +'ADMIN'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Alerte' + '\n' +'a su' + '\n' +'Informático'+'\n'+'\n'+"-"*18]
         },
 
     'connecting':
@@ -70,14 +70,14 @@ messages_dic = {
 
     'comm_failed':
         {
-          "ENGLISH": [(9, 0), 14,'Error while\ncommunicating\nwith Odoo'],
-          "ESPAÑOL": [(9, 0), 14,'Error mientras\ncomunicando\ncon Odoo'],
+          "ENGLISH": [(0, 6), 15,'Error while\ncommunicating\nwith Odoo'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Error mientras\ncomunicando\ncon Odoo'+'\n'+'\n'+"-"*18],
         },
 
     'odoo_failed':
         {
-          "ENGLISH": [(9, 0), 14,'Communication\nwith Odoo FAILED,\nplease check\nthe parameters'],
-          "ESPAÑOL": [(9, 0), 14,'La comunicación\ncon Odoo ha fallado\nfor favor, revise\nlos parámetros'],
+          "ENGLISH": [(0, 0), 14,'Communication\nwith Odoo FAILED,\nplease check\nthe parameters'+ '\n' +"-"*16],
+          "ESPAÑOL": [(0, 0), 14,'La comunicación\ncon Odoo ha fallado\nPor favor, revise\nlos parámetros'+ '\n' +"-"*16],
         },
 
     'no_wifi':
@@ -88,20 +88,20 @@ messages_dic = {
 
     'gotOdooUID':
         {
-          "ENGLISH": [(12, 0), 14,'Communication' + '\n' +'with Odoo' + '\n' +'established'],
-          "ESPAÑOL": [(12, 0), 14,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'],  
+          "ENGLISH": [(0, 6), 15,'Communication' + '\n' +'with Odoo' + '\n' +'established'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'+'\n'+'\n'+"-"*18],  
         },
 
     'noOdooUID':
         {
-          "ENGLISH": [(0, 6), 14,"-"*18 + '\n' + 'Couldn''t get' + '\n' +'an Odoo UID' + '\n' +"-"*18],
-          "ESPAÑOL": [(0,6), 14,"-"*18 + '\n' +'No fué posible' + '\n' +'conseguir una' + '\n' +'UID en Odoo'+ '\n' +"-"*18],  
+          "ENGLISH": [(0,6), 15, "Couldn't get" + '\n' +'an Odoo UID' +'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0,6), 15,'No fué posible' + '\n' +'conseguir una' + '\n' +'UID en Odoo'+'\n'+'\n'+"-"*18],  
         },
 
     'configure_wifi':
       {
-        "ENGLISH": [(12, 0), 14, '1. Connect to AP' + '\n' + SSID_reset + '\n' + '2. Browse to ' + '\n' + '192.168.42.1'],
-        "ESPAÑOL": [(12, 0), 14, '1. Conéctese al AP' + '\n' + SSID_reset + '\n' + '2. Navege a ' + '\n' + '192.168.42.1'], 
+        "ENGLISH": [(0, 0), 14, '1. Connect to AP' + '\n' + SSID_reset + '\n' + '2. Browse to ' + '\n' + '192.168.42.1'+'\n' +"-"*18 + '\n' ],
+        "ESPAÑOL": [(0, 0), 14, '1. Conéctese al AP' + '\n' + SSID_reset + '\n' + '2. Navege a ' + '\n' + '192.168.42.1'+'\n' +"-"*18 + '\n' ], 
       },
 
     'rebooting':
@@ -112,81 +112,81 @@ messages_dic = {
 
     'shuttingDown':
       {
-        "ENGLISH": [(1, 1), 16, ' ' + '\n' + 'SHUTTING DOWN' + '\n' + ' '],
-        "ESPAÑOL": [(1, 1), 16, 'Apagando' + '\n' + 'el Terminal' + '\n' + '(shutting down)'], 
+        "ENGLISH": [(0, 0), 16, '\n'  + 'SHUTTING' + '\n'+'DOWN\n'+'\n'+"-"*13],
+        "ESPAÑOL": [(0, 0), 16, 'Apagando' + '\n' + 'el Terminal' + '\n' + '(shutting down)'+'\n'+'\n'+"-"*13], 
       },
 
     'ERRUpdate':
       {
-        "ENGLISH": [(1, 1), 15,'Unable to update,' + '\n' + 'GitHub not' + '\n' +'pingable'],
-        "ESPAÑOL": [(1, 1), 15,'Update no es' + '\n' + 'posible, Github' + '\n' +'no responde'],
+        "ENGLISH": [(0, 0), 14,'-'*18 +'\n'+ 'Unable to update,' + '\n' + 'GitHub not' + '\n' +'pingable'],
+        "ESPAÑOL": [(0, 0), 14,'-'*18 + '\n'+'Update no es' + '\n' + 'posible, Github' + '\n' +'no responde'],
       },
 
 
     'update':
         {
-          "ENGLISH": [(18, 1), 15,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'],
-          "ESPAÑOL": [(18, 1), 15,'Actualizando' + '\n' + 'el' + '\n' + 'FIRMWARE'],
+          "ENGLISH": [(0, 6), 15,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Actualizando' + '\n' + 'el' + '\n' + 'FIRMWARE'+'\n'+'\n'+"-"*18],
         },
 
     'swipecard':
         {
-          "ENGLISH": [(22, 1), 15,'Please' + '\n' + 'swipe' + '\n' + 'your CARD'],
-          "ESPAÑOL": [(18, 1), 15,'Por favor' + '\n' + 'pase una' + '\n' + '---TARJETA---'],
+          "ENGLISH": [(0, 6), 15,'Please' + '\n' + 'swipe' + '\n' + 'your CARD'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Por favor' + '\n' + 'pase una' + '\n' + '---TARJETA---'+'\n'+'\n'+"-"*18],
         },
 
     'clocking':
       {
-        "ENGLISH": [(18, 5), 15,'press OK\nto begin\nCLOCKING'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK\npara empezar\na fichar']
+        "ENGLISH": [(0, 6), 15,'press OK\nto begin\nCLOCKING'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK\npara empezar\na fichar'+'\n'+'\n'+"-"*18]
       },
 
     'chooseLanguage':
       {
-        "ENGLISH": [(18, 5), 15,'press OK\nto change\nLANGUAGE'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK\npara cambiar\nel IDIOMA']
+        "ENGLISH": [(0, 6), 15,'press OK\nto change\nLANGUAGE'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK\npara cambiar\nel IDIOMA'+'\n'+'\n'+"-"*18]
       },
 
     'showRFID':
       {
-        "ENGLISH": [(18, 5), 15,'press OK\nto read\nRFID codes'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK para\nleer los\ncódigos RFID']
+        "ENGLISH": [(0, 6), 15,'press OK\nto read\nRFID codes'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nleer los\ncódigos RFID'+'\n'+'\n'+"-"*18]
       },
 
     'updateFirmware':
       {
-        "ENGLISH": [(18, 5), 15,'press OK\nto UPDATE\nthe firmware'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK para\nactualizar\nel firmware']
+        "ENGLISH": [(0, 6), 15,'press OK\nto UPDATE\nthe firmware'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nactualizar\nel firmware'+'\n'+'\n'+"-"*18]
       },
 
     'resetWifi':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to\nRESET the WiFi\nparameters'],
-        "ESPAÑOL": [(0, 0), 15,'pulse OK para\nresetear la\nconexión WiFi']
+        "ENGLISH": [(0, 6), 15,'press OK to\nRESET the WiFi\nparameters'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nresetear la\nconexión WiFi'+'\n'+'\n'+"-"*18]
       },    
 
     'resetOdoo':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to\nRESET the Odoo\nparameters'],
-        "ESPAÑOL": [(18, 0), 14,'pulse OK para\nresetear los\nparámetros\nde Odoo']
+        "ENGLISH": [(0, 6), 15,'press OK to\nRESET the Odoo\nparameters'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 0), 14,'pulse OK para\nresetear los\nparámetros\nde Odoo'+'\n'+'\n'+"-"*18]
       },  
 
     'getNewAdminCard':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to\nchange the\nADMIN CARD'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK para\ncambiar la\ntarjeta ADMIN']
+        "ENGLISH": [(0, 6), 15,'press OK to\nchange the\nADMIN CARD'+'\n'+'\n'+"-"*16],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\ncambiar la\ntarjeta ADMIN'+'\n'+'\n'+"-"*16]
       },  
 
     'showVersion':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to see\nRESET the firmware\nVERSION'],
-        "ESPAÑOL": [(18, 5), 15,'pulse OK para\nver la VERSION\ndel firmware']
+        "ENGLISH": [(0, 0), 15,'\n' +'press OK to see\nthe firmware\nVERSION'+ '\n'+ '\n'+"-"*18 ],
+        "ESPAÑOL": [(0, 0), 15,'\n' +'pulse OK para\nver la VERSION\ndel firmware'+'\n'+'\n'+"-"*18]
       },     
 
     'shutdownSafe':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to safe\nSHUTDOWN\n----------'],
-        "ESPAÑOL": [(18, 0), 14,'pulse OK para\n-- APAGAR --\nel terminal\n(SHUTDOWN)']
+        "ENGLISH": [(0, 6), 15,'press OK to safe\nSHUTDOWN\n'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 0), 14,'pulse OK para\n-- APAGAR --\nel terminal\n(SHUTDOWN)'+'\n'+'\n'+"-"*18]
       }, 
 
     'reboot':
@@ -197,8 +197,8 @@ messages_dic = {
 
     'sure?':
       {
-        "ENGLISH": [(5, 5), 15,'ARE YOU SURE?\nPress OK again\nif you are sure'],
-        "ESPAÑOL": [(5, 5), 15,'Está usted seguro?\nPulse OK\notra vez\nsi está seguro']
+        "ENGLISH": [(0, 0), 15,'ARE YOU SURE?\nPress OK again\nif you are sure'+'\n'+"-"*14],
+        "ESPAÑOL": [(0, 0), 15,'Está seguro?\nPulse OK otra\nvez si\nestá seguro'+'\n'+"-"*14]
       },     
 
     'newAdmCardDefined':
@@ -209,13 +209,13 @@ messages_dic = {
 
     'browseForNewAdminCard':
         {
-          "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nAdmin Card RFID'],
-          "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir la\nnueva tarjeta Admin'],
+          "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nAdmin Card RFID'+'\n'+'-'*18 +'\n'],
+          "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir otra\ntarjeta Admin'+'\n'+'-'*18 +'\n'],
         },
 
     'browseForNewOdooParams':
         {
-          "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nOdoo parameters'],
-          "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir nuevos\nParámetros de Odoo'],
+          "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nOdoo parameters'+'\n'+ '-'*18 +'\n'],
+          "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir nuevos\nParámetros Odoo'+ '\n'+'-'*18 +'\n'],
         },     
 }
