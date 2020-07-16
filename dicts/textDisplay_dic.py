@@ -6,16 +6,13 @@ listOfLanguages = [
   "ESPAÑOL"
 ]
 
-# allows to display the different messages
-# by defining the parameters needed to  use
+# allows to display the different messages by defining the parameters needed to  use
 # the function multiline of luma.core
 #
 # [ (x0,y0), font size , text of the message]
 #
-# (x0,y0) positions the message in the screen
-#         defining the origin
-# the message can extend over several lines
-# this is indicated with the escape character \n
+# (x0,y0) positions the message in the screen defining the origin
+# the message can extend over several lines this is indicated with the escape character \n
 
 messages_dic = {
     ' ':
@@ -89,10 +86,16 @@ messages_dic = {
           "ESPAÑOL": [(26, 1), 20, 'No hay' + '\n' +'Señal' + '\n' +'WiFi'],
         },
 
-    'odoo_success':
+    'gotOdooUID':
         {
           "ENGLISH": [(12, 0), 14,'Communication' + '\n' +'with Odoo' + '\n' +'established'],
           "ESPAÑOL": [(12, 0), 14,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'],  
+        },
+
+    'noOdooUID':
+        {
+          "ENGLISH": [(0, 6), 14,"-"*18 + '\n' + 'Unable to get' + '\n' +'an Odoo UID' + '\n' +"-"*18],
+          "ESPAÑOL": [(0,6), 14,'Communicación' + '\n' +'con Odoo' + '\n' +'establecida'],  
         },
 
     'configure_wifi':
@@ -208,5 +211,11 @@ messages_dic = {
         {
           "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nAdmin Card RFID'],
           "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir la\nnueva tarjeta Admin'],
-        },    
+        },
+
+    'browseForNewOdooParams':
+        {
+          "ENGLISH": [(0, 0), 14,'Browse to\n'+ '-IpPlaceholder-' + ':3000\nto introduce new\nOdoo parameters'],
+          "ESPAÑOL": [(0, 0), 14,'Navege a\n'+ '-IpPlaceholder-' + ':3000\npara definir nuevos\nParámetros de Odoo'],
+        },     
 }

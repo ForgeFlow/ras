@@ -62,7 +62,7 @@ class OdooXMLrpc:
             self.https_on = False
             self.url_template = False
             self.odooIpPort = False
-            self.uid = False
+            self.uid = None
 
     def _get_object_facade(self, url):
         try:
@@ -78,13 +78,13 @@ class OdooXMLrpc:
             user_id = login_facade.login(self.db, self.user, self.pswd)
             if user_id:
                 return user_id
-            return False
+            return None
         except ConnectionRefusedError:
             _logger.debug(ConnectionRefusedError)
-            return False
+            return None
         except Exception as e:
             _logger.exception(e)
-            return False
+            return None
     
     def isOdooPortOpen(self): # you can not ping ports, you have to use connect_ex for ports
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

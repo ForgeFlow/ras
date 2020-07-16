@@ -45,7 +45,7 @@ class Tasks:
 				"showRFID"				: self.showRFID,
 				"updateFirmware"	: self.updateFirmware,
 				"resetWifi"				: self.resetWifi,
-				"resetOdoo"				: self.resetOdoo,
+				"resetOdoo"				: self.getOdooUIDwithNewParameters,
 				"getNewAdminCard"	: self.getNewAdminCard,
 				"showVersion"			: self.showVersion,
 				"shutdownSafe"		: self.shutdownSafe,
@@ -280,79 +280,53 @@ class Tasks:
 		_logger.debug("checking if wifi works, i.e. if 1.1.1.1 pingable")
 		return Utils.isPingable("1.1.1.1")
 
-	def odooConfig(self):
-			_logger.debug("Configure Odoo on Flask app")
-			origin = (0, 0)
-			size = 14
-			text = (
-					"Browse to\n"
-					+ self.get_ip()
-					+ ":3000\n"
-					+ "to introduce new\n"
-					+ "Odoo parameters"
-			)
-			while not os.path.isfile(self.Odoo.datajson):
-					message = [origin,size,text]
-					self.Disp.displayMsgRaw(message)
-					self.card = self.Reader.scan_card()
-					if self.card:
-							self.Disp.show_card(self.card)
-							self.Buzz.Play("cardswiped")
-							time.sleep(2)
-					self.Clock.check_both_buttons_pressed()  # check if the user wants
-					# to go to the admin menu on the terminal
-					# without admin card, only pressing both
-					# capacitive buttons longer than between
-					# 4*3 and 4*(3+3) seconds
-					if self.Clock.both_buttons_pressed:
-							return True
-			self.Odoo.set_params()
-			if not self.Odoo.uid:
-					self.Buzz.Play("FALSE")
-					self.Disp.display_msg("odoo_failed")
-					time.sleep(3)
-					self.Disp.clear_display()
-
-	def resetOdoo(self):
-		_logger.debug("Reset Odoo credentials")
+	def getOdooUIDwithNewParameters(self):
+		_logger.debug("getOdooUIDwithNewParameters")
 		self.ensureThatWifiWorks()
 		if self.wifiStable():
+
+			self.Disp.displayWithIP('browseForNewOdooParams')
+
+			if os.path.isfile(self.Odoo.datajson):
+				os.system("sudo rm " + self.Odoo.datajson)
+
+			self.Odoo.uid = False
 
 			exitFlag = threading.Event()
 			exitFlag.clear()
 
-			pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+			pollCardReader 					= threading.Thread(target=self.threadPollCardReader, args=(
+																self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+			checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
+																self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
 
 			pollCardReader.start()
-			routes.start_server()
+			checkBothButtonsPressed.start()
+			routes.startServerOdooParams(exitFlag)
 
-			self.Odoo.uid = False
-
-			while not self.Odoo.uid:
-					if os.path.isfile(self.Odoo.datajson):
-							os.system("sudo rm " + self.Odoo.datajson)
-					self.odooConfig()
-					if self.Clock.both_buttons_pressed:
-							break
-
+			checkBothButtonsPressed.join()
 			pollCardReader.join()
 			routes.stop_server()
 
-			if self.Clock.both_buttons_pressed:
-					self.Clock.both_buttons_pressed = False
-					self._reset_wifi()
-					time.sleep(5)
-					self.reset_odoo()
+			self.Odoo.set_params()
 
-			self.Disp.display_msg("odoo_success")
-			self.Buzz.Play("back_to_menu")
-			self.nextTask = self.defaultNextTask
+			if self.Odoo.uid:
+				self.Disp.display_msg("gotOdooUID")
+				self.Buzz.Play("OK")
+				self.nextTask = self.defaultNextTask
+			else:
+				self.Disp.display_msg("noOdooUID")
+				self.Buzz.Play("FALSE")
+				self.nextTask = "resetOdoo"
+
 		else:
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
 			self.nextTask = "ensureWiFiAndOdoo"
+
+		time.sleep(3)
+		self.Disp.clear_display()
 		self.Buzz.Play("back_to_menu")
-		time.sleep(1)
 
 	def showVersion(self):
 			origin = (34, 20)
@@ -360,7 +334,8 @@ class Tasks:
 			text = FIRMWARE_VERSION
 			message = [origin,size,text]
 			self.Disp.displayMsgRaw(message)
-			time.sleep(1)
+			time.sleep(2)
+			self.nextTask = self.defaultNextTask
 
 	def shutdownSafe(self):
 			_logger.debug("Shutting down safe")
@@ -425,9 +400,11 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		if not self.Odoo.user:  
-			self.resetOdoo()
+		if not self.Odoo.user:
+			while not self.Odoo.uid:
+				self.getOdooUIDwithNewParameters()
 		else:
+			
 			self.nextTask = self.defaultNextTask
 
 	def ensureWiFiAndOdoo(self):

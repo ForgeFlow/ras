@@ -157,13 +157,9 @@ def startServerAdminCard(exitFlag):
                 flash("wrong password!")
             return form()
 
-def start_server():
+def startServerOdooParams(exitFlag):
     global server
     global app
-    global data
-
-    data =Utils.getJsonData(WORK_DIR + "dicts/data.json")
-    oldAdminCard = data["admin_id"][0].lower()
 
     app = Flask("odoo_config_params")
     app.secret_key = os.urandom(12)
@@ -178,9 +174,7 @@ def start_server():
         if not session.get("logged_in"):
             return render_template("login.html")
         else:
-            return render_template(
-                "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
-            )
+            return render_template( "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted)
 
     @app.route("/result", methods=["POST", "GET"])
     def result():
@@ -188,6 +182,7 @@ def start_server():
             results = request.form
             dic = results.to_dict(flat=False)
             Utils.storeJsonData(WORK_DIR + "dicts/data.json", dic)
+            exitFlag.set() # end all the threads          
             return render_template("result.html", result=dic)
 
     @app.route("/login", methods=["POST"])
@@ -195,29 +190,15 @@ def start_server():
         if request.form.get("Reset credentials") == "Reset credentials":
             return render_template("change.html")
         elif request.form.get("Log in") == "Log in":
-            json_file = open(WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
+            data =Utils.getJsonData(WORK_DIR + "dicts/credentials.json")
             if (
-                request.form["password"] == json_data["new password"][0]
-                and request.form["username"] == json_data["username"][0]
+                request.form["password"]     == data["new password"][0]
+                and request.form["username"] == data["username"][0]
             ):
                 session["logged_in"] = True
             else:
                 flash("wrong password!")
             return form()
-        elif request.form.get("Reset AdminCard") == "Reset AdminCard":
-            json_file = open(WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
-            if (
-                request.form["password"] == json_data["new password"][0]
-                and request.form["username"] == json_data["username"][0]
-            ):
-                session["logged_in"] = True
-            else:
-                flash("wrong password!")
-            return reset_admin_form()
         else:
             return form()
 
@@ -225,20 +206,11 @@ def start_server():
     def change_credentials():
         if request.method == "POST":
             result = request.form
-            dic = result.to_dict(flat=False)
-            print(dic)
-            jsonarray = json.dumps(dic)
-            json_file = open(WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
-            print(json_data["new password"][0])
-            if (
-                str(dic["old password"][0]) == json_data["new password"][0]
-                and str(dic["username"][0]) == json_data["username"][0]
-            ):
-                with open(WORK_DIR + "dicts/credentials.json", "w+") as outfile:
-                    json.dump(dic, outfile)
-                print(jsonarray)
+            dataFromTheForm = result.to_dict(flat=False)
+            storedData = Utils.getJsonData(WORK_DIR + "dicts/credentials.json")
+            if (    str(dataFromTheForm["old password"][0]) == storedData["new password"][0]
+                    and str(dataFromTheForm["username"][0]) == storedData["username"][0]      ):
+                Utils.storeJsonData(WORK_DIR + "dicts/credentials.json", dataFromTheForm)
             else:
                 flash("wrong password!")
             return form()
