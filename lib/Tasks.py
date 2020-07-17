@@ -188,7 +188,7 @@ class Tasks:
 		displayClock.join()
 		checkBothButtonsPressed.join()
 
-		print('Exiting Clocking Option')
+		_logger.debug('Exiting Clocking Option')
 
 	def chooseLanguage(self):
 		def goOneLanguageDownInTheMenu():
@@ -375,7 +375,7 @@ class Tasks:
 		def checkAskTwice_and_eventuallySetNextTask():
 			self.Buzz.Play("OK")
 			if self.listOfTasksInMenu[self.currentMenuOption] in self.ask_twice:
-				print("Task in ask twice list")
+				_logger.debug("Task in ask twice list")
 				askTwice()
 			else:
 				setNextTask()
@@ -393,7 +393,7 @@ class Tasks:
 			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:		
-				print("OK ", self.listOfTasksInMenu[self.currentMenuOption])
+				_logger.debug("OK pressed - current Menu Option is: ", self.listOfTasksInMenu[self.currentMenuOption])
 				checkAskTwice_and_eventuallySetNextTask()
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
