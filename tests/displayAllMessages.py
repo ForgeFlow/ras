@@ -20,11 +20,12 @@ employee = "Joseph-Michael von Ross.Dietzenbach"
 for language in listOfLanguages:
   Disp.language = language
   for key in listOfKeysSorted:
-    if '-IpPlaceholder-' in messages_dic[key][language][2]:
+    thisMessage = messages_dic[key]
+    if '-IpPlaceholder-' in thisMessage[language][2]:
       Disp.displayWithIP(key)
-    elif '-EmployeePlaceholder-' in messages_dic[key][language][2]:
+    elif '-EmployeePlaceholder-' in thisMessage[language][2]:
       Disp.display_msg(key)
-      print("#"*15, messages_dic[key][language][2])
+      print("#"*15, thisMessage[language][2])
       input('waiting for user input')
       Disp.display_msg(key,employee)
     else:

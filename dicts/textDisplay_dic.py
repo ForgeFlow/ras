@@ -23,48 +23,46 @@ messages_dic = {
 
     'welcome':
         {
-          "ENGLISH": [(5, 10), 15, 'Welcome to the' + '\n' +
-            'RFID attendance' + '\n' + 'system'],
-          "ESPAÑOL": [(1, 10), 13, 'Sistema de Control' + '\n' +
-            'de Presencia' + '\n' + 'por RFID']
+          "ENGLISH": [(5, 10), 15, 'Welcome to the' + '\n' +'RFID attendance' + '\n' + 'system'],
+          "ESPAÑOL": [(0, 0), 14, 'Sistema de' + '\n' +'Control' + '\n' +'de Presencia' + '\n' + 'por RFID'+'\n'+'\n'+"-"*18]
         },
 
     'wait':
         {
-          "ENGLISH": [(0, 0), 18, 'Please'+'\n'+'wait'+'\n' +'\n'+"-"*12],
-          "ESPAÑOL": [(0, 0), 18, 'Espere'+'\n'+'por favor'+'\n' +'\n'+"-"*12]
+          "ENGLISH": [(0, 6), 18, 'Please'+'\n'+'wait'+'\n' +'\n'+"-"*14],
+          "ESPAÑOL": [(0, 6), 18, 'Espere'+'\n'+'por favor'+'\n' +'\n'+"-"*14]
         },
 
     'check_in':
         {
-          "ENGLISH": [(0, 0), 16,'\n' +'>> CHECK IN' + '\n' + '-EmployeePlaceholder-'],
-          "ESPAÑOL": [(0, 0), 16,' ' + '\n' +'>> Entrada ....' + '\n' +'-EmployeePlaceholder-']
+          "ENGLISH": [(0, 6), 16,'>> CHECK IN' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
+          "ESPAÑOL": [(0, 6), 16,'>> Entrada ....' + '\n' +'-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
         },
 
 
     'check_out':
         {
-          "ENGLISH": [(0, 0), 16,'\n' + 'CHECK OUT >>' + '\n' + '-EmployeePlaceholder-'],
-          "ESPAÑOL": [(0, 0), 16,'\n' + '.... Salida >>>' + '\n' + '-EmployeePlaceholder-']
+          "ENGLISH": [(0, 6), 16,'CHECK OUT >>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
+          "ESPAÑOL": [(0, 6), 16,'.... Salida >>>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
         },
 
     'FALSE':
         {
-          "ENGLISH": [(0, 0), 18,"-"*14 + '\n' +'NOT' + '\n' +'AUTHORIZED'],
-          "ESPAÑOL": [(0, 0), 18,"-"*14 + '\n' +' NO' + '\n' +'AUTORIZADO']
+          "ENGLISH": [(0, 12), 16,'NOT' + '\n' +'AUTHORIZED'+'\n'+'\n'+"-"*16],
+          "ESPAÑOL": [(0, 12), 16,' NO' + '\n' +'AUTORIZADO'+'\n'+'\n'+"-"*16]
         },
 
 
     'ContactAdm':
         {
-          "ENGLISH": [(0, 6), 15, 'Contact' + '\n' +'your' + '\n' +'ADMIN'+'\n'+'\n'+"-"*18],
-          "ESPAÑOL": [(0, 6), 15,'Alerte' + '\n' +'a su' + '\n' +'Informático'+'\n'+'\n'+"-"*18]
+          "ENGLISH": [(0, 6), 15, 'Contact' + '\n' +'your' + '\n' +'Administrator'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Contacte' + '\n' +'con su' + '\n' +'Informático'+'\n'+'\n'+"-"*18]
         },
 
     'connecting':
         {
-          "ENGLISH": [(1, 1), 18,' ' + '\n' + 'Connecting...' + '\n' +' '],
-          "ESPAÑOL": [(1, 5), 18,' ' + '\n' + 'Conectando...' + '\n' +' ']
+          "ENGLISH": [(1, 2), 18,' ' + '\n' + '.. connecting...' + '\n' +'\n'+'\n'+"-"*15],
+          "ESPAÑOL": [(1, 2), 18,' ' + '\n' + '.. conectando...' + '\n' +'\n'+'\n'+"-"*15]
         },
 
 
@@ -76,14 +74,14 @@ messages_dic = {
 
     'odoo_failed':
         {
-          "ENGLISH": [(0, 0), 14,'Communication\nwith Odoo FAILED,\nplease check\nthe parameters'+ '\n' +"-"*16],
-          "ESPAÑOL": [(0, 0), 14,'La comunicación\ncon Odoo ha fallado\nPor favor, revise\nlos parámetros'+ '\n' +"-"*16],
+          "ENGLISH": [(0, 0), 14,'Communication\nwith Odoo FAILED,\nplease check\nthe parameters'+ '\n' +"-"*18],
+          "ESPAÑOL": [(0, 0), 14,'La comunicación\ncon Odoo ha fallado\nPor favor, revise\nlos parámetros'+ '\n' +"-"*17],
         },
 
     'no_wifi':
         {
-          "ENGLISH": [(26, 1), 20, 'No' + '\n' +'WiFi' + '\n' +'Signal'],
-          "ESPAÑOL": [(26, 1), 20, 'No hay' + '\n' +'Señal' + '\n' +'WiFi'],
+          "ENGLISH": [(0, 4), 18, 'No' + '\n' +'WiFi' + '\n' +'Signal'+'\n'+'\n'+"-"*14],
+          "ESPAÑOL": [(0, 4), 18, 'No hay' + '\n' +'Señal' + '\n' +'WiFi'+'\n'+'\n'+"-"*14],
         },
 
     'gotOdooUID':
@@ -94,7 +92,7 @@ messages_dic = {
 
     'noOdooUID':
         {
-          "ENGLISH": [(0,6), 15, "Couldn't get" + '\n' +'an Odoo UID' +'\n'+'\n'+"-"*18],
+          "ENGLISH": [(0,6), 16, "Could not get" + '\n' +'an Odoo'+'\n'+'UID' '\n'+"-"*16],
           "ESPAÑOL": [(0,6), 15,'No fué posible' + '\n' +'conseguir una' + '\n' +'UID en Odoo'+'\n'+'\n'+"-"*18],  
         },
 
@@ -106,20 +104,20 @@ messages_dic = {
 
     'rebooting':
       {
-        "ENGLISH": [(1, 1), 21, ' ' + '\n' + 'REBOOTING' + '\n' + ' '],
-        "ESPAÑOL": [(1, 1), 16, 'Reinicializando' + '\n' + 'el Terminal' + '\n' + '(rebooting)'], 
+        "ENGLISH": [(0, 0), 16, '\n' + 'REBOOTING' + '\n' +'\n'+'\n'+"-"*16],
+        "ESPAÑOL": [(0, 0), 16, 'Reinicializando' + '\n' + 'el terminal' + '\n' + '-rebooting-'+'\n'+'\n'+"-"*16], 
       },
 
     'shuttingDown':
       {
-        "ENGLISH": [(0, 0), 16, '\n'  + 'SHUTTING' + '\n'+'DOWN\n'+'\n'+"-"*13],
-        "ESPAÑOL": [(0, 0), 16, 'Apagando' + '\n' + 'el Terminal' + '\n' + '(shutting down)'+'\n'+'\n'+"-"*13], 
+        "ENGLISH": [(0, 12), 16, 'SHUTTING' + '\n'+'DOWN\n'+'\n'+'\n'+"-"*16],
+        "ESPAÑOL": [(0, 0), 16, 'Apagando' + '\n' + 'el terminal' + '\n' + '-shutting down-'+'\n'+'\n'+"-"*16], 
       },
 
     'ERRUpdate':
       {
-        "ENGLISH": [(0, 0), 14,'-'*18 +'\n'+ 'Unable to update,' + '\n' + 'GitHub not' + '\n' +'pingable'],
-        "ESPAÑOL": [(0, 0), 14,'-'*18 + '\n'+'Update no es' + '\n' + 'posible, Github' + '\n' +'no responde'],
+        "ENGLISH": [(0, 6), 14,'Unable to update,' + '\n' + 'GitHub is not' + '\n' +'available'+'\n'+'\n'+'-'*18],
+        "ESPAÑOL": [(0, 6), 14,'Update no es' + '\n' + 'posible, GitHub' + '\n' +'no responde'+'\n'+'\n'+'-'*18],
       },
 
 
@@ -131,8 +129,8 @@ messages_dic = {
 
     'swipecard':
         {
-          "ENGLISH": [(0, 6), 15,'Please' + '\n' + 'swipe' + '\n' + 'your CARD'+'\n'+'\n'+"-"*18],
-          "ESPAÑOL": [(0, 6), 15,'Por favor' + '\n' + 'pase una' + '\n' + '---TARJETA---'+'\n'+'\n'+"-"*18],
+          "ENGLISH": [(0, 6), 16,'Please' + '\n' + 'swipe' + '\n' + 'your card'+'\n'+'\n'+"-"*16],
+          "ESPAÑOL": [(0, 6), 16,'Por favor' + '\n' + 'pase una' + '\n' + 'tarjeta'+'\n'+'\n'+"-"*16],
         },
 
     'clocking':
@@ -173,38 +171,38 @@ messages_dic = {
 
     'getNewAdminCard':
       {
-        "ENGLISH": [(0, 6), 15,'press OK to\nchange the\nADMIN CARD'+'\n'+'\n'+"-"*16],
-        "ESPAÑOL": [(0, 6), 15,'pulse OK para\ncambiar la\ntarjeta ADMIN'+'\n'+'\n'+"-"*16]
+        "ENGLISH": [(0, 6), 15,'press OK to\nchange the\nADMIN CARD'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\ncambiar la\ntarjeta ADMIN'+'\n'+'\n'+"-"*18]
       },  
 
     'showVersion':
       {
-        "ENGLISH": [(0, 0), 15,'\n' +'press OK to see\nthe firmware\nVERSION'+ '\n'+ '\n'+"-"*18 ],
-        "ESPAÑOL": [(0, 0), 15,'\n' +'pulse OK para\nver la VERSION\ndel firmware'+'\n'+'\n'+"-"*18]
+        "ENGLISH": [(0, 6), 15,'press OK to see\nthe firmware\nVERSION'+ '\n'+ '\n'+"-"*18 ],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nver la VERSION\ndel firmware'+'\n'+'\n'+"-"*18]
       },     
 
     'shutdownSafe':
       {
-        "ENGLISH": [(0, 6), 15,'press OK to safe\nSHUTDOWN\n'+'\n'+'\n'+"-"*18],
-        "ESPAÑOL": [(0, 0), 14,'pulse OK para\n-- APAGAR --\nel terminal\n(SHUTDOWN)'+'\n'+'\n'+"-"*18]
+        "ENGLISH": [(0, 6), 15,'press OK to\nsafe\nSHUTDOWN\n'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 0), 14,'pulse OK para\n-- APAGAR --\nel terminal\n-shutdown-'+'\n'+'\n'+"-"*18]
       }, 
 
     'reboot':
       {
-        "ENGLISH": [(18, 5), 15,'press OK to\nREBOOT\n----------'],
-        "ESPAÑOL": [(18, 0), 14,'pulse OK para\n-- REINICIAR --\nel terminal\n(REBOOT)']
+        "ENGLISH": [(0, 6), 15,'press OK\nto\nREBOOT\n'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 3), 14,'pulse OK para\n-- REINICIAR --\nel terminal\n-reboot-'+'\n'+'\n'+"-"*18]
       }, 
 
     'sure?':
       {
-        "ENGLISH": [(0, 0), 15,'ARE YOU SURE?\nPress OK again\nif you are sure'+'\n'+"-"*14],
-        "ESPAÑOL": [(0, 0), 15,'Está seguro?\nPulse OK otra\nvez si\nestá seguro'+'\n'+"-"*14]
+        "ENGLISH": [(0, 6), 15,'ARE YOU SURE?\nPress OK again\nif you are sure'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 0), 14,'ESTÁ SEGURO?\nPulse OK otra\nvez si\nestá seguro'+'\n'+'\n'+"-"*18]
       },     
 
     'newAdmCardDefined':
         {
-          "ENGLISH": [(16, 0), 16,'New Admin\nRFID Card\ndefined'],
-          "ESPAÑOL": [(16, 0), 14,'Nueva Tarjeta\nAdmin\nregistrada'],
+          "ENGLISH": [(0, 6), 16,'New Admin\nRFID Card\ndefined'+'\n'+'\n'+"-"*16],
+          "ESPAÑOL": [(0, 3), 15,'Nueva Tarjeta\nAdmin\nregistrada'+'\n'+'\n'+"-"*18],
         },      
 
     'browseForNewAdminCard':

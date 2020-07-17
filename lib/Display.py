@@ -1,5 +1,6 @@
 import time
 import logging
+import copy
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
@@ -106,22 +107,28 @@ class Display:
         return msgTranslated
 
     def display_msg(self, textKey, employee_name = None):
-        message = self.getMsgTranslated(textKey)
-        messageToBeDisplayed = message
+        message = copy.deepcopy(self.getMsgTranslated(textKey))
+        # messageText = message[2]
+        # messageToBeDisplayed = message
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and self.showEmployeeName == "Yes":
-                employeeNameInTwoLines= employee_name.replace(" ","\n",1)
-                messageToBeDisplayed = [(0,5), 16, ""]
-                standardMessageInOneLine = message[2].replace("\n","")          
-                messageToBeDisplayed[2] = standardMessageInOneLine.replace('-EmployeePlaceholder-',"\n"+employeeNameInTwoLines,1)
+                employeeName = employee_name.split(" ",1)
+                firstName = employeeName[0][0:14]
+                lastName = employeeName[1][0:14]
+                #employeeNameInTwoLines= firstName+"\n"+lastName
+                #message= [(0,5), 16, message[2]]
+                #standardMessageInOneLine = message[2].replace("\n","")          
+                message[2] = message[2].replace('-EmployeePlaceholder-',firstName+"\n"+lastName,1)
             else:
-                messageToBeDisplayed[2] = message[2].replace('-EmployeePlaceholder-',"")
-        self.displayMsgRaw(messageToBeDisplayed)
+                message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
+        self.displayMsgRaw(message)
     
     def displayWithIP(self, textKey):
         message = self.getMsgTranslated(textKey)
-        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
-        self.displayMsgRaw(message)
+        messageText = message[2]
+        messageToBeDisplayed = message
+        messageToBeDisplayed[2] = messageText.replace("-IpPlaceholder-",routes.get_ip(),1)
+        self.displayMsgRaw(messageToBeDisplayed)
 
     def clear_display(self):
         with canvas(self.device) as draw:
