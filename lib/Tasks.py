@@ -353,7 +353,7 @@ class Tasks:
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
 		time.sleep(3)
-		#self.Disp.clear_display()
+		self.Disp.clear_display()
 		os.system("sudo reboot")
 		time.sleep(60)
 		sys,exit(0)
