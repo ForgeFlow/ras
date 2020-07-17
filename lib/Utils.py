@@ -84,6 +84,17 @@ def storeJsonData(filePath,data):
   except:
     return False
 
+def storeOptionInJsonFile(filePath,option,optionValue):
+  data = getJsonData(filePath)
+  if data:
+      data[option] = optionValue
+      if storeJsonData(filePath, data):
+          return True
+      else:
+          return False
+  else:
+      return False
+
 def isPingable(address):
   response = os.system("ping -c 1 " + address)
   if response == 0:

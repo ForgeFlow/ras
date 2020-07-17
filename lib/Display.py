@@ -34,20 +34,9 @@ class Display:
             return True
         else:
             self.language           = "ENGLISH"
-            self.showEmployeeName   = "Yes"
+            self.showEmployeeName   = "yes"
             return False
     
-    def storeLanguageInFile(self):
-        data = Utils.getJsonData(self.fileDeviceCustomization)
-        if data:
-            data["language"] = self.language
-            if Utils.storeJsonData(self.fileDeviceCustomization, data):
-                return True
-            else:
-                return False
-        else:
-            return False
-
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
             hour = time.strftime("%H:%M", time.localtime())
@@ -108,7 +97,7 @@ class Display:
     def display_msg(self, textKey, employee_name = None):
         message = self.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
-            if employee_name and self.showEmployeeName == "Yes":
+            if employee_name and self.showEmployeeName == "yes":
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
                 lastName = employeeName[1][0:14]         

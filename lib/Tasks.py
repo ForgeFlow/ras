@@ -72,6 +72,8 @@ class Tasks:
 
 		self.currentMenuOption = 0
 
+		self.listOfYesNo =['yes', 'no']
+
 	 ########### LANGUAGES ####################
 		self.listOfLanguages = listOfLanguages
 
@@ -212,7 +214,7 @@ class Tasks:
 			if self.B_OK.pressed:
 				self.Buzz.Play("OK")
 				self.Disp.language = currentLanguageOption
-				self.Disp.storeLanguageInFile()
+				Utils.storeOptionInJsonFile(self.Disp.fileDeviceCustomization,"language",currentLanguageOption)
 			elif self.B_Down.pressed:
 				goOneLanguageDownInTheMenu()
 		
@@ -412,32 +414,30 @@ class Tasks:
 		self.ensureThatOdooHasBeenReachedAtLeastOnce()
 
 	def shouldEmployeeNameBeDisplayed(self):
-		def goOneLanguageDownInTheMenu():
+		def goOneDownInTheMenu(currentOption):
 			self.Buzz.Play("down")
-			self.currentLanguageOption  += 1
-			if self.currentLanguageOption  > self.maxLanguageOptions:
-					self.currentLanguageOption  = 0
-			_logger.debug("Button Down in Language Menu")
+			currentOption  += 1
+			if currentOption  > len(self.listOfYesNo)-1:
+					currentOption  = 0
+			return currentOption
 
-		_logger.debug("choose Language")
+		_logger.debug("shouldEmployeeNameBeDisplayed")
 
-		textPositionOrigin = (0,6)
-		textSize = 15
-		banner = "-"*18
-		self.currentLanguageOption = 0
+		currentOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
-			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
-			text = banner +"\n" + currentLanguageOption +"\n"+ banner
-			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			textCurrentOption = self.listOfYesNo[currentOption]
+			message = self.Disp.getMsgTranslated(textCurrentOption)
+			self.Disp.displayMsgRaw(message)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
-			if self.B_OK.pressed:
-				self.Buzz.Play("OK")
-				self.Disp.language = currentLanguageOption
-				self.Disp.storeLanguageInFile()
-			elif self.B_Down.pressed:
-				goOneLanguageDownInTheMenu()
+
+			if self.B_Down.pressed:
+				currentOption = goOneDownInTheMenu(currentOption)
+
+		self.Buzz.Play("OK")
+		self.Disp.showEmployeeName = textCurrentOption
+		Utils.storeOptionInJsonFile(self.Disp.fileDeviceCustomization,"showEmployeeName",textCurrentOption)
 		
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask

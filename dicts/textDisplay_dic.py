@@ -64,6 +64,19 @@ messages_dic = {
           "ENGLISH": [(1, 2), 18,' ' + '\n' + '.. connecting...' + '\n' +'\n'+'\n'+"-"*15],
           "ESPAÑOL": [(1, 2), 18,' ' + '\n' + '.. conectando...' + '\n' +'\n'+'\n'+"-"*15]
         },
+    
+    'yes':
+        {
+          "ENGLISH": [(1, 2), 18,' ' + '\n' + 'YES' + '\n' +'\n'+'\n'+"-"*15],
+          "ESPAÑOL": [(1, 2), 18,' ' + '\n' + 'SI' + '\n' +'\n'+'\n'+"-"*15]
+        },
+
+    'no':
+        {
+          "ENGLISH": [(1, 2), 18,' ' + '\n' + 'NO' + '\n' +'\n'+'\n'+"-"*15],
+          "ESPAÑOL": [(1, 2), 18,' ' + '\n' + 'NO' + '\n' +'\n'+'\n'+"-"*15]
+        },
+
 
 
     'comm_failed':
@@ -105,7 +118,7 @@ messages_dic = {
     'rebooting':
       {
         "ENGLISH": [(0, 0), 16, '\n' + 'REBOOTING' + '\n' +'\n'+'\n'+"-"*16],
-        "ESPAÑOL": [(0, 0), 16, 'Reinicializando' + '\n' + 'el terminal' + '\n' + '-rebooting-'+'\n'+'\n'+"-"*16], 
+        "ESPAÑOL": [(0, 6), 16, 'Reinicializando' + '\n' + 'el terminal' + '\n' + '-rebooting-'+'\n'+'\n'+"-"*16], 
       },
 
     'shuttingDown':
@@ -156,6 +169,12 @@ messages_dic = {
         "ENGLISH": [(0, 6), 15,'press OK\nto UPDATE\nthe Firmware'+'\n'+'\n'+"-"*18],
         "ESPAÑOL": [(0, 6), 15,'pulse OK para\nactualizar\nel Firmware'+'\n'+'\n'+"-"*18]
       },
+
+    'shouldEmployeeNameBeDisplayed':
+      {
+        "ENGLISH": [(0, 0), 14,'press OK to\nchoose if the\nemployee name'+'\n'+'should be shown'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 0), 14,'pulse OK para\ndeterminar si se\nmuestra el nombre'+'\n'+'del empleado''\n'+"-"*18]
+      },     
 
     'resetWifi':
       {

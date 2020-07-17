@@ -131,7 +131,7 @@ class Clocking:
             try:
                 res = self.Odoo.check_attendance(self.card)
                 if res:
-                    print("response odoo - check attendance ", res)
+                    _logger.debug("response odoo - check attendance ", res)
                     self.employee_name = res["employee_name"]
                     self.msg = res["action"]
                     _logger.debug(res)
