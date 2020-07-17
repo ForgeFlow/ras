@@ -15,7 +15,7 @@ Disp = Display.Display()
 listOfKeysSorted = sorted(list(messages_dic))
 print(listOfKeysSorted)
 
-employee = "Joseph-Michael von Ross.Dietzenbach"
+employee = "José-Eugenio Schwarzenegger"
 
 for language in listOfLanguages:
   Disp.language = language
@@ -25,7 +25,6 @@ for language in listOfLanguages:
       Disp.displayWithIP(key)
     elif '-EmployeePlaceholder-' in thisMessage[language][2]:
       Disp.display_msg(key)
-      print("#"*15, thisMessage[language][2])
       input('waiting for user input')
       Disp.display_msg(key,employee)
     else:

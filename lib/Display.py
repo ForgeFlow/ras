@@ -102,22 +102,16 @@ class Display:
 
     def getMsgTranslated(self, textKey):
         dictWithAllLanguages = messages_dic.get(textKey)
-        print(dictWithAllLanguages)
         msgTranslated = dictWithAllLanguages.get(self.language)       
-        return msgTranslated
+        return copy.deepcopy(msgTranslated)
 
     def display_msg(self, textKey, employee_name = None):
-        message = copy.deepcopy(self.getMsgTranslated(textKey))
-        # messageText = message[2]
-        # messageToBeDisplayed = message
+        message = self.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and self.showEmployeeName == "Yes":
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
-                lastName = employeeName[1][0:14]
-                #employeeNameInTwoLines= firstName+"\n"+lastName
-                #message= [(0,5), 16, message[2]]
-                #standardMessageInOneLine = message[2].replace("\n","")          
+                lastName = employeeName[1][0:14]         
                 message[2] = message[2].replace('-EmployeePlaceholder-',firstName+"\n"+lastName,1)
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
@@ -125,10 +119,8 @@ class Display:
     
     def displayWithIP(self, textKey):
         message = self.getMsgTranslated(textKey)
-        messageText = message[2]
-        messageToBeDisplayed = message
-        messageToBeDisplayed[2] = messageText.replace("-IpPlaceholder-",routes.get_ip(),1)
-        self.displayMsgRaw(messageToBeDisplayed)
+        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
+        self.displayMsgRaw(message)
 
     def clear_display(self):
         with canvas(self.device) as draw:

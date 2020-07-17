@@ -35,15 +35,15 @@ messages_dic = {
 
     'check_in':
         {
-          "ENGLISH": [(0, 6), 16,'>> CHECK IN' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
-          "ESPAÑOL": [(0, 6), 16,'>> Entrada ....' + '\n' +'-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
+          "ENGLISH": [(0, 6), 16,'>>> CHECK IN ...' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
+          "ESPAÑOL": [(0, 6), 16,'>>> Entrada .....' + '\n' +'-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
         },
 
 
     'check_out':
         {
-          "ENGLISH": [(0, 6), 16,'CHECK OUT >>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
-          "ESPAÑOL": [(0, 6), 16,'.... Salida >>>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
+          "ENGLISH": [(0, 6), 16,'CHECK OUT >>>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14],
+          "ESPAÑOL": [(0, 6), 16,'...... Salida >>>>' + '\n' + '-EmployeePlaceholder-'+'\n' +'\n'+'\n'+"-"*14]
         },
 
     'FALSE':
@@ -123,8 +123,8 @@ messages_dic = {
 
     'update':
         {
-          "ENGLISH": [(0, 6), 15,'Updating' + '\n' + ' ' + '\n' + 'FIRMWARE'+'\n'+'\n'+"-"*18],
-          "ESPAÑOL": [(0, 6), 15,'Actualizando' + '\n' + 'el' + '\n' + 'FIRMWARE'+'\n'+'\n'+"-"*18],
+          "ENGLISH": [(0, 10), 15,'Updating' + '\n' + 'the'+'\n' + 'Firmware'+'\n'+'\n'+"-"*18],
+          "ESPAÑOL": [(0, 6), 15,'Actualizando' + '\n' + 'el' + '\n' + 'Firmware'+'\n'+'\n'+"-"*18],
         },
 
     'swipecard':
@@ -153,8 +153,8 @@ messages_dic = {
 
     'updateFirmware':
       {
-        "ENGLISH": [(0, 6), 15,'press OK\nto UPDATE\nthe firmware'+'\n'+'\n'+"-"*18],
-        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nactualizar\nel firmware'+'\n'+'\n'+"-"*18]
+        "ENGLISH": [(0, 6), 15,'press OK\nto UPDATE\nthe Firmware'+'\n'+'\n'+"-"*18],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nactualizar\nel Firmware'+'\n'+'\n'+"-"*18]
       },
 
     'resetWifi':
@@ -177,8 +177,8 @@ messages_dic = {
 
     'showVersion':
       {
-        "ENGLISH": [(0, 6), 15,'press OK to see\nthe firmware\nVERSION'+ '\n'+ '\n'+"-"*18 ],
-        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nver la VERSION\ndel firmware'+'\n'+'\n'+"-"*18]
+        "ENGLISH": [(0, 6), 15,'press OK to see\nthe Firmware\nVERSION'+ '\n'+ '\n'+"-"*18 ],
+        "ESPAÑOL": [(0, 6), 15,'pulse OK para\nver la VERSION\ndel Firmware'+'\n'+'\n'+"-"*18]
       },     
 
     'shutdownSafe':

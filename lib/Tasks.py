@@ -44,6 +44,7 @@ class Tasks:
 				"chooseLanguage"	: self.chooseLanguage,  
 				"showRFID"				: self.showRFID,
 				"updateFirmware"	: self.updateFirmware,
+				"shouldEmployeeNameBeDisplayed": self.shouldEmployeeNameBeDisplayed,
 				"resetWifi"				: self.resetWifi,
 				"resetOdoo"				: self.getOdooUIDwithNewParameters,
 				"getNewAdminCard"	: self.getNewAdminCard,
@@ -58,6 +59,7 @@ class Tasks:
 				"chooseLanguage"	,  
 				"showRFID"				,
 				"updateFirmware"	,
+				"shouldEmployeeNameBeDisplayed",
 				"resetWifi"				,
 				"resetOdoo"				,
 				"getNewAdminCard"	,
@@ -409,3 +411,33 @@ class Tasks:
 		self.ensureThatWifiWorks()
 		self.ensureThatOdooHasBeenReachedAtLeastOnce()
 
+	def shouldEmployeeNameBeDisplayed(self):
+		def goOneLanguageDownInTheMenu():
+			self.Buzz.Play("down")
+			self.currentLanguageOption  += 1
+			if self.currentLanguageOption  > self.maxLanguageOptions:
+					self.currentLanguageOption  = 0
+			_logger.debug("Button Down in Language Menu")
+
+		_logger.debug("choose Language")
+
+		textPositionOrigin = (0,6)
+		textSize = 15
+		banner = "-"*18
+		self.currentLanguageOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
+			text = banner +"\n" + currentLanguageOption +"\n"+ banner
+			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			if self.B_OK.pressed:
+				self.Buzz.Play("OK")
+				self.Disp.language = currentLanguageOption
+				self.Disp.storeLanguageInFile()
+			elif self.B_Down.pressed:
+				goOneLanguageDownInTheMenu()
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
