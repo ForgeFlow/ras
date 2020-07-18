@@ -14,14 +14,20 @@ _logger = logging.getLogger(__name__)
 
 class OdooXMLrpc:
     def __init__(self):
-        self.workdir = WORK_DIR
-        self.datajson = self.workdir + "dicts/data.json"
+        self.workdir                    = WORK_DIR
+        self.datajson                   = self.workdir + "dicts/data.json"
+        self.fileDeviceCustomization    = self.workdir + "dicts/deviceCustomization.json"
         self.set_params()
         _logger.debug("Odoo XMLrpc Class Initialized")
 
     def set_params(self):
         _logger.debug("Params config is %s " % os.path.isfile(self.datajson))
         self.j_data = Utils.getJsonData(self.datajson)
+        if self.j_data:
+            self.odooConnectedAtLeastOnce = True
+        else:
+            self.getOdooParamsFromDeviceCustomizationFile()
+
         if self.j_data:
             self.db     = self.j_data["db"][0]
             self.user   = self.j_data["user_name"][0]
@@ -61,6 +67,12 @@ class OdooXMLrpc:
             self.url_template = False
             self.odooIpPort = False
             self.uid = False
+        
+        if self.uid and not self.odooConnectedAtLeastOnce:
+            self.odooConnectedAtLeastOnce = True
+            self.storeOdooParamsInDeviceCustomizationFile()
+
+        _logger.debug("After set params method, Odoo UID : ", self.uid)
 
     def _get_object_facade(self, url):
         try:
@@ -107,3 +119,18 @@ class OdooXMLrpc:
     def ensureNoDataJsonFile(self):
         if os.path.isfile(self.datajson):
             os.system("sudo rm " + self.datajson)
+    
+    def storeOdooParamsInDeviceCustomizationFile(self):
+        deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
+        deviceCustomizationData["odooParameters"] = self.j_data
+        self.odooConnectedAtLeastOnce = True
+        deviceCustomizationData["odooConnectedAtLeastOnce"] = self.odooConnectedAtLeastOnce
+        Utils.storeJsonData(self.fileDeviceCustomization,deviceCustomizationData)
+        _logger.debug("wrote to deviceCustomizationData.json: ",self.j_data)
+    
+    def getOdooParamsFromDeviceCustomizationFile(self):
+        deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
+        self.j_data = deviceCustomizationData["odooParameters"]
+        self.odooConnectedAtLeastOnce = deviceCustomizationData["odooConnectedAtLeastOnce"]
+        Utils.storeJsonData(self.datajson, self.j_data)
+        _logger.debug("wrote to data.json: ",self.j_data)

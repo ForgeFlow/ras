@@ -1,0 +1,40 @@
+{
+  "language": "ENGLISH",
+  "manufacturingData": {
+    "firmwareAtShipment": "v1.4.1",
+    "productName": "RAS2",
+    "productionDate": "2020-07-18T08:00:00+01:00",
+    "productionLocation": "Frankfurt",
+    "productionNumber": "2020-07-18-001",
+    "qualityInspector": "Luis"
+  },
+  "odooConnectedAtLeastOnce": true,
+  "odooParameters": {
+    "admin_id": [
+      "91a6e62f"
+    ],
+    "db": [
+      "01"
+    ],
+    "odoo_host": [
+      "192.168.0.31"
+    ],
+    "odoo_port": [
+      "8069"
+    ],
+    "timezone": [
+      "+01:00"
+    ],
+    "user_name": [
+      "luis"
+    ],
+    "user_password": [
+      "SOME PSSWD"
+    ]
+  },
+  "showEmployeeName": "yes",
+  "wifi": {
+    "Password": "SSID PSSWD",
+    "SSID": "SSID NAME"
+  }
+}

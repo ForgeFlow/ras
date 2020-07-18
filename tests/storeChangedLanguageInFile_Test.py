@@ -8,6 +8,7 @@ print(sys.path)
 
 import json
 from lib import Display
+from lib import Utils
 
 Disp = Display.Display()
 
@@ -17,4 +18,4 @@ Disp.language = "ENGLISH"
 
 print("change language to ", Disp.language)
 
-Disp.storeLanguageInFile()
+Utils.storeOptionInJsonFile(Disp.fileDeviceCustomization,"language",Disp.language)

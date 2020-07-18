@@ -134,7 +134,7 @@ class CardReader:
   def __init__(self, dev='/dev/spidev0.0', spd=200):
     self.card = False
     self.spi = spi.openSPI(device=dev,speed=spd)
-    print("after openSPI")
+    _logger.debug("after openSPI")
     self.MFRC522_Init()
 
   def Write_MFRC522(self, addr, val):

@@ -314,6 +314,7 @@ class Tasks:
 			if self.Odoo.uid:
 				self.Disp.display_msg("gotOdooUID")
 				self.Buzz.Play("OK")
+				self.Odoo.storeOdooParamsInDeviceCustomizationFile()
 				self.nextTask = self.defaultNextTask
 			else:
 				self.Disp.display_msg("noOdooUID")
@@ -403,11 +404,13 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		if not self.Odoo.user:
+		_logger.debug("odooConnectedAtLeastOnce? is ", self.Odoo.odooConnectedAtLeastOnce)
+		if not self.Odoo.odooConnectedAtLeastOnce:
+			_logger.debug("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
-		else:
-			self.nextTask = self.defaultNextTask
+		
+		self.nextTask = self.defaultNextTask
 
 	def ensureWiFiAndOdoo(self):
 		self.ensureThatWifiWorks()
