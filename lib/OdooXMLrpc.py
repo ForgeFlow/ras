@@ -26,6 +26,7 @@ class OdooXMLrpc:
         if self.j_data:
             self.odooConnectedAtLeastOnce = True
         else:
+            self.odooConnectedAtLeastOnce = False
             self.getOdooParamsFromDeviceCustomizationFile()
 
         if self.j_data:
@@ -130,7 +131,10 @@ class OdooXMLrpc:
     
     def getOdooParamsFromDeviceCustomizationFile(self):
         deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
-        self.j_data = deviceCustomizationData["odooParameters"]
-        self.odooConnectedAtLeastOnce = deviceCustomizationData["odooConnectedAtLeastOnce"]
-        Utils.storeJsonData(self.datajson, self.j_data)
-        _logger.debug("wrote to data.json: ",self.j_data)
+        if deviceCustomizationData:
+            self.j_data = deviceCustomizationData["odooParameters"]
+            self.odooConnectedAtLeastOnce = deviceCustomizationData["odooConnectedAtLeastOnce"]
+            Utils.storeJsonData(self.datajson, self.j_data)
+            _logger.debug("wrote to data.json: ",self.j_data)
+        else:
+            self.j_data = None
