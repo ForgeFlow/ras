@@ -14,7 +14,7 @@ Disp = Display.Display()
 
 print("current stored language ", Disp.language)
 
-Disp.language = "ENGLISH"
+Disp.language = "ESPAÑOL"
 
 print("change language to ", Disp.language)
 
