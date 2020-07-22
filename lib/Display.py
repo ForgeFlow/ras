@@ -34,6 +34,7 @@ class Display:
             self.showEmployeeName   = data["showEmployeeName"]
             return True
         else:
+            print("no data :", data)
             self.language           = "ENGLISH"
             self.showEmployeeName   = "yes"
             return False
