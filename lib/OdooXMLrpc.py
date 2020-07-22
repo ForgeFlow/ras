@@ -123,11 +123,12 @@ class OdooXMLrpc:
     
     def storeOdooParamsInDeviceCustomizationFile(self):
         deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
-        deviceCustomizationData["odooParameters"] = self.j_data
-        self.odooConnectedAtLeastOnce = True
-        deviceCustomizationData["odooConnectedAtLeastOnce"] = self.odooConnectedAtLeastOnce
-        Utils.storeJsonData(self.fileDeviceCustomization,deviceCustomizationData)
-        _logger.debug("wrote to deviceCustomizationData.json: ",self.j_data)
+        if deviceCustomizationData:
+            deviceCustomizationData["odooParameters"] = self.j_data
+            self.odooConnectedAtLeastOnce = True
+            deviceCustomizationData["odooConnectedAtLeastOnce"] = self.odooConnectedAtLeastOnce
+            Utils.storeJsonData(self.fileDeviceCustomization,deviceCustomizationData)
+            _logger.debug("wrote to deviceCustomizationData.json: ",self.j_data)
     
     def getOdooParamsFromDeviceCustomizationFile(self):
         deviceCustomizationData = Utils.getJsonData(self.fileDeviceCustomization)
