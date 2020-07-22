@@ -30,6 +30,7 @@ class Display:
         data = Utils.getJsonData(self.fileDeviceCustomization)
         if data:
             self.language           = data["language"]
+            print("language :", self.language)
             self.showEmployeeName   = data["showEmployeeName"]
             return True
         else:
