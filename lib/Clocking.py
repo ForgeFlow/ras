@@ -118,7 +118,7 @@ class Clocking:
         else:
             self.odoo_m = "NO Odoo connected"
             self.odoo_conn = False
-            _logger.warn(msg)
+            # _logger.warn(msg)
         _logger.debug(time.localtime(), "\n self.odoo_m ", self.odoo_m, "\n self.wifi_m ", self.wifi_m)        
         return self.odoo_conn
 
