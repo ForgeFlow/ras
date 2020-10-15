@@ -8,7 +8,6 @@ from collections import OrderedDict
 from flask import Flask, flash, render_template, request, session
 
 from dicts.tz_dic import tz_dic
-from dicts.ras_dic import WORK_DIR
 
 from werkzeug.serving import make_server
 
@@ -49,7 +48,7 @@ def startServerAdminCard(exitFlag):
     global app
     global data
 
-    data =Utils.getJsonData(WORK_DIR + "dicts/data.json")
+    data =Utils.getJsonData(Utils.WORK_DIR + "dicts/data.json")
     oldAdminCard = data["admin_id"][0].lower()
 
     app = Flask("odoo_config_params")
@@ -89,7 +88,7 @@ def startServerAdminCard(exitFlag):
 
             data["admin_id"] = dic["admin_id"]
 
-            Utils.storeJsonData(WORK_DIR + "dicts/data.json", data)
+            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", data)
 
             exitFlag.set() # end all the threads
 
@@ -100,7 +99,7 @@ def startServerAdminCard(exitFlag):
         if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
-            # with open(WORK_DIR + "dicts/data.json", "w+") as outfile:
+            # with open(Utils.WORK_DIR + "dicts/data.json", "w+") as outfile:
             #     json.dump(dic, outfile)
             return render_template("result.html", result=dic)
 
@@ -109,7 +108,7 @@ def startServerAdminCard(exitFlag):
         if request.form.get("Reset credentials") == "Reset credentials":
             return render_template("change.html")
         elif request.form.get("Log in") == "Log in":
-            json_file = open(WORK_DIR + "dicts/credentials.json")
+            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
             json_data = json.load(json_file)
             json_file.close()
             if (
@@ -121,7 +120,7 @@ def startServerAdminCard(exitFlag):
                 flash("wrong password!")
             return form()
         elif request.form.get("Reset AdminCard") == "Reset AdminCard":
-            json_file = open(WORK_DIR + "dicts/credentials.json")
+            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
             json_data = json.load(json_file)
             json_file.close()
             if (
@@ -142,7 +141,7 @@ def startServerAdminCard(exitFlag):
             dic = result.to_dict(flat=False)
             print(dic)
             jsonarray = json.dumps(dic)
-            json_file = open(WORK_DIR + "dicts/credentials.json")
+            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
             json_data = json.load(json_file)
             json_file.close()
             print(json_data["new password"][0])
@@ -150,7 +149,7 @@ def startServerAdminCard(exitFlag):
                 str(dic["old password"][0]) == json_data["new password"][0]
                 and str(dic["username"][0]) == json_data["username"][0]
             ):
-                with open(WORK_DIR + "dicts/credentials.json", "w+") as outfile:
+                with open(Utils.WORK_DIR + "dicts/credentials.json", "w+") as outfile:
                     json.dump(dic, outfile)
                 print(jsonarray)
             else:
@@ -181,7 +180,7 @@ def startServerOdooParams(exitFlag):
         if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
-            Utils.storeJsonData(WORK_DIR + "dicts/data.json", dic)
+            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", dic)
             exitFlag.set() # end all the threads          
             return render_template("result.html", result=dic)
 
@@ -190,7 +189,7 @@ def startServerOdooParams(exitFlag):
         if request.form.get("Reset credentials") == "Reset credentials":
             return render_template("change.html")
         elif request.form.get("Log in") == "Log in":
-            data =Utils.getJsonData(WORK_DIR + "dicts/credentials.json")
+            data =Utils.getJsonData(Utils.WORK_DIR + "dicts/credentials.json")
             if (
                 request.form["password"]     == data["new password"][0]
                 and request.form["username"] == data["username"][0]
@@ -207,10 +206,10 @@ def startServerOdooParams(exitFlag):
         if request.method == "POST":
             result = request.form
             dataFromTheForm = result.to_dict(flat=False)
-            storedData = Utils.getJsonData(WORK_DIR + "dicts/credentials.json")
+            storedData = Utils.getJsonData(Utils.WORK_DIR + "dicts/credentials.json")
             if (    str(dataFromTheForm["old password"][0]) == storedData["new password"][0]
                     and str(dataFromTheForm["username"][0]) == storedData["username"][0]      ):
-                Utils.storeJsonData(WORK_DIR + "dicts/credentials.json", dataFromTheForm)
+                Utils.storeJsonData(Utils.WORK_DIR + "dicts/credentials.json", dataFromTheForm)
             else:
                 flash("wrong password!")
             return form()

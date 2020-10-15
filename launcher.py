@@ -1,5 +1,4 @@
 #! /usr/bin/python3.5
-# this is a comment
 import os
 import time
 import logging
@@ -9,13 +8,17 @@ format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
 
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
-from lib import OdooXMLrpc, Tasks
+from lib import OdooXMLrpc, Tasks, Utils
 
 import traceback
 from io import StringIO
 
 
 _logger = logging.getLogger(__name__)
+
+#Utils.getSettingsFromDeviceCustomization() # initialize device customization settings/options
+Utils.migrationToVersion1_4_2()
+Utils.getSettingsFromDeviceCustomization()
 
 Buzz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
@@ -24,7 +27,7 @@ B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
 Hardware = [Buzz, Disp, Reader, B_Down, B_OK]
 
-Odoo = OdooXMLrpc.OdooXMLrpc()  
+Odoo = OdooXMLrpc.OdooXMLrpc(Disp)  
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
 def mainLoop():
@@ -35,6 +38,7 @@ def mainLoop():
 
         while True:
             if Tasks.nextTask:
+                Disp.display_msg("connecting")
                 Tasks.executeNextTask()
             else:
                 Tasks.chooseTaskFromMenu()

@@ -1,44 +1,26 @@
 import time
 import logging
-import copy
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
 from .demo_opts import get_device
-from dicts.ras_dic import WORK_DIR, display_driver
-from dicts.textDisplay_dic import messages_dic
+from dicts.ras_dic import display_driver
 from . import routes
 from . import Utils
 
-
 _logger = logging.getLogger(__name__)
-
 
 class Display:
     def __init__(self):
-        self.font_ttf = WORK_DIR + "fonts/Orkney.ttf"
-        self.img_path = WORK_DIR + "images/"
+        self.font_ttf = Utils.WORK_DIR + "fonts/Orkney.ttf"
+        self.img_path = Utils.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
         _logger.debug("Display Class Initialized")
         self.font1 = ImageFont.truetype(self.font_ttf, 30)
         self.font2 = ImageFont.truetype(self.font_ttf, 14)
         self.font3 = ImageFont.truetype(self.font_ttf, 22)
-        self.fileDeviceCustomization = WORK_DIR + "dicts/deviceCustomization.json"
-        self.getSettingsFromFile()
-    
-    def getSettingsFromFile(self):
-        data = Utils.getJsonData(self.fileDeviceCustomization)
-        if data:
-            self.language           = data["language"]
-            #print("language :", self.language)
-            self.showEmployeeName   = data["showEmployeeName"]
-            return True
-        else:
-            #print("no data :", data)
-            self.language           = "ENGLISH"
-            self.showEmployeeName   = "yes"
-            return False
-    
+        self.display_msg("connecting")
+
     def _display_time(self, wifi_quality, odoo_m):
         with canvas(self.device) as draw:
             hour = time.strftime("%H:%M", time.localtime())
@@ -53,8 +35,8 @@ class Display:
                 draw.text((31, 19), hour, font=self.font1, fill="white")
             else:
                 draw.text((34, 19), hour, font=self.font1, fill="white")
-            draw.text((0, 0), wifi_quality, font=self.font2, fill="white")
-            draw.text((0, 52), odoo_m, font=self.font2, fill="white")
+            draw.text((0, 0), wifi_quality+"\n"*7+"-"*17, font=self.font2, fill="white", align="center")
+            draw.text((0, 52), odoo_m, font=self.font2, fill="white", align="center")
 
     def showCard(self,card):
         with canvas(self.device) as draw:
@@ -91,25 +73,23 @@ class Display:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
         _logger.debug("Displaying message: " + text)
 
-    def getMsgTranslated(self, textKey):
-        dictWithAllLanguages = messages_dic.get(textKey)
-        msgTranslated = dictWithAllLanguages.get(self.language)       
-        return copy.deepcopy(msgTranslated)
-
+    #@Utils.timer
     def display_msg(self, textKey, employee_name = None):
-        message = self.getMsgTranslated(textKey)
+        message = Utils.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
-            if employee_name and self.showEmployeeName == "yes":
+            if employee_name and Utils.settings["showEmployeeName"] == "yes":
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
                 lastName = employeeName[1][0:14]         
                 message[2] = message[2].replace('-EmployeePlaceholder-',firstName+"\n"+lastName,1)
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
+        if '-SSIDresetPlaceholder-' in message[2]:
+            message[2] =  message[2].replace('-SSIDresetPlaceholder-',Utils.settings["SSIDreset"])
         self.displayMsgRaw(message)
     
     def displayWithIP(self, textKey):
-        message = self.getMsgTranslated(textKey)
+        message = Utils.getMsgTranslated(textKey)
         message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
         self.displayMsgRaw(message)
 

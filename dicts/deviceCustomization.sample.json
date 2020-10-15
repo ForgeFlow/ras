@@ -1,23 +1,26 @@
 {
+  "SSIDreset": "__RAS__",
+  "fileForMessages": "messagesDicDefault.json",
+  "firmwareVersion": "v1.4.2",
   "language": "ENGLISH",
   "manufacturingData": {
-    "firmwareAtShipment": "v1.4.1",
+    "firmwareAtShipment": "prior to v1.4.2",
     "productName": "RAS2",
-    "productionDate": "2020-07-18T08:00:00+01:00",
+    "productionDate": "before October 2020",
     "productionLocation": "Frankfurt",
-    "productionNumber": "2020-07-18-001",
+    "productionNumber": "before October 2020",
     "qualityInspector": "Luis"
   },
-  "odooConnectedAtLeastOnce": true,
+  "odooConnectedAtLeastOnce": false,
   "odooParameters": {
     "admin_id": [
-      "91a6e62f"
+      "ffffffff"
     ],
     "db": [
-      "01"
+      "1"
     ],
     "odoo_host": [
-      "192.168.0.31"
+      "192.168.0.xx"
     ],
     "odoo_port": [
       "8069"
@@ -26,10 +29,10 @@
       "+01:00"
     ],
     "user_name": [
-      "luis"
+      "user"
     ],
     "user_password": [
-      "SOME PSSWD"
+      "psswd"
     ]
   },
   "showEmployeeName": "yes",

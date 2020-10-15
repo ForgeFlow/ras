@@ -3,6 +3,26 @@ import time
 import json
 import os
 import socket
+import copy
+import functools
+
+WORK_DIR                      = "/home/pi/ras/"
+fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
+fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
+fileDataJson                  = WORK_DIR + "dicts/data.json"
+settings                      = {}
+defaultMessagesDic            = {}
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper_timer(*args, **kwargs):
+        tic = time.perf_counter()
+        value = func(*args, **kwargs)
+        toc = time.perf_counter()
+        elapsed_time = toc - tic
+        print("Elapsed time: {1:0.4f} seconds - Function: {0}".format(func, elapsed_time))
+        return value
+    return wrapper_timer
 
 class Timer:
   def __init__(self, howLong):
@@ -67,6 +87,7 @@ def setButtonsToNotPressed(button1,button2):
   if button1: button1.pressed=False
   if button2: button2.pressed=False
 
+#@timer
 def getJsonData(filePath):
   try:
     with open(filePath) as f:
@@ -104,15 +125,101 @@ def isPingable(address):
   return pingstatus
 
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        canConnectResult = s.connect_ex(ipPort)
-        if canConnectResult == 0:
-            isOpen = True
-        else:
-            isOpen = False
-    except:
-        isOpen = False
-    finally:
-        s.close()
-    return isOpen
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  try:
+    canConnectResult = s.connect_ex(ipPort)
+    if canConnectResult == 0:
+      isOpen = True
+    else:
+      isOpen = False
+  except:
+    isOpen = False
+  finally:
+    s.close()
+  return isOpen
+
+def getOptionFromKey(dataDic, key):
+  try:
+    value = dataDic[key]
+    return value
+  except:
+    return None
+
+def getOptionFromDeviceCustomization(option, defaultValue):
+  try:
+    data = getJsonData(fileDeviceCustomization)
+    value = getOptionFromKey(data,option) or defaultValue
+    storeOptionInDeviceCustomization(option,value)
+    return value
+  except:
+    return None
+
+def storeOptionInDeviceCustomization(option,value):
+  try:
+    storeOptionInJsonFile(fileDeviceCustomization,option,value) # stores in file
+    settings[option]= value # stores on the running program
+    return True
+  except:
+    return False
+
+def getSettingsFromDeviceCustomization():
+  settings["language"]          = getOptionFromDeviceCustomization("language"         , defaultValue= "ENGLISH")
+  settings["showEmployeeName"]  = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue= "yes")
+  settings["fileForMessages"]   = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue= "messagesDicDefault.json")
+  settings["messagesDic"]       = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
+  settings["SSIDreset"]         = getOptionFromDeviceCustomization("SSIDreset"  , defaultValue= "__RAS__")
+  settings["defaultMessagesDic"]= getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+
+def getMsg(textKey):
+  try:
+    return settings["messagesDic"][textKey] 
+  except KeyError:
+    return settings["defaultMessagesDic"][textKey]
+  except:
+    return None
+
+def getMsgTranslated(textKey):
+  try:
+    msgTranslated = getMsg(textKey)[settings["language"]]       
+    return copy.deepcopy(msgTranslated)
+  except:
+    if textKey == "listOfLanguages":
+      return ["ENGLISH"]
+    else:
+      return [[0, 0], 20," "]
+
+def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
+  try:
+    return getMsg("listOfLanguages")
+  except:
+    return defaultListOfLanguages
+
+def transferDataJsonToDeviceCustomization(deviceCustomizationDic):
+  dataJsonOdooParameters = getJsonData(fileDataJson)
+  if dataJsonOdooParameters:
+    #print("dataJson params:",  dataJsonOdooParameters)
+    #deviceCustomizationDic["odooParameters"] = {}
+    deviceCustomizationDic["odooParameters"] = dataJsonOdooParameters
+    deviceCustomizationDic["odooConnectedAtLeastOnce"] = True
+  else:
+    deviceCustomizationDic["odooConnectedAtLeastOnce"] = False
+  return deviceCustomizationDic
+
+
+def migrationToVersion1_4_2():
+  deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
+  deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
+  if deviceCustomizationDic:
+    #add 
+    deviceCustomizationDic["SSIDreset"]       = deviceCustomizationSampleDic["SSIDreset"]
+    deviceCustomizationDic["fileForMessages"] = deviceCustomizationSampleDic["fileForMessages"]
+    deviceCustomizationDic["firmwareVersion"] = deviceCustomizationSampleDic["firmwareVersion"]
+  else:
+    deviceCustomizationDic = copy.deepcopy(deviceCustomizationSampleDic)
+    deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
+  print("deviceCustomizationDic: ", deviceCustomizationDic)
+  storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
+
+
+#getSettingsFromDeviceCustomization()
+
