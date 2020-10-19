@@ -163,12 +163,13 @@ def storeOptionInDeviceCustomization(option,value):
     return False
 
 def getSettingsFromDeviceCustomization():
-  settings["language"]          = getOptionFromDeviceCustomization("language"         , defaultValue= "ENGLISH")
-  settings["showEmployeeName"]  = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue= "yes")
-  settings["fileForMessages"]   = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue= "messagesDicDefault.json")
+  settings["language"]          = getOptionFromDeviceCustomization("language"         , defaultValue = "ENGLISH")
+  settings["showEmployeeName"]  = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue = "yes")
+  settings["fileForMessages"]   = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue = "messagesDicDefault.json")
   settings["messagesDic"]       = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["SSIDreset"]         = getOptionFromDeviceCustomization("SSIDreset"  , defaultValue= "__RAS__")
+  settings["SSIDreset"]         = getOptionFromDeviceCustomization("SSIDreset"        , defaultValue = "__RAS__")
   settings["defaultMessagesDic"]= getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+  settings["odooParameters"]    = getOptionFromDeviceCustomization("odooParameters"   , defaultValue = None)
 
 def getMsg(textKey):
   try:
@@ -197,29 +198,31 @@ def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
 def transferDataJsonToDeviceCustomization(deviceCustomizationDic):
   dataJsonOdooParameters = getJsonData(fileDataJson)
   if dataJsonOdooParameters:
-    #print("dataJson params:",  dataJsonOdooParameters)
-    #deviceCustomizationDic["odooParameters"] = {}
     deviceCustomizationDic["odooParameters"] = dataJsonOdooParameters
     deviceCustomizationDic["odooConnectedAtLeastOnce"] = True
   else:
     deviceCustomizationDic["odooConnectedAtLeastOnce"] = False
   return deviceCustomizationDic
 
+def storeOdooParamsInDeviceCustomization(newOdooParams):
+  try:
+    storeOptionInDeviceCustomization("odooParameters",newOdooParams)
+    return True
+  except:
+    return False
 
 def migrationToVersion1_4_2():
   deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
   deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
   if deviceCustomizationDic:
-    #add 
     deviceCustomizationDic["SSIDreset"]       = deviceCustomizationSampleDic["SSIDreset"]
     deviceCustomizationDic["fileForMessages"] = deviceCustomizationSampleDic["fileForMessages"]
     deviceCustomizationDic["firmwareVersion"] = deviceCustomizationSampleDic["firmwareVersion"]
   else:
     deviceCustomizationDic = copy.deepcopy(deviceCustomizationSampleDic)
     deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
-  print("deviceCustomizationDic: ", deviceCustomizationDic)
+  #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
 
 
-#getSettingsFromDeviceCustomization()
 

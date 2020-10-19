@@ -16,7 +16,7 @@
       {
         "ENGLISH": [[5, 10], 15, "Welcome to the\nRFID attendance\nsystem"],
         "ESPAÑOL": [[0, 0], 14, "Sistema de\nControl\nde Presencia\npor RFID\n\n-----------------"],
-        "FRANÇAIS": [[0, 0], 14, "Bienvenue sur\nsur votre badgeuse\nconnectée à Odoo"]
+        "FRANÇAIS": [[0, 0], 14, "Bienvenue sur\nvotre badgeuse\nconnectée à Odoo"]
       },
 
   "wait":

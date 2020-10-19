@@ -302,7 +302,7 @@ class Tasks:
 			pollCardReader.join()
 			routes.stop_server()
 
-			self.Odoo.set_params()
+			self.Odoo.getUIDfromOdoo()
 
 			if self.Odoo.uid:
 				self.Disp.display_msg("gotUID")

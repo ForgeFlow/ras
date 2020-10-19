@@ -48,7 +48,7 @@ def startServerAdminCard(exitFlag):
     global app
     global data
 
-    data =Utils.getJsonData(Utils.WORK_DIR + "dicts/data.json")
+    data =Utils.getOptionFromDeviceCustomization("odooParameters", None):
     oldAdminCard = data["admin_id"][0].lower()
 
     app = Flask("odoo_config_params")
@@ -88,7 +88,7 @@ def startServerAdminCard(exitFlag):
 
             data["admin_id"] = dic["admin_id"]
 
-            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", data)
+            Utils.storeOptionInDeviceCustomization("odooParameters",data)
 
             exitFlag.set() # end all the threads
 
@@ -99,8 +99,6 @@ def startServerAdminCard(exitFlag):
         if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
-            # with open(Utils.WORK_DIR + "dicts/data.json", "w+") as outfile:
-            #     json.dump(dic, outfile)
             return render_template("result.html", result=dic)
 
     @app.route("/login", methods=["POST"])
@@ -165,7 +163,6 @@ def startServerOdooParams(exitFlag):
     server = ServerThread(app)
     server.start()
     
-
     @app.route("/")
     def form():
         _logger.debug("inside form")
@@ -173,14 +170,14 @@ def startServerOdooParams(exitFlag):
         if not session.get("logged_in"):
             return render_template("login.html")
         else:
-            return render_template( "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted)
+            return render_template("form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted)
 
     @app.route("/result", methods=["POST", "GET"])
     def result():
         if request.method == "POST":
             results = request.form
             dic = results.to_dict(flat=False)
-            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", dic)
+            Utils.storeOptionInDeviceCustomization("odooParameters",dic)
             exitFlag.set() # end all the threads          
             return render_template("result.html", result=dic)
 

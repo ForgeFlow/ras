@@ -16,79 +16,59 @@ class OdooXMLrpc:
     def __init__(self, Display):
         self.display        = Display
         self.datajson       = Utils.WORK_DIR + "dicts/data.json"
-        self.set_params()
+        self.getUIDfromOdoo()
         _logger.debug("Odoo XMLrpc Class Initialized")
 
     #@Utils.timer
-    def set_params(self):       
-        _logger.debug("Params config is %s " % os.path.isfile(self.datajson))
-        self.j_data = Utils.getJsonData(self.datajson)
+    def getUIDfromOdoo(self):
+        self.setTimeZone()
+        self.setOdooUrlTemplate()
+        self.setOdooIpPort()
+        self.setUserID()                                                                  
 
-        if self.j_data:
-            self.odooConnectedAtLeastOnce = True
-        else:
-            self.getOdooParamsFromDeviceCustomizationFile()
-
-        if self.j_data:
-            self.db     = self.j_data["db"][0]
-            self.user   = self.j_data["user_name"][0]
-            self.pswd   = self.j_data["user_password"][0]
-            self.host   = self.j_data["odoo_host"][0]
-            self.port   = self.j_data["odoo_port"][0]
-            self.adm    = self.j_data["admin_id"][0]
-            self.tz     = self.j_data["timezone"][0]
-
-            os.environ["TZ"] = tz_dic.tz_dic[self.tz]
+    def setTimeZone(self):
+            timeZone            = tz_dic.tz_dic[Utils.settings["odooParameters"]["timezone"]]
+            os.environ["TZ"]    = timeZone
             time.tzset()
+            return timeZone
 
-            if "https" not in self.j_data:
-                self.https_on = False
-                self.url_template = "http://%s" % self.host
+    def setOdooUrlTemplate(self):
+            if  Utils.settings["odooParameters"]["https"]:
+                self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"]
             else:
-                self.https_on = True
-                self.url_template = "https://%s" % self.host
+                self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"]
 
-            if self.port:
-                self.url_template += ":%s" % self.port
+            if Utils.settings["odooParameters"]["odoo_port"]:
+                self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"]
             
-            self.odooIpPort = (self.host, int(self.port))
-            self.uid = self.getUserID()
-        else:
-            self.ensureNoDataJsonFile()
-
-            self.j_data = False
-            self.db = False
-            self.user = False
-            self.pswd = False
-            self.host = False
-            self.port = False
-            self.adm = False
-            self.tz = False
-            self.https_on = False
-            self.url_template = False
-            self.odooIpPort = False
-            self.uid = False
-        
-        if self.uid and not self.odooConnectedAtLeastOnce:
-            self.odooConnectedAtLeastOnce = True
-            self.storeOdooParamsInDeviceCustomizationFile()
-
-        _logger.debug("After set params method, Odoo UID : ", self.uid)
-
+            return self.odooUrlTemplate
+               
+    def setOdooIpPort(self):
+        try:
+            if Utils.settings["odooParameters"]["odoo_port"]: 
+                portNumber =  int(Utils.settings["odooParameters"]["odoo_port"])                          
+            elif Utils.settings["odooParameters"]["https"]:
+                portNumber =   443
+            return (Utils.settings["odooParameters"]["odoo_host"], portNumber)
+    
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(self.url_template + str(url))
+            serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
             return serverProxy
         except Exception as e:
             _logger.exception(e)
             return False
 
     #@Utils.timer
-    def getUserID(self):
+    def setUserID(self):
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            user_id = loginServerProxy.login(self.db, self.user, self.pswd)
+            user_id = loginServerProxy.login(
+                Utils.settings["odooParameters"]["db"],
+                Utils.settings["odooParameters"]["user_name"],
+                Utils.settings["odooParameters"]["db"])
             if user_id:
+                self.uid = user_id
                 return user_id
             return None
         except ConnectionRefusedError:
@@ -113,11 +93,10 @@ class OdooXMLrpc:
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                serverProxy.transport.connection.timeout = 2
                 res = serverProxy.execute(
-                    self.db,
+                    Utils.settings["odooParameters"]["db"],
                     self.uid,
-                    self.pswd,
+                    Utils.settings["odooParameters"]["db"],
                     "hr.employee",
                     "register_attendance",
                     card,
@@ -126,11 +105,6 @@ class OdooXMLrpc:
         except Exception as e:
             _logger.exception(e)
             return False
-        finally:
-            serverProxy.transport.connection.timeout = None
-        
-        print("-"*60)
-        print()
 
     def ensureNoDataJsonFile(self):
         if os.path.isfile(self.datajson):

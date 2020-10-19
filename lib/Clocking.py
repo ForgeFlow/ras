@@ -125,7 +125,7 @@ class Clocking:
             if isOdooReachable():
                 self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
             else:
-                self.Odoo.set_params()
+                self.Odoo.getUIDfromOdoo()
                 self.msg = "comm_failed"
             #print("isOdooReachable: ", self.odooReachable )
         _logger.info("Clocking sync returns: %s" % self.msg)
@@ -136,7 +136,7 @@ class Clocking:
         if not self.Odoo.uid:
             self.msg = "ContactAdm"  # There was no successful Odoo Connection (no uid) since turning the device on:
                                      # Contact Your Admin because Odoo is down , the message is changed eventually later
-            self.Odoo.set_params()  # be sure that always uid is set to the last Odoo status (if connected)
+            self.Odoo.getUIDfromOdoo()  # be sure that always uid is set to the last Odoo status (if connected)
 
         if self.Odoo.uid: # check if the uid was set after running SetParams
             if self.wifiStable():
