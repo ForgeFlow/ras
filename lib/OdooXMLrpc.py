@@ -15,11 +15,7 @@ _logger = logging.getLogger(__name__)
 class OdooXMLrpc:
     def __init__(self, Display):
         self.display            = Display
-        self.datajson           = Utils.WORK_DIR + "dicts/data.json"
-        self.uid                = False
         self.adm                = False
-        self.odooUrlTemplate    = None
-        self.odooIpPort         = None
         self.getUIDfromOdoo()
         _logger.debug("Odoo XMLrpc Class Initialized")
 
@@ -43,25 +39,26 @@ class OdooXMLrpc:
 
     def setOdooUrlTemplate(self):
         try:
-            if  Utils.settings["odooParameters"]["https"]:
+            if  Utils.isOdooUsingHTTPS():
                 self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"][0]
             else:
-                self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]
-
+                self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
             if Utils.settings["odooParameters"]["odoo_port"]:
                 self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
             print("self.odooUrlTemplate ",self.odooUrlTemplate )
             return True
         except Exception as e:
+            self.odooUrlTemplate    = None
             print("exception in method setOdooUrlTemplate: ", e)
             return False        
                
     def setOdooIpPort(self):
+        self.odooIpPort = None
         try:
             print( "Utils.settings[""odooParameters""][""odoo_port""][0] ",Utils.settings["odooParameters"]["odoo_port"][0])
-            if Utils.settings["odooParameters"]["odoo_port"]: 
+            if Utils.settings["odooParameters"]["odoo_port"]!=[""]: 
                 portNumber =  int(Utils.settings["odooParameters"]["odoo_port"][0])                          
-            elif Utils.settings["odooParameters"]["https"]:
+            elif Utils.isOdooUsingHTTPS():
                 portNumber =   443
             self.odooIpPort = (Utils.settings["odooParameters"]["odoo_host"][0], portNumber)
             return True
@@ -80,6 +77,7 @@ class OdooXMLrpc:
 
     #@Utils.timer
     def setUserID(self):
+        self.uid = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
             user_id = loginServerProxy.login(
@@ -108,6 +106,7 @@ class OdooXMLrpc:
     
     #@Utils.timer
     def isOdooPortOpen(self):
+        print("is Odoo Port Open? :", Utils.isIpPortOpen(self.odooIpPort) )
         return Utils.isIpPortOpen(self.odooIpPort)
 
     #@Utils.timer
@@ -129,5 +128,5 @@ class OdooXMLrpc:
             return False
 
     def ensureNoDataJsonFile(self):
-        if os.path.isfile(self.datajson):
-            os.system("sudo rm " + self.datajson)
+        if os.path.isfile(Utils.fileDataJson):
+            os.system("sudo rm " + Utils.fileDataJson)

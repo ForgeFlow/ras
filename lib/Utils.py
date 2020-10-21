@@ -10,6 +10,8 @@ WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
 fileDataJson                  = WORK_DIR + "dicts/data.json"
+fileCredentials               = WORK_DIR + "dicts/credentials.json"
+fileCredentialsSample         = WORK_DIR + "dicts/credentials.sample.json"
 settings                      = {}
 defaultMessagesDic            = {}
 
@@ -233,9 +235,6 @@ def handleMigratioOfDeviceCustomizationFile():
   #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
 
-def storeDataJsonInDeviceCustomizationFile():
-  pass
-
 def migrationToVersion1_4_2():
   handleMigratioOfDeviceCustomizationFile()
   try:
@@ -246,7 +245,14 @@ def migrationToVersion1_4_2():
   except Exception as e:
     print("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer data.json to deviceCustomization file: ", e)
 
+def isOdooUsingHTTPS():
+  if  "https" in settings["odooParameters"].keys():
+    if settings["odooParameters"]["https"]== ["https"]:
+      return True
+  return False
 
+def getCredentialsDic():
 
+  return credentialsDic
 
 
