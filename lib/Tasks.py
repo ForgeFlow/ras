@@ -397,9 +397,8 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		_logger.debug("odooConnectedAtLeastOnce? is ", self.Odoo.odooConnectedAtLeastOnce)
-		if not self.Odoo.odooConnectedAtLeastOnce:
-			_logger.debug("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+		if not Utils.settings["odooConnectedAtLeastOnce"]:
+			print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 		

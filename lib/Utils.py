@@ -132,7 +132,8 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
       isOpen = True
     else:
       isOpen = False
-  except:
+  except Exception as e:
+    print("exception in method isIpPortOpen: ", e)
     isOpen = False
   finally:
     s.close()
@@ -211,7 +212,13 @@ def storeOdooParamsInDeviceCustomization(newOdooParams):
   except:
     return False
 
-def migrationToVersion1_4_2():
+def handleMigratioOfDeviceCustomizationFile():
+  '''
+  if there is no "DeviceCustomization" File,
+  take the sample file
+  if there is a "DeviceCustomization" File,
+  add the Fields: "SSIDreset","fileForMessages","firmwareVersion"
+  '''
   deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
   deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
   if deviceCustomizationDic:
@@ -223,6 +230,16 @@ def migrationToVersion1_4_2():
     deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
   #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
+
+def storeDataJsonInDeviceCustomizationFile():
+  pass
+
+def migrationToVersion1_4_2():
+  handleMigrationWhenNoDeviceCustomizationFile()
+  storeDataJsonInDeviceCustomizationFile() # in data.json the Odoo Params are stored when a successful connection was made
+
+
+
 
 
 

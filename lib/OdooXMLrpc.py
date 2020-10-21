@@ -21,18 +21,20 @@ class OdooXMLrpc:
 
     #@Utils.timer
     def getUIDfromOdoo(self):
+        print("in method getUIDfromOdoo , the Odoo Params are: ", Utils.settings["odooParameters"])
         self.setTimeZone()
         self.setOdooUrlTemplate()
         self.setOdooIpPort()
         self.setUserID()                                                                  
 
     def setTimeZone(self):
-            timeZone            = tz_dic.tz_dic[Utils.settings["odooParameters"]["timezone"]]
-            os.environ["TZ"]    = timeZone
-            time.tzset()
-            return timeZone
+        timeZone            = tz_dic.tz_dic[Utils.settings["odooParameters"]["timezone"]]
+        os.environ["TZ"]    = timeZone
+        time.tzset()
+        return timeZone
 
     def setOdooUrlTemplate(self):
+        try:
             if  Utils.settings["odooParameters"]["https"]:
                 self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"]
             else:
@@ -40,8 +42,10 @@ class OdooXMLrpc:
 
             if Utils.settings["odooParameters"]["odoo_port"]:
                 self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"]
-            
-            return self.odooUrlTemplate
+            return True
+        except Exception as e:
+            print("exception in method setOdooUrlTemplate: ", e)
+            return False        
                
     def setOdooIpPort(self):
         try:
@@ -49,7 +53,11 @@ class OdooXMLrpc:
                 portNumber =  int(Utils.settings["odooParameters"]["odoo_port"])                          
             elif Utils.settings["odooParameters"]["https"]:
                 portNumber =   443
-            return (Utils.settings["odooParameters"]["odoo_host"], portNumber)
+            self.odooIpPort = (Utils.settings["odooParameters"]["odoo_host"], portNumber)
+            return True
+        except Exception as e:
+            print("exception in method setOdooIpPort: ", e)
+            return False
     
     def getServerProxy(self, url):
         try:
@@ -69,20 +77,21 @@ class OdooXMLrpc:
                 Utils.settings["odooParameters"]["db"])
             if user_id:
                 self.uid = user_id
-                return user_id
-            return None
+                return True
+            return False
         except ConnectionRefusedError:
             _logger.debug(ConnectionRefusedError)
-            return None
+            return False
         except OSError as osError:
             _logger.debug(OSError)
             if "No route to host" in str(osError):
                 self.display.display_msg("noRouteToHost")
                 time.sleep(1.5)
-            return None 
+            return False 
         except Exception as e:
             _logger.exception(e)
-            return None
+            print("exception in method setUserID: ", e)
+            return False
     
     #@Utils.timer
     def isOdooPortOpen(self):
