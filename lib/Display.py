@@ -21,7 +21,7 @@ class Display:
         self.font3 = ImageFont.truetype(self.font_ttf, 22)
         self.display_msg("connecting")
 
-    def _display_time(self, wifi_quality, odoo_m):
+    def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
         with canvas(self.device) as draw:
             hour = time.strftime("%H:%M", time.localtime())
             num_ones = hour.count("1")
@@ -35,8 +35,8 @@ class Display:
                 draw.text((31, 19), hour, font=self.font1, fill="white")
             else:
                 draw.text((34, 19), hour, font=self.font1, fill="white")
-            draw.text((0, 0), wifi_quality+"\n"*7+"-"*17, font=self.font2, fill="white", align="center")
-            draw.text((0, 52), odoo_m, font=self.font2, fill="white", align="center")
+            draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*17, font=self.font2, fill="white", align="center")
+            draw.text((0, 52), odooReachabilityMessage, font=self.font2, fill="white", align="center")
 
     def showCard(self,card):
         with canvas(self.device) as draw:

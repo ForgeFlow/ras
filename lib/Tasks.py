@@ -119,7 +119,7 @@ class Tasks:
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
-				if self.Reader.card.lower() == self.Odoo.adm.lower():
+				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
 					_logger.debug("ADMIN CARD was swipped\n")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
@@ -155,7 +155,7 @@ class Tasks:
 			while not exitFlag.isSet():
 				if not (time.localtime().tm_min == minutes): 
 					minutes = time.localtime().tm_min 
-					self.Disp._display_time(self.Clock.wifiStatusMessage, self.Clock.odooStatusMessage) 
+					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
 			_logger.debug('Thread Display Clock stopped')
  

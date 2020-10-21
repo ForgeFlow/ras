@@ -94,7 +94,8 @@ def getJsonData(filePath):
       data = json.load(f)
     return data
   except Exception as e:
-      #_logger.exception(e):
+    print("exception while getting/loading data from json file: ", filePath, " -exception: ", e)
+    #_logger.exception(e):
     return None
 
 def storeJsonData(filePath,data):
@@ -164,13 +165,14 @@ def storeOptionInDeviceCustomization(option,value):
     return False
 
 def getSettingsFromDeviceCustomization():
-  settings["language"]          = getOptionFromDeviceCustomization("language"         , defaultValue = "ENGLISH")
-  settings["showEmployeeName"]  = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue = "yes")
-  settings["fileForMessages"]   = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue = "messagesDicDefault.json")
-  settings["messagesDic"]       = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["SSIDreset"]         = getOptionFromDeviceCustomization("SSIDreset"        , defaultValue = "__RAS__")
-  settings["defaultMessagesDic"]= getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
-  settings["odooParameters"]    = getOptionFromDeviceCustomization("odooParameters"   , defaultValue = None)
+  settings["language"]                = getOptionFromDeviceCustomization("language"         , defaultValue = "ENGLISH")
+  settings["showEmployeeName"]        = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue = "yes")
+  settings["fileForMessages"]         = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue = "messagesDicDefault.json")
+  settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
+  settings["SSIDreset"]               = getOptionFromDeviceCustomization("SSIDreset"        , defaultValue = "__RAS__")
+  settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+  settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"   , defaultValue = None)
+  settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce"         , defaultValue = False)
 
 def getMsg(textKey):
   try:
@@ -235,9 +237,14 @@ def storeDataJsonInDeviceCustomizationFile():
   pass
 
 def migrationToVersion1_4_2():
-  handleMigrationWhenNoDeviceCustomizationFile()
-  storeDataJsonInDeviceCustomizationFile() # in data.json the Odoo Params are stored when a successful connection was made
-
+  handleMigratioOfDeviceCustomizationFile()
+  try:
+    data = getJsonData(fileDataJson)
+    print("read dict from data.json in method Utils.migrationToVersion1_4_2 ", data)
+    if data and storeOptionInDeviceCustomization("odooParameters",data): # in data.json the Odoo Params are stored when a successful connection was made
+      storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)    
+  except Exception as e:
+    print("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer data.json to deviceCustomization file: ", e)
 
 
 

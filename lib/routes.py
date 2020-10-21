@@ -48,7 +48,7 @@ def startServerAdminCard(exitFlag):
     global app
     global data
 
-    data =Utils.getOptionFromDeviceCustomization("odooParameters", None):
+    data =Utils.getOptionFromDeviceCustomization("odooParameters", None)
     oldAdminCard = data["admin_id"][0].lower()
 
     app = Flask("odoo_config_params")

@@ -1,7 +1,7 @@
 {
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
-  "firmwareVersion": "v1.4.2",
+  "firmwareVersion": "v1.4.3",
   "language": "ENGLISH",
   "manufacturingData": {
     "firmwareAtShipment": "prior to v1.4.2",
