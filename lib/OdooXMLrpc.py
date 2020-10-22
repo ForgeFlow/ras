@@ -43,7 +43,7 @@ class OdooXMLrpc:
                 self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"][0]
             else:
                 self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
-            if Utils.settings["odooParameters"]["odoo_port"]:
+            if Utils.settings["odooParameters"]["odoo_port"][0]:
                 self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
             print("self.odooUrlTemplate ",self.odooUrlTemplate )
             return True

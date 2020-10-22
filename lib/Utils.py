@@ -14,6 +14,8 @@ fileCredentials               = WORK_DIR + "dicts/credentials.json"
 fileCredentialsSample         = WORK_DIR + "dicts/credentials.sample.json"
 settings                      = {}
 defaultMessagesDic            = {}
+credentialsDic                = {}
+defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
 
 def timer(func):
     @functools.wraps(func)
@@ -94,7 +96,7 @@ def getJsonData(filePath):
   try:
     with open(filePath) as f:
       data = json.load(f)
-    return data
+    return data  
   except Exception as e:
     print("exception while getting/loading data from json file: ", filePath, " -exception: ", e)
     #_logger.exception(e):
@@ -132,11 +134,13 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
   try:
     canConnectResult = s.connect_ex(ipPort)
     if canConnectResult == 0:
+      print("Utils - IP Port OPEN ", ipPort)
       isOpen = True
     else:
+      print("Utils - IP Port CLOSED ", ipPort)
       isOpen = False
   except Exception as e:
-    print("exception in method isIpPortOpen: ", e)
+    print("Utils - exception in method isIpPortOpen: ", e)
     isOpen = False
   finally:
     s.close()
@@ -167,14 +171,15 @@ def storeOptionInDeviceCustomization(option,value):
     return False
 
 def getSettingsFromDeviceCustomization():
-  settings["language"]                = getOptionFromDeviceCustomization("language"         , defaultValue = "ENGLISH")
-  settings["showEmployeeName"]        = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue = "yes")
-  settings["fileForMessages"]         = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue = "messagesDicDefault.json")
+  settings["language"]                = getOptionFromDeviceCustomization("language"                 , defaultValue = "ENGLISH")
+  settings["showEmployeeName"]        = getOptionFromDeviceCustomization("showEmployeeName"         , defaultValue = "yes")
+  settings["fileForMessages"]         = getOptionFromDeviceCustomization("fileForMessages"          , defaultValue = "messagesDicDefault.json")
   settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["SSIDreset"]               = getOptionFromDeviceCustomization("SSIDreset"        , defaultValue = "__RAS__")
+  settings["SSIDreset"]               = getOptionFromDeviceCustomization("SSIDreset"                , defaultValue = "__RAS__")
   settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
-  settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"   , defaultValue = None)
-  settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce"         , defaultValue = False)
+  settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"           , defaultValue = None)
+  settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce" , defaultValue = False)
+  settings["flask"]                   = getOptionFromDeviceCustomization("flask"                    , defaultValue = defaultCredentialsDic)
 
 def getMsg(textKey):
   try:
@@ -251,7 +256,6 @@ def isOdooUsingHTTPS():
       return True
   return False
 
-def getCredentialsDic():
 
   return credentialsDic
 

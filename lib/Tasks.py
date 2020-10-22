@@ -307,7 +307,6 @@ class Tasks:
 			if self.Odoo.uid:
 				self.Disp.display_msg("gotUID")
 				self.Buzz.Play("OK")
-				self.Odoo.storeOdooParamsInDeviceCustomizationFile()
 				self.nextTask = self.defaultNextTask
 			else:
 				self.Disp.display_msg("noUID")
