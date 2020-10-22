@@ -12,7 +12,7 @@ fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
 fileDataJson                  = WORK_DIR + "dicts/data.json"
 fileCredentials               = WORK_DIR + "dicts/credentials.json"
-fileCredentialsSample         = WORK_DIR + "dicts/credentials.sample.json"
+#fileCredentialsSample         = WORK_DIR + "dicts/credentials.sample.json"
 settings                      = {}
 defaultMessagesDic            = {}
 credentialsDic                = {}
@@ -241,8 +241,15 @@ def handleMigratioOfDeviceCustomizationFile():
   #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
 
+def handleMigrationOfCredentialsJson():
+  credentialsDic = getJsonData(fileCredentials)
+  if not credentialsDic:
+    credentialsDic = defaultCredentialsDic
+  storeOptionInDeviceCustomization("flask",credentialsDic)
+
 def migrationToVersion1_4_2():
   handleMigratioOfDeviceCustomizationFile()
+  handleMigrationOfCredentialsJson()
   try:
     data = getJsonData(fileDataJson)
     print("read dict from data.json in method Utils.migrationToVersion1_4_2 ", data)
