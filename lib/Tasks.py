@@ -21,8 +21,7 @@ class Tasks:
 
 		self.Clock = Clocking.Clocking(Odoo, Hardware)
 		self.ask_twice = ask_twice  # list of tasks to ask 'are you sure?' upon selection
-		self.get_ip = routes.get_ip
-
+		
 		self.wifiStable = self.Clock.wifiStable
 
 		self.periodPollCardReader 							= 0.2  # second

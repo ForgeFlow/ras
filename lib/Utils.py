@@ -5,6 +5,7 @@ import os
 import socket
 import copy
 import functools
+import subprocess
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
@@ -180,7 +181,7 @@ def getSettingsFromDeviceCustomization():
   settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"           , defaultValue = None)
   settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce" , defaultValue = False)
   settings["flask"]                   = getOptionFromDeviceCustomization("flask"                    , defaultValue = defaultCredentialsDic)
-
+  
 def getMsg(textKey):
   try:
     return settings["messagesDic"][textKey] 
@@ -259,4 +260,9 @@ def isOdooUsingHTTPS():
 
   return credentialsDic
 
+def getOwnIpAddress():
+  command = "hostname -I | awk '{ print $1}' "
+  ipAddress = (subprocess.check_output(command, shell=True).decode("utf-8").strip("\n"))
+  storeOptionInDeviceCustomization("ownIpAddress",[ipAddress])
+  return ipAddress
 

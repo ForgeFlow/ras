@@ -90,7 +90,7 @@ class Display:
     
     def displayWithIP(self, textKey):
         message = Utils.getMsgTranslated(textKey)
-        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
+        message[2] = message[2].replace("-IpPlaceholder-",Utils.getOwnIpAddress(),1)
         self.displayMsgRaw(message)
 
     def clear_display(self):

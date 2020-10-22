@@ -16,21 +16,11 @@ from . import Utils
 
 _logger = logging.getLogger(__name__)
 
-
-def get_ip():
-    _logger.debug("Getting IP")
-    command = "hostname -I | awk '{ print $1}' "
-
-    ip_address = (
-        subprocess.check_output(command, shell=True).decode("utf-8").strip("\n")
-    )
-
-    return ip_address
-
 class ServerThread(threading.Thread):
     def __init__(self, app):
         threading.Thread.__init__(self)
-        self.srv = make_server(str(get_ip()), 3000, app)
+        Utils.getOwnIpAddress()
+        self.srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
         self.ctx = app.app_context()
         self.ctx.push()
         _logger.debug("ServerThread Class Initialized")
@@ -65,7 +55,7 @@ def startServerAdminCard(exitFlag):
             return render_template("loginNewAdminCard.html")
         else:
             return render_template(
-                "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
+                "form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, tz_dic=tz_sorted
             )
 
     def reset_admin_form():
@@ -73,7 +63,7 @@ def startServerAdminCard(exitFlag):
         if not session.get("logged_in"):
             return render_template("loginNewAdminCard.html")
         else:
-            return render_template("reset_admin_form.html", IP=str(get_ip()), port=3000)
+            return render_template("reset_admin_form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000)
 
     @app.route("/reset_admin_card", methods=["POST"])
     def reset_admin_card_result():
@@ -154,7 +144,7 @@ def startServerOdooParams(exitFlag):
         if not session.get("logged_in"):
             return render_template("login.html")
         else:
-            return render_template("form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted)
+            return render_template("form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, tz_dic=tz_sorted)
 
     @app.route("/result", methods=["POST", "GET"])
     def result():
