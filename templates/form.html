@@ -1,45 +1,78 @@
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configuration portal</title>
-  <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="static/main.css?version=1">
-</head>
+	<head>
+		<meta charset="utf-8">	
+		<title>RAS2 Parameters</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="/static/style.css" type="text/css">
+		<link rel="icon" href="/static/faviconThings.ico">
 
-<body>
-  <form action="/result" method="post" id="testform">
-    <h1>Configuration portal</h1>
-    <fieldset>
-      <legend><span class="number">1</span>Odoo Parameters</legend>
-      <label for="name">Odoo Host (*)</label>
-      <input type="text" id="odoo_host" name="odoo_host" placeholder="demo.odoo.com" required>
-      <label for="name">Port</label>
-      <input type="text" id="odoo_port" name="odoo_port" placeholder="8069">
-      <label for="https">Click the checkbox if your Odoo employs HTTPS:</label>
-      <span>If you use default HTTPS port 443 leave port field empty</span>
-      <input type="checkbox" id="https" value="https" name="https"><label class="light" for="https"></label><br>
-      <label for="user">Username (*)</label>
-      <input type="text" id="user" name="user_name" placeholder="rfid_attendance" required>
-      <label for="password">Password (*)</label>
-      <input type="password" id="password" name="user_password" required>
-      <label for="db">Database (*)</label>
-      <input type="text" id="db" name="db" required>
-      <label for="admin_id">Admin ID (*)</label>
-      <span>Swap Admin RFID Card on device to get Admin ID</span>
-      <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. FFFFFFFF" pattern="^([A-Fa-f0-9]{1,20})$" required>
-      <label for="timezone">Country:</label>
-      <select name="timezone" form="testform" required>
-        {% for tz in tz_dic %}
-        <option value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
-        {% endfor %}
-      </select>
-    </fieldset>
-    <fieldset>
-      <legend><span class="number">2</span>Go!</legend>
-      <button type="submit">Configure!</button>
-      <button type="reset">Reset parameters</button>
-    </fieldset>
-  </form>
-</body>
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	</head>
+	<body>
+
+    <section id="logo">	
+      <div class="container-fluid">
+        <img src="/static/thingsLogo05_333.png" class="img-fluid logoSize" alt="ThingsInTouch Logo 05">
+      </div>
+    </section>
+
+      <form action="/result" method="post" id="testform">
+
+
+				<section id="inputFields">
+					<div class="container-fluid">
+						<p>
+							<label class="login-field-icon fui-lock formField" for="odoo_host">Odoo Host Name or IP Address (*)</label>
+							<input type="text" id="odoo_host" name="odoo_host" class="formField" value="" placeholder="demo.odoo.com" >
+						</p>
+          </div>
+					<div class="container-fluid">
+						<p>
+              <label class="login-field-icon fui-lock formField" for="odoo_port">Odoo Port</label>
+              <label class="text-muted formField">If you use the default https port (443) leave this field empty</label>
+							<input type="text" id="odoo_port" name="odoo_port" class="formField" value="" placeholder="8069" >
+						</p>
+          </div>
+          <div class="container-fluid">
+						<p>
+              <input type="checkbox" id="https" name="https" class="formField checkbox-2x" value="https">
+              <label class="login-field-icon fui-lock formField">Check if you use Odoo over https</label>
+						</p>
+          </div>          
+
+				</section>
+
+            <div class="form-group">              
+              <label for="user">Username for the "HR Attendance RFID" Module (*)</label>
+              <input type="text" id="user" name="user_name" placeholder="Enter username" required>
+              <label for="password">Password (*)</label>
+              <input type="password" id="password" name="Enter password" required>
+              <label for="db">Database (*)</label>
+              <input type="text" id="db" name="db" required>
+              <label for="admin_id">Admin Card (hexadecimal code) (*)</label>
+              <span class="info">Swap the Admin Card on the device to get the hexadecimal code</span>
+              <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. 12ab45cd" pattern="^([A-Fa-f0-9]{1,20})$" required>
+              <label for="timezone">Timezone</label>
+              <select name="timezone" form="testform" required>
+                {% for tz in tz_dic %}
+                <option value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">   
+              <fieldset>
+                <button type="submit" class="btn-lg">Send to Odoo</button>
+              </fieldset>
+            </div>
+            <br>
+            <fieldset>     
+              <button type="reset" class="btn-sm">Clear the Form</button>
+            </fieldset>
+
+
+      </form>
+  </body>
 </html>

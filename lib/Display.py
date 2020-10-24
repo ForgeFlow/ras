@@ -46,7 +46,7 @@ class Display:
                 draw.text((15, 20), card, font=self.font3, fill="white")
 
     def displayLogo(self):
-        logo = Image.open(self.img_path + "thingsLogo02_128.png").convert("RGBA")
+        logo = Image.open(self.img_path + "thingsLogo04_128.png").convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
         background = Image.new("RGBA", self.device.size, "black")

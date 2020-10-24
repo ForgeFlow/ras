@@ -96,19 +96,13 @@ def startServerAdminCard(exitFlag):
         if request.form.get("Reset credentials") == "Reset credentials":
             return render_template("change.html")
         elif request.form.get("Log in") == "Log in":
-            if (
-                request.form["password"] == Utils.settings["flask"]["new password"][0]
-                and request.form["username"] == Utils.settings["flask"]["username"][0]
-            ):
+            if (request.form["password"] == Utils.settings["flask"]["new password"][0]):
                 session["logged_in"] = True
             else:
                 flash("wrong password!")
             return form()
         elif request.form.get("Reset AdminCard") == "Reset AdminCard":
-            if (
-                request.form["password"] == Utils.settings["flask"]["new password"][0]
-                and request.form["username"] == Utils.settings["flask"]["username"][0]
-            ):
+            if (request.form["password"] == Utils.settings["flask"]["new password"][0]):
                 session["logged_in"] = True
             else:
                 flash("wrong password!")
@@ -121,8 +115,7 @@ def startServerAdminCard(exitFlag):
         if request.method == "POST":
             result = request.form
             dic = result.to_dict(flat=False)
-            if (str(dic["old password"][0]) == Utils.settings["flask"]["new password"][0]
-                and str(dic["username"][0]) == Utils.settings["flask"]["username"][0]):
+            if (str(dic["old password"][0]) == Utils.settings["flask"]["new password"][0]):
                 Utils.storeOptionInDeviceCustomization("flask",Utils.settings["flask"])            
             else:
                 flash("wrong password!")
@@ -161,10 +154,7 @@ def startServerOdooParams(exitFlag):
             return render_template("change.html")
         elif request.form.get("Log in") == "Log in":
             print("routes 190 - do_admin_login, credentialsDic ", Utils.settings["flask"]["new password"][0], )
-            if (
-                request.form["password"]     == Utils.settings["flask"]["new password"][0]
-                and request.form["username"] == Utils.settings["flask"]["username"][0]
-            ):
+            if (request.form["password"]     == Utils.settings["flask"]["new password"][0]):
                 session["logged_in"] = True
             else:
                 flash("wrong password!")
@@ -178,8 +168,7 @@ def startServerOdooParams(exitFlag):
             result = request.form
             dataFromTheForm = result.to_dict(flat=False)
             storedData = Utils.getJsonData(Utils.WORK_DIR + "dicts/credentials.json")
-            if (    str(dataFromTheForm["old password"][0]) == Utils.settings["flask"]["new password"][0]
-                    and str(dataFromTheForm["username"][0]) == Utils.settings["flask"]["username"][0]      ):
+            if (str(dataFromTheForm["old password"][0]) == Utils.settings["flask"]["new password"][0]):
                 Utils.storeOptionInDeviceCustomization("flask", dataFromTheForm)
             else:
                 flash("wrong password!")
