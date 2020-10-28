@@ -97,10 +97,13 @@ class Tasks:
 		pollCardReader.start()
 
 		pollCardReader.join()
-		self.Disp.display_msg("newAdmCardDefined")
-		routes.stop_server()
+		print("Taks ln 100 - Back to method getNewAdminCard")
+		#routes.stop_server()
 
-		data = Utils.getJsonData(Utils.WORK_DIR + "dicts/data.json")
+		print("Taks ln 103 - After stop server -  method getNewAdminCard")
+		self.Disp.display_msg("newAdmCardDefined")
+
+		data = Utils.settings["odooParameters"]
 		self.Odoo.adm = data["admin_id"][0]
 		self.Buzz.Play("back_to_menu")
 

@@ -250,7 +250,7 @@
 
   "browseForNewAdminCard":
       {
-        "ENGLISH": [[0, 0], 14,"Browse to\n-IpPlaceholder-:3000\nto introduce new\nAdmin Card RFID\n-----------------\n"],
+        "ENGLISH": [[0, 0], 14,"Browse to\n-IpPlaceholder-:3000\nto define a new\nAdmin Card\n-----------------\n"],
         "ESPAÑOL": [[0, 0], 14,"Navege a\n-IpPlaceholder-:3000\npara definir otra\ntarjeta Admin\n-----------------\n"],
         "FRANÇAIS": [[0, 0], 14,"Ouvrez l\"URL\n-IpPlaceholder-:3000\npour un nouveau\nbadge ADMIN\n-----------------\n"]
       },

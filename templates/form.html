@@ -11,68 +11,93 @@
 		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 	</head>
-	<body>
+	<body class="left-aligned">
+  <!-- <body> -->
 
     <section id="logo">	
-      <div class="container-fluid">
+      <div class="container-fluid logo-padding" >
         <img src="/static/thingsLogo05_333.png" class="img-fluid logoSize" alt="ThingsInTouch Logo 05">
       </div>
     </section>
 
-      <form action="/result" method="post" id="testform">
+    <form action="/result" method="post" id="testform">
+
+      <section id="inputFields">
+
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="odoo_host">Odoo Host Name or IP Address (*)</label>
+            <input type="text" id="odoo_host" name="odoo_host" class="formField" value="" placeholder="demo.odoo.com" required>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="odoo_port">Odoo Port</label>
+            <input type="text" id="odoo_port" name="odoo_port" class="formField" value="" placeholder="8069" >              
+            <label class="labelGrey">(Leave this field empty if you use the default https port 443)</label>
+          </p>
+        </div>
+        <div class="container-fluid custom-checkbox">
+          <p>
+            <input type="checkbox" id="https" name="https" class="checkbox-input formField" value="https">
+            <label class="checkbox-label formField">Check if you use Odoo over https</label>
+          </p>
+        </div>          
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="user">Username  (*)</label>
+            <input type="text" id="user" name="user_name" class="formField" value="" placeholder="Enter username" required>
+            <label class="labelGrey">(This User should have Access Rights for the OCA "HR Attendance RFID" Module)</label>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="password">Password (*)</label>
+            <input type="password" id="password" name="user_password" class="formField" value="" placeholder="Enter password" required>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="db">Database (*)</label>
+            <input type="text" id="db" name="db" class="formField" value="" placeholder="Enter database name" required>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="admin_id">Admin Card (hexadecimal code) (*)</label>
+            <input type="text" id="admin_id" name="admin_id" class="formField" value="" placeholder="Enter hex code e.g. beff2c5a" pattern="^([A-Fa-f0-9]{1,20})$" required>
+            <label class="labelGrey">Swap the Admin Card on the device to get the hexadecimal code</label>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>          
+            <label class="login-field-icon fui-lock formField" for="timezone">Timezone (*)</label>
+            <select name="timezone" form="testform" class="formField" required>
+              <option selected class="formField" value="+01:00">(GMT +01:00) {{ tz_dic['+01:00'] }}</option>
+              <option value="" disabled>----------------------------------------</option> 
+              {% for tz in tz_dic %}
+              <option class="formField" value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
+              {% endfor %}
+            </select>
+          </p>
+        </div>          
+
+      </section>
 
 
-				<section id="inputFields">
-					<div class="container-fluid">
-						<p>
-							<label class="login-field-icon fui-lock formField" for="odoo_host">Odoo Host Name or IP Address (*)</label>
-							<input type="text" id="odoo_host" name="odoo_host" class="formField" value="" placeholder="demo.odoo.com" >
-						</p>
-          </div>
-					<div class="container-fluid">
-						<p>
-              <label class="login-field-icon fui-lock formField" for="odoo_port">Odoo Port</label>
-              <label class="text-muted formField">If you use the default https port (443) leave this field empty</label>
-							<input type="text" id="odoo_port" name="odoo_port" class="formField" value="" placeholder="8069" >
-						</p>
-          </div>
-          <div class="container-fluid">
-						<p>
-              <input type="checkbox" id="https" name="https" class="formField checkbox-2x" value="https">
-              <label class="login-field-icon fui-lock formField">Check if you use Odoo over https</label>
-						</p>
-          </div>          
+      <section id="buttons">
+        <div class="container-fluid">
+          <p>
+            <button type="submit" class="btn btn-warning formField custom-button-submit">Send to Odoo</button>
+          </p>
+        </div>
+        <div class="container-fluid">
+          <p>
+            <button type="reset" name="Clear" value="Clear the Form" class="formField btn btn-secondary">Clear the Form</button>
+          </p>
+        </div>
+      </section>
 
-				</section>
-
-            <div class="form-group">              
-              <label for="user">Username for the "HR Attendance RFID" Module (*)</label>
-              <input type="text" id="user" name="user_name" placeholder="Enter username" required>
-              <label for="password">Password (*)</label>
-              <input type="password" id="password" name="Enter password" required>
-              <label for="db">Database (*)</label>
-              <input type="text" id="db" name="db" required>
-              <label for="admin_id">Admin Card (hexadecimal code) (*)</label>
-              <span class="info">Swap the Admin Card on the device to get the hexadecimal code</span>
-              <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. 12ab45cd" pattern="^([A-Fa-f0-9]{1,20})$" required>
-              <label for="timezone">Timezone</label>
-              <select name="timezone" form="testform" required>
-                {% for tz in tz_dic %}
-                <option value="{{ tz }}">(GMT {{ tz }}) {{ tz_dic[tz] }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="form-group">   
-              <fieldset>
-                <button type="submit" class="btn-lg">Send to Odoo</button>
-              </fieldset>
-            </div>
-            <br>
-            <fieldset>     
-              <button type="reset" class="btn-sm">Clear the Form</button>
-            </fieldset>
-
-
-      </form>
+    </form>
   </body>
 </html>

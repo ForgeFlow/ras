@@ -1,34 +1,53 @@
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Define new Admin Card RFID</title>
-  <link href='http://fonts.googleapis.com/css?family=Nunito:400,300' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="static/main.css?version=1">
-</head>
+	<head>
+		<meta charset="utf-8">	
+		<title>RAS2 Parameters</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="/static/style.css" type="text/css">
+		<link rel="icon" href="/static/faviconThings.ico">
 
-<body>
-  <form action="/reset_admin_card" method="post" id="testform">
-    <h1>Enter new Admin ID</h1>
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-          {% for message in messages %}
-            <li style="color:red;">{{ message }}</li>
-          {% endfor %}
-      </ul>
-      {% endif %}
-      {% endwith %}
-    <fieldset>
-      <legend><span class="number">1</span>Enter ID</legend>
-      <label for="admin_id">Swap Admin RFID Card on device to get Admin ID</label>
-      <input type="text" id="admin_id" name="admin_id" placeholder="RFID digit hex e.g. FFFFFFFF" pattern="^([A-Fa-f0-9]{1,20})$" required>
-    </fieldset>
-    <fieldset>
-      <legend><span class="number">2</span>Go!</legend>
-      <button type="submit">Save</button>
-      <button type="reset">Reset Data</button>
-    </fieldset>
-  </form>
-</body>
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	</head>
+	<body class="left-aligned">
+  <!-- <body> -->
+
+    <section id="logo">	
+      <div class="container-fluid logo-padding" >
+        <img src="/static/thingsLogo05_333.png" class="img-fluid logoSize" alt="ThingsInTouch Logo 05">
+      </div>
+    </section>
+
+    <form action="/adminCardChanged" method="post" id="testform">
+
+      <section id="inputFields">
+
+        <div class="container-fluid">
+          <p>
+            <label class="login-field-icon fui-lock formField" for="admin_id">Admin Card (hexadecimal code) (*)</label>
+            <input type="text" id="admin_id" name="admin_id" class="formField" value="" placeholder="Enter hex code" pattern="^([A-Fa-f0-9]{1,20})$" required>
+            <label class="labelGrey">Swap the Admin Card on the device to get the hexadecimal code</label>
+          </p>
+        </div>
+
+      </section>
+
+
+      <section id="buttons">
+        <div class="container-fluid">
+          <p>
+            <button type="submit" class="btn btn-warning formField custom-button-submit">Send to Odoo</button>
+          </p>
+        </div>
+        <!-- <div class="container-fluid">
+          <p>
+            <button type="reset" name="Clear" value="Clear the Form" class="formField btn btn-secondary">Clear the Form</button>
+          </p>
+        </div> -->
+      </section>
+
+    </form>
+  </body>
 </html>

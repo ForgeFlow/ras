@@ -12,13 +12,9 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 	</head>
 	<body>
-		{% block body %}
-		{% if session['logged_in'] %}
-		<p>You're logged in already!</p>
-		{% else %}
 
 			<section id="logo">	
-				<div class="container-fluid">
+				<div class="container-fluid logo-padding">
 					<img src="/static/thingsLogo05_333.png" class="img-fluid logoSize" alt="ThingsInTouch Logo 05">
 				</div>
 			</section>
@@ -26,7 +22,7 @@
 			<form action="/login" method="POST" id="loginform">
 
 				<section id="inputFields">
-					<div class="container-fluid">
+					<div class="container-fluid double-top-padding">
 						<p>
 
 							<input type="password" id="login-pass" name="password" class="formField" value="" placeholder="Password" >
@@ -39,19 +35,17 @@
 				<section id="buttons">
 					<div class="container-fluid">
 						<p>
-							<button type="submit" name="Log in" value="Log in" class="btn btn-warning formField">Set Odoo Parameters</button>
+							<button type="submit" name="Log in" value="Log in" class="btn btn-warning formField custom-button-submit">Set Odoo Parameters</button>
 						</p>
 					</div>
 					<div class="container-fluid">
 						<p>
-							<button type="submit" name="Reset credentials" value="Reset credentials" class="btn btn-secondary">Change Password</button>
+							<button type="submit" name="Reset credentials" value="Reset credentials" class="formField btn btn-secondary">Change Password</button>
 						</p>
 					</div>
 				</section>
 
 			</form>
 
-		{% endif %}
-		{% endblock %}
 	</body>	
 </html>
