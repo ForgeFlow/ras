@@ -12,6 +12,8 @@ from dicts.tz_dic import tz_dic
 
 from werkzeug.serving import make_server
 
+from multiprocessing import Process
+
 import threading
 from . import Utils
 
@@ -19,35 +21,26 @@ _logger = logging.getLogger(__name__)
 
 tz_sorted = OrderedDict(sorted(tz_dic.items()))
 
+server = None
+
 class ServerThread(threading.Thread):
-    def __init__(self, app):
-        threading.Thread.__init__(self)
-        Utils.getOwnIpAddress()
-        self.srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
-        self.ctx = app.app_context()
-        self.ctx.push()
-        _logger.debug("ServerThread Class Initialized")
+	def __init__(self,srv):
+		threading.Thread.__init__(self)
+		self.srv = srv
 
-    def run(self):
-        _logger.debug("Serve forever")
-        self.srv.serve_forever()
-
-    def shutdown(self):
-        _logger.debug("Shutdown")
-        self.srv.shutdown()
+	def run(self):
+		self.srv.serve_forever()
 
 def startServerAdminCard(exitFlag):
-	global server
-	global app
-	global data
-
 	oldAdminCard = Utils.settings["odooParameters"]["admin_id"][0].lower()
-
 	app = Flask("odoo_new_admin_card")
 	app.secret_key = os.urandom(12)
-	server = ServerThread(app)
-	server.start()
-	
+	Utils.getOwnIpAddress()
+	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	ctx = app.app_context()
+	ctx.push()
+	server = ServerThread(srv)
+	server.start()	
 
 	@app.route("/")
 	def form():
@@ -83,18 +76,15 @@ def startServerAdminCard(exitFlag):
 				message = ["",""]
 
 				if newAdminCard == oldAdminCard :
-					#print("You just introduced the old Admin Card. Please introduce a new one.")
 					message[0] = "You just introduced the old Admin Card."
 					message[1] = "Please introduce a new Admin Card."
 					defineAgain = True
-					#print(message)
 					return render_template("adminCardChanged.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, adminCardChangeResult = message, defineAgain = defineAgain)
 				else:
 					Utils.settings["odooParameters"]["admin_id"] = dic["admin_id"]
 
 					Utils.storeOptionInDeviceCustomization("odooParameters",Utils.settings["odooParameters"])
 
-					#print("Succesfully updated the Admin Card.")
 					message[0] = "The new Admin Card is " + dic["admin_id"][0]
 					message[1] = "and was succesfully updated in Odoo."
 					defineAgain = False
@@ -104,15 +94,18 @@ def startServerAdminCard(exitFlag):
 		else:
 			return render_template("reset_admin_form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000)
 
-def startServerOdooParams(exitFlag):
-	global server
-	global app
+	return srv
 
+def startServerOdooParams(exitFlag):
 	app = Flask("odoo_config_params")
 	app.secret_key = os.urandom(12)
-	server = ServerThread(app)
-	server.start()
-	
+	Utils.getOwnIpAddress()
+	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	ctx = app.app_context()
+	ctx.push()
+	server = ServerThread(srv)
+	server.start()	
+
 	@app.route("/")
 	def form():
 		if session.get("logged_in"):
@@ -120,20 +113,16 @@ def startServerOdooParams(exitFlag):
 		else:
 			return render_template("login.html")
 
-
 	@app.route("/result", methods=["POST", "GET"])
 	def result():
-		if request.method == "POST":
-			results = request.form
-			dic = results.to_dict(flat=False)
-			Utils.storeOptionInDeviceCustomization("odooParameters",dic)
-			exitFlag.set() # end all the threads
-			render_template("result.html", result=dic)
-			time.sleep(2)
-			server.shutdown()         
-			return True
-		else:
-			return form()
+		#if request.method == "POST":
+		results = request.form
+		dic = results.to_dict(flat=False)
+		Utils.storeOptionInDeviceCustomization("odooParameters",dic)
+		exitFlag.set() # end all the threads   
+		return render_template("result.html", result=dic)
+		#else:
+			#return exitFlag.set()
 
 	@app.route("/login", methods=["POST", "GET"])
 	def do_admin_login():
@@ -152,7 +141,6 @@ def startServerOdooParams(exitFlag):
 		else:
 			return form()
 
-
 	@app.route("/change", methods=["POST", "GET"])
 	def change_credentials():
 		if request.method == "POST":
@@ -165,7 +153,6 @@ def startServerOdooParams(exitFlag):
 			return form()
 		else:
 			return form()
+	
+	return srv
 
-def stop_server():
-    global server
-    server.shutdown()

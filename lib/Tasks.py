@@ -86,21 +86,23 @@ class Tasks:
 
 		_logger.debug("Enter New Admin Card on Flask app")
 
+		self.Disp.displayWithIP('browseForNewAdminCard')
+
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		self.Disp.displayWithIP('browseForNewAdminCard')
+		srv = routes.startServerAdminCard(exitFlag)
 		
 		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+		serverKiller = threading.Thread(target=self.threadServerKiller, args=(
+															self.periodPollCardReader,exitFlag,srv))
 
-		routes.startServerAdminCard(exitFlag)
 		pollCardReader.start()
+		serverKiller.start()
 
 		pollCardReader.join()
-		print("Taks ln 100 - Back to method getNewAdminCard")
-		#routes.stop_server()
+		serverKiller.join()
 
-		print("Taks ln 103 - After stop server -  method getNewAdminCard")
 		self.Disp.display_msg("newAdmCardDefined")
 
 		data = Utils.settings["odooParameters"]
@@ -115,6 +117,14 @@ class Tasks:
 	def displayCard_and_Buzz(self):
 		self.Disp.showCard(self.Reader.card)
 		self.Buzz.Play("cardswiped")
+
+	def threadServerKiller(self, period, exitFlag, srv):
+		_logger.debug('Thread Server Killer started')
+		while not exitFlag.isSet():		
+			exitFlag.wait(period)
+		print("Tasks ln 123 . srv shutdown: ", srv)
+		srv.shutdown()
+		_logger.debug('Thread Server Killer stopped')
 
 	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
 		_logger.debug('Thread Poll Card Reader started')
@@ -291,18 +301,22 @@ class Tasks:
 			exitFlag = threading.Event()
 			exitFlag.clear()
 
+			srv = routes.startServerOdooParams(exitFlag)
+
 			pollCardReader 					= threading.Thread(target=self.threadPollCardReader, args=(
 																self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
 			checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
 																self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
+			serverKiller = threading.Thread(target=self.threadServerKiller, args=(
+																self.periodPollCardReader,exitFlag,srv))
 
 			pollCardReader.start()
 			checkBothButtonsPressed.start()
-			routes.startServerOdooParams(exitFlag)
+			serverKiller.start()
 
 			checkBothButtonsPressed.join()
 			pollCardReader.join()
-			routes.stop_server()
+			serverKiller.join()
 
 			self.Odoo.getUIDfromOdoo()
 
