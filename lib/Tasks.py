@@ -438,8 +438,7 @@ class Tasks:
 
 		while not self.B_OK.pressed:
 			textCurrentOption = self.listOfYesNo[currentOption]
-			message = self.Disp.getMsgTranslated(textCurrentOption)
-			self.Disp.displayMsgRaw(message)
+			self.Disp.display_msg(textCurrentOption)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 
 			if self.B_Down.pressed:
