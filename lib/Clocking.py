@@ -72,19 +72,19 @@ class Clocking:
         if self.wifiActive():
             strength = int(self.get_status()["Signal level"])  # in dBm
             if strength >= 79:
-                self.wifiSignalQualityMessage  = "WiFi: " + "\u2022" * 1 + "o" * 4
+                self.wifiSignalQualityMessage  = "\u2022" * 1 + "o" * 4
                 self.wifi = False
             elif strength >= 75:
-                self.wifiSignalQualityMessage  = "WiFi: " + "\u2022" * 2 + "o" * 3
+                self.wifiSignalQualityMessage  = "\u2022" * 2 + "o" * 3
                 self.wifi = True
             elif strength >= 65:
-                self.wifiSignalQualityMessage  = "WiFi: " + "\u2022" * 3 + "o" * 2
+                self.wifiSignalQualityMessage  = "\u2022" * 3 + "o" * 2
                 self.wifi = True
             elif strength >= 40:
-                self.wifiSignalQualityMessage  = "WiFi: " + "\u2022" * 4 + "o" * 1
+                self.wifiSignalQualityMessage  = "\u2022" * 4 + "o" * 1
                 self.wifi = True
             else:
-                self.wifiSignalQualityMessage  = "WiFi: " + "\u2022" * 5
+                self.wifiSignalQualityMessage  = "\u2022" * 5
                 self.wifi = True
         else:
             self.wifiSignalQualityMessage  = Utils.getMsgTranslated("noWiFiSignal")[2]

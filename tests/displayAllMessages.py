@@ -7,7 +7,13 @@ sys.path.append("/home/pi/ras")
 print(sys.path)
 
 from lib import Display
-from dicts.textDisplay_dic import messages_dic, listOfLanguages
+from lib import Utils
+#from dicts.textDisplay_dic import messages_dic, listOfLanguages
+Utils.getSettingsFromDeviceCustomization()
+
+listOfLanguages = Utils.getListOfLanguages()
+
+messages_dic = Utils.settings["messagesDic"]
 
 Disp = Display.Display()
 
@@ -18,9 +24,8 @@ print(listOfKeysSorted)
 employee = "José-Eugenio Schwarzenegger"
 
 for language in listOfLanguages:
-  Disp.language = language
   for key in listOfKeysSorted:
-    thisMessage = messages_dic[key]
+    thisMessage = Utils.getMsg(key)
     if '-IpPlaceholder-' in thisMessage[language][2]:
       Disp.displayWithIP(key)
     elif '-EmployeePlaceholder-' in thisMessage[language][2]:

@@ -30,7 +30,7 @@
       {
         "ENGLISH": [[0, 6], 16,">>> CHECK IN ...\n-EmployeePlaceholder-\n\n\n-------------"],
         "ESPAÑOL": [[0, 6], 16,">>> Entrada .....\n-EmployeePlaceholder-\n\n\n-------------"],
-        "FRANÇAIS": [[0, 6], 16,">>> BIENVENUE\n-EmployeePlaceholder-\n\n\n-------------"]
+        "FRANÇAIS": [[0, 0], 16,">>> BIENVENUE\n-EmployeePlaceholder-\n\n\n-------------"]
       },
 
 
@@ -38,14 +38,14 @@
       {
         "ENGLISH": [[0, 6], 16,"CHECK OUT >>>\n-EmployeePlaceholder-\n\n\n-------------"],
         "ESPAÑOL": [[0, 6], 16,"...... Salida >>>>\n-EmployeePlaceholder-\n\n\n-------------"],
-        "FRANÇAIS": [[0, 6], 16,"AU REVOIR >>>\n-EmployeePlaceholder-\n\n\n-------------"]
+        "FRANÇAIS": [[0, 0], 16,"AU REVOIR >>>\n-EmployeePlaceholder-\n\n\n-------------"]
       },
 
   "FALSE":
       {
         "ENGLISH": [[0, 12], 16,"NOT\nAUTHORIZED\n\n---------------"],
-        "ESPAÑOL": [[0, 12], 16," NO\nAUTORIZADO\n\n---------------"],
-        "FRANÇAIS": [[0, 12], 16," BADGE\nNON RECONNU\n\n---------------"]
+        "ESPAÑOL": [[0, 12], 16,"NO\nAUTORIZADO\n\n---------------"],
+        "FRANÇAIS": [[0, 6], 18,"BADGE\nNON RECONNU\n\n---------------"]
       },
 
 
@@ -53,7 +53,7 @@
       {
         "ENGLISH": [[0, 6], 15, "Contact\nyour\nAdministrator\n\n-----------------"],
         "ESPAÑOL": [[0, 6], 15,"Contacte\ncon su\nInformático\n\n-----------------"],
-        "FRANÇAIS": [[0, 6], 15,"Contactez votre\n Responsable\nInformatique\n\n-----------------"]
+        "FRANÇAIS": [[0, 0], 17,"Contactez votre\n Responsable\nInformatique\n\n---------------------"]
       },
 
   "connecting":
@@ -139,7 +139,7 @@
     {
       "ENGLISH": [[0, 6], 14,"Unable to update,\nGitHub is not\navailable\n\n-----------------"],
       "ESPAÑOL": [[0, 6], 14,"Update no es\nposible, GitHub\nno responde\n\n-----------------"],
-      "FRANÇAIS": [[0, 6], 14,"Mise à jour impossible\nGitHub\nne répond pas\n\n-----------------"]
+      "FRANÇAIS": [[0, 0], 15,"Mise à jour\nimpossible, GitHub\nne répond pas\n\n---------------"]
     },
 
 
@@ -161,14 +161,14 @@
     {
       "ENGLISH": [[0, 6], 15,"press OK\nto begin\nCLOCKING\n\n-----------------"],
       "ESPAÑOL": [[0, 6], 15,"pulse OK\npara empezar\na fichar\n\n-----------------"],
-      "FRANÇAIS": [[0, 6], 15,"appuyez sur OK\npour\ncommencer\n\n-----------------"]
+      "FRANÇAIS": [[0, 0], 16,"appuyez sur OK\npour\ncommencer\n\n-------------------"]
     },
 
   "chooseLanguage":
     {
       "ENGLISH": [[0, 6], 15,"press OK\nto change\nLANGUAGE\n\n-----------------"],
       "ESPAÑOL": [[0, 6], 15,"pulse OK\npara cambiar\nel IDIOMA\n\n-----------------"],
-      "FRANÇAIS": [[0, 6], 15,"appuyez sur OK\npour changer\n la LANGUE\n\n-----------------"]
+      "FRANÇAIS": [[0, 0], 18,"appuyez sur OK\npour changer\n la LANGUE\n\n-----------------"]
     },
 
   "showRFID":
@@ -252,28 +252,28 @@
       {
         "ENGLISH": [[0, 0], 14,"Browse to\n-IpPlaceholder-:3000\nto define a new\nAdmin Card\n-----------------\n"],
         "ESPAÑOL": [[0, 0], 14,"Navege a\n-IpPlaceholder-:3000\npara definir otra\ntarjeta Admin\n-----------------\n"],
-        "FRANÇAIS": [[0, 0], 14,"Ouvrez l\"URL\n-IpPlaceholder-:3000\npour un nouveau\nbadge ADMIN\n-----------------\n"]
+        "FRANÇAIS": [[0, 0], 12,"Ouvrez l´URL\n-IpPlaceholder-:3000\npour un nouveau\nbadge ADMIN\n--------------------------------\n"]
       },
 
   "browseForNewOdooParams":
       {
         "ENGLISH": [[0, 0], 14,"Browse to\n-IpPlaceholder-:3000\nto introduce new\nOdoo parameters\n-----------------\n"],
         "ESPAÑOL": [[0, 0], 14,"Navege a\n-IpPlaceholder-:3000\npara definir nuevos\nParámetros Odoo\n-----------------\n"],
-        "FRANÇAIS": [[0, 0], 14,"Ouvrez l\"URL\n-IpPlaceholder-:3000\npour definir les\nparamètres Odoo\n-----------------\n"]
+        "FRANÇAIS": [[0, 0], 12,"Ouvrez l\"URL\n-IpPlaceholder-:3000\npour definir les\nparamètres Odoo\n--------------------------------\n"]
       },
 
   "clockScreen_databaseOK":
       {
         "ENGLISH": [[0, 0], 14,"Odoo connected\n-----------------\n"],
         "ESPAÑOL": [[0, 0], 14,"Odoo conectado\n-----------------\n"],
-        "FRANÇAIS": [[0, 0], 14,"Odoo connecté\n-----------------\n"]
+        "FRANÇAIS": [[0, 0], 14,"Odoo connecté\n----------------------\n"]
       },
 
   "clockScreen_databaseNotConnected":
   {
     "ENGLISH": [[0, 0], 14,"Odoo disconnected\n-----------------\n"],
     "ESPAÑOL": [[0, 0], 14,"Odoo desconectado\n-----------------\n"],
-    "FRANÇAIS": [[0, 0], 14,"Odoo déconnecté\n-----------------\n"]
+    "FRANÇAIS": [[0, 0], 14,"Odoo déconnecté\n---------------------\n"]
   },
 
   "noWiFiSignal":
