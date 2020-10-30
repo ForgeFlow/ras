@@ -31,15 +31,15 @@ class Display:
                 hour = time.strftime("%H:%M", time.localtime())
                 num_ones = hour.count("1")
                 if num_ones == 0:
-                    draw.text((7, 9), hour, font=self.fontClockTime, fill="white")
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
                 elif num_ones == 1:
-                    draw.text((9, 9), hour, font=self.fontClockTime, fill="white")
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
                 elif num_ones == 2:
-                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
                 elif num_ones == 3:
-                    draw.text((15, 9), hour, font=self.fontClockTime, fill="white")
+                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
                 else:
-                    draw.text((18, 9), hour, font=self.fontClockTime, fill="white")
+                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
                 draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
                 draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
                 draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")
@@ -79,7 +79,7 @@ class Display:
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
         _logger.debug("Displaying message: " + text)
-        time.sleep(2)
+        #time.sleep(2)
         self.lockForTheClock = False
 
 

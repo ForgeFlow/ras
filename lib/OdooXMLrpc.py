@@ -6,10 +6,11 @@ import logging
 from dicts import tz_dic
 
 import xmlrpc.client as xmlrpclib
-import socket
+from socket import setdefaulttimeout as setTimeout
 
 from . import Utils
 
+print("name socket.setdefaulttimeout in Odoo :", setTimeout)
 _logger = logging.getLogger(__name__)
 
 class OdooXMLrpc:
@@ -78,8 +79,10 @@ class OdooXMLrpc:
     #@Utils.timer
     def setUserID(self):
         self.uid = False
+        returnValue = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
+            setTimeout(6)
             user_id = loginServerProxy.login(
                 Utils.settings["odooParameters"]["db"][0],
                 Utils.settings["odooParameters"]["user_name"][0],
@@ -88,21 +91,31 @@ class OdooXMLrpc:
                 print("got user id from Odoo ", user_id)
                 self.uid = user_id
                 Utils.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
-                return True
-            return False
-        except ConnectionRefusedError:
+                returnValue =  True
+            else:
+                print("NO user id from Odoo ", user_id)
+                returnValue =  False
+        except ConnectionRefusedError as e:
+            print("ConnectionRefusedError checkattendance odoo ln139", e)
             _logger.debug(ConnectionRefusedError)
-            return False
+            returnValue =  False
+        except socket.timeout as e:
+            print("timeout checkattendance odoo ln139", e)
+            returnValue = False
         except OSError as osError:
+            print("osError checkattendance odoo ln139", osError)
             _logger.debug(OSError)
             if "No route to host" in str(osError):
                 self.display.display_msg("noRouteToHost")
                 time.sleep(1.5)
-            return False 
+            returnValue =  False 
         except Exception as e:
             _logger.exception(e)
             print("exception in method setUserID: ", e)
-            return False
+            returnValue =  False
+        finally:
+            setTimeout(None)
+            return returnValue
     
     #@Utils.timer
     def isOdooPortOpen(self):
@@ -111,9 +124,11 @@ class OdooXMLrpc:
 
     #@Utils.timer
     def checkAttendance(self, card):
+        res=False
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
+                setTimeout(3)
                 res = serverProxy.execute(
                     Utils.settings["odooParameters"]["db"][0],
                     self.uid,
@@ -122,10 +137,16 @@ class OdooXMLrpc:
                     "register_attendance",
                     card,
                 )
-            return res
         except Exception as e:
+            print("Odoo ln127 - checkAttendance - exception e:",e)
             _logger.exception(e)
-            return False
+            res = False
+        except socket.timeout as e:
+            print("timeout checkattendance odoo ln139", e)
+            res=False
+        finally:
+            setTimeout(None)
+            return res
 
     def ensureNoDataJsonFile(self):
         if os.path.isfile(Utils.fileDataJson):

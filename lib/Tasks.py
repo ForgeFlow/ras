@@ -173,7 +173,7 @@ class Tasks:
 		exitFlag.clear()
 
 		periodEvaluateReachability          = 2    # seconds		
-		periodDisplayClock                  = 5    # seconds
+		periodDisplayClock                  = 2   # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
@@ -253,16 +253,20 @@ class Tasks:
 		def warnGithubNotPingable():
 			_logger.warn("Github not pingable: Unable to Update Firmware")
 			self.Buzz.Play("FALSE")
+			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("ERRUpdate")
-			#time.sleep(2)
+			time.sleep(2)
 			self.Disp.clear_display()
+			self.Disp.lockForTheClock = False
 
 		def warnNoWiFiSignal():
-			self.Disp.display_msg("no_wifi")
+			self.Disp.lockForTheClock = True
 			self.Buzz.Play("FALSE")
+			self.Disp.display_msg("no_wifi")
 			time.sleep(0.5)
 			self.Buzz.Play("back_to_menu")
-			#time.sleep(2)			
+			time.sleep(2)
+			self.Disp.lockForTheClock = False			
 
 		if self.wifiStable():
 			if Utils.isPingable("github.com"):
@@ -318,9 +322,10 @@ class Tasks:
 
 			self.Odoo.getUIDfromOdoo()
 
+			self.Disp.lockForTheClock = True
 			if self.Odoo.uid:
+				self.Buzz.Play("OK")				
 				self.Disp.display_msg("gotUID")
-				self.Buzz.Play("OK")
 				self.nextTask = self.defaultNextTask
 			else:
 				self.Disp.display_msg("noUID")
@@ -328,39 +333,47 @@ class Tasks:
 				self.nextTask = "resetOdoo"
 
 		else:
+			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
 			self.nextTask = "ensureWiFiAndOdoo"
 
-		#time.sleep(3)
+		time.sleep(3)
 		self.Disp.clear_display()
 		self.Buzz.Play("back_to_menu")
+		self.Disp.lockForTheClock = False
 
 	def showVersion(self):
+			self.Disp.lockForTheClock = True
 			origin = (34, 20)
 			size = 24
 			text = FIRMWARE_VERSION
 			message = [origin,size,text]
 			self.Disp.displayMsgRaw(message)
-			#time.sleep(2)
+			time.sleep(2)
 			self.nextTask = self.defaultNextTask
+			self.Disp.lockForTheClock = False
 
 	def shutdownSafe(self):
+			self.Disp.lockForTheClock = True
 			_logger.debug("Shutting down safe")
 			time.sleep(0.2)
 			self.Disp.display_msg("shuttingDown")
-			#time.sleep(3)
+			time.sleep(3)
 			self.Disp.clear_display()
+			#self.Disp.lockForTheClock = False
 			os.system("sudo shutdown now")
 			time.sleep(60)
 			sys.exit(0)
 
 	def reboot(self):
+		self.Disp.lockForTheClock = True
 		_logger.debug("Rebooting")
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
-		#time.sleep(3)
+		time.sleep(3)
 		self.Disp.clear_display()
+		#self.Disp.lockForTheClock = False
 		os.system("sudo reboot")
 		time.sleep(60)
 		sys,exit(0)

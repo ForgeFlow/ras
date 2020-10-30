@@ -144,10 +144,10 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
     s.settimeout(2)
     canConnectResult = s.connect_ex(ipPort)
     if canConnectResult == 0:
-      print("Utils - IP Port OPEN ", ipPort)
+      #print("Utils - IP Port OPEN ", ipPort)
       isOpen = True
     else:
-      print("Utils - IP Port CLOSED ", ipPort)
+      #print("Utils - IP Port CLOSED ", ipPort)
       isOpen = False
   except Exception as e:
     print("Utils - exception in method isIpPortOpen: ", e)

@@ -95,7 +95,7 @@ class Clocking:
     #@Utils.timer
     def isOdooReachable(self):
         if self.wifiStable() and Utils.isIpPortOpen(self.Odoo.odooIpPort) and not self.Odoo.uid:
-            self.Odoo.setUserID()
+            self.Odoo.getUIDfromOdoo()
 
         if self.wifiStable() and Utils.isIpPortOpen(self.Odoo.odooIpPort) and self.Odoo.uid:
             self.odooReachabilityMessage = Utils.getMsgTranslated("clockScreen_databaseOK")[2]
@@ -105,7 +105,7 @@ class Clocking:
             self.odooReachable = False
             #_logger.warn(msg)
         print("odooReachabilityMessage", self.odooReachabilityMessage)
-        print("isOdoo reachable: ", self.odooReachable)
+        #print("isOdoo reachable: ", self.odooReachable)
         _logger.debug(time.localtime(), "\n self.odooReachabilityMessage ", self.odooReachabilityMessage, "\n self.wifiSignalQualityMessage ", self.wifiSignalQualityMessage)        
         return self.odooReachable
 
@@ -130,19 +130,21 @@ class Clocking:
             if self.isOdooReachable():
                 self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
             else:
-                self.Odoo.setUserID()
+                #self.Odoo.setUserID()
                 self.msg = "comm_failed"
             #print("isOdooReachable: ", self.odooReachable )
         _logger.info("Clocking sync returns: %s" % self.msg)
 
     #@Utils.timer
     def card_logging(self):
+        self.msg = "comm_failed"
         self.Disp.display_msg("connecting")
+        print("clocking ln142 - odoo uid ", self.Odoo.uid)
         if not self.Odoo.uid:
             print("first if in card logging")
             self.msg = "ContactAdm"  # There was no successful Odoo Connection (no uid) since turning the device on:
                                      # Contact Your Admin because Odoo is down , the message is changed eventually later
-            self.Odoo.setUserID()  # be sure that always uid is set to the last Odoo status (if connected)
+            self.Odoo.getUIDfromOdoo()  # be sure that always uid is set to the last Odoo status (if connected)
 
         if self.Odoo.uid and self.odooReachable: # check if the uid was set after running SetParams
             print("second if in card logging")
@@ -150,6 +152,8 @@ class Clocking:
                 self.doTheClocking()
             else:
                 self.msg = "no_wifi"
+        else:
+            self.msg = "comm_failed"
         
         self.Disp.display_msg(self.msg, self.employeeName)
         self.Buzz.Play(self.msg)
