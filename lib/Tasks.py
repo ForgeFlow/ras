@@ -413,7 +413,7 @@ class Tasks:
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
 		if not Utils.settings["odooConnectedAtLeastOnce"]:
-			print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+			#print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 		

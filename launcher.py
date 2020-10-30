@@ -18,7 +18,6 @@ _logger = logging.getLogger(__name__)
 
 Utils.migrationToVersion1_4_2()
 Utils.getSettingsFromDeviceCustomization()
-print("launcher - credentials ", Utils.settings["flask"]["new password"][0])
 
 Buzz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()

@@ -21,7 +21,7 @@ class OdooXMLrpc:
 
     #@Utils.timer
     def getUIDfromOdoo(self):
-        print("in method getUIDfromOdoo , the Odoo Params are: ", Utils.settings["odooParameters"])
+        #print("in method getUIDfromOdoo , the Odoo Params are: ", Utils.settings["odooParameters"])
         self.setTimeZone()
         self.setOdooUrlTemplate()
         self.setOdooIpPort()
