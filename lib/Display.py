@@ -17,29 +17,30 @@ class Display:
         self.img_path = Utils.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
         _logger.debug("Display Class Initialized")
-        self.font1 = ImageFont.truetype(self.fontRoboto, 44)
-        self.font2 = ImageFont.truetype(self.fontRoboto, 14)
+        self.fontClockTime = ImageFont.truetype(self.fontRoboto, 42)
+        self.fontClockInfos = ImageFont.truetype(self.fontRoboto, 14)
         self.font3 = ImageFont.truetype(self.fontRoboto, 22)
         self.font4 = ImageFont.truetype(self.fontOrkney, 14)
         self.display_msg("connecting")
 
     def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
+        print("display time .....")
         with canvas(self.device) as draw:
             hour = time.strftime("%H:%M", time.localtime())
             num_ones = hour.count("1")
             if num_ones == 0:
-                draw.text((9, 8), hour, font=self.font1, fill="white")
+                draw.text((7, 9), hour, font=self.fontClockTime, fill="white")
             elif num_ones == 1:
-                draw.text((11, 8), hour, font=self.font1, fill="white")
+                draw.text((9, 9), hour, font=self.fontClockTime, fill="white")
             elif num_ones == 2:
-                draw.text((14, 8), hour, font=self.font1, fill="white")
+                draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
             elif num_ones == 3:
-                draw.text((17, 8), hour, font=self.font1, fill="white")
+                draw.text((15, 9), hour, font=self.fontClockTime, fill="white")
             else:
-                draw.text((20, 8), hour, font=self.font1, fill="white")
-            draw.text((0, 0), "WiFi: " +"\n"*7+"-"*19, font=self.font2, fill="white", align="center")
+                draw.text((18, 9), hour, font=self.fontClockTime, fill="white")
+            draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
             draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
-            draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.font2, fill="white", align="center")
+            draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")
 
     def showCard(self,card):
         with canvas(self.device) as draw:

@@ -119,7 +119,6 @@ def beautifyJsonFile(filePath):
   except:
     return False
 
-
 def storeOptionInJsonFile(filePath,option,optionValue):
   data = getJsonData(filePath)
   if data:
@@ -142,6 +141,7 @@ def isPingable(address):
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   try:
+    s.settimeout(2)
     canConnectResult = s.connect_ex(ipPort)
     if canConnectResult == 0:
       print("Utils - IP Port OPEN ", ipPort)
