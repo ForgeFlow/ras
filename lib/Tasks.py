@@ -254,7 +254,7 @@ class Tasks:
 			_logger.warn("Github not pingable: Unable to Update Firmware")
 			self.Buzz.Play("FALSE")
 			self.Disp.display_msg("ERRUpdate")
-			time.sleep(2)
+			#time.sleep(2)
 			self.Disp.clear_display()
 
 		def warnNoWiFiSignal():
@@ -262,7 +262,7 @@ class Tasks:
 			self.Buzz.Play("FALSE")
 			time.sleep(0.5)
 			self.Buzz.Play("back_to_menu")
-			time.sleep(2)			
+			#time.sleep(2)			
 
 		if self.wifiStable():
 			if Utils.isPingable("github.com"):
@@ -332,7 +332,7 @@ class Tasks:
 			self.Buzz.Play("FALSE")
 			self.nextTask = "ensureWiFiAndOdoo"
 
-		time.sleep(3)
+		#time.sleep(3)
 		self.Disp.clear_display()
 		self.Buzz.Play("back_to_menu")
 
@@ -342,24 +342,24 @@ class Tasks:
 			text = FIRMWARE_VERSION
 			message = [origin,size,text]
 			self.Disp.displayMsgRaw(message)
-			time.sleep(2)
+			#time.sleep(2)
 			self.nextTask = self.defaultNextTask
 
 	def shutdownSafe(self):
 			_logger.debug("Shutting down safe")
 			time.sleep(0.2)
 			self.Disp.display_msg("shuttingDown")
-			time.sleep(3)
+			#time.sleep(3)
 			self.Disp.clear_display()
 			os.system("sudo shutdown now")
 			time.sleep(60)
-			sys,exit(0)
+			sys.exit(0)
 
 	def reboot(self):
 		_logger.debug("Rebooting")
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
-		time.sleep(3)
+		#time.sleep(3)
 		self.Disp.clear_display()
 		os.system("sudo reboot")
 		time.sleep(60)
