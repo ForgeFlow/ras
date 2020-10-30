@@ -111,6 +111,15 @@ def storeJsonData(filePath,data):
   except:
     return False
 
+def beautifyJsonFile(filePath):
+  try:
+    data=getJsonData(filePath)
+    storeJsonData(filePath,data)
+    return True
+  except:
+    return False
+
+
 def storeOptionInJsonFile(filePath,option,optionValue):
   data = getJsonData(filePath)
   if data:
