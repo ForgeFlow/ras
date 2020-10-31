@@ -137,6 +137,7 @@ class Clocking:
 
     #@Utils.timer
     def card_logging(self):
+        self.Disp.lockForTheClock = True
         self.msg = "comm_failed"
         self.Disp.display_msg("connecting")
         print("clocking ln142 - odoo uid ", self.Odoo.uid)
@@ -159,6 +160,7 @@ class Clocking:
         self.Buzz.Play(self.msg)
 
         time.sleep(self.timeToDisplayResult)
+        self.Disp.lockForTheClock = False
         self.Disp._display_time(self.wifiSignalQualityMessage, self.odooReachabilityMessage)
 
 

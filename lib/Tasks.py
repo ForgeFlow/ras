@@ -164,8 +164,9 @@ class Tasks:
 			self.Clock.isOdooReachable() 
 			_logger.debug('Thread Display Clock started')
 			while not exitFlag.isSet():
-				print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 				
-				self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
+				print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
+				if not self.Disp.lockForTheClock:	
+					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
 			_logger.debug('Thread Display Clock stopped')
  
@@ -173,7 +174,7 @@ class Tasks:
 		exitFlag.clear()
 
 		periodEvaluateReachability          = 2    # seconds		
-		periodDisplayClock                  = 2   # seconds
+		periodDisplayClock                  = 1   # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
