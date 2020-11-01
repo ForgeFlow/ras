@@ -1,7 +1,14 @@
 {
+  "ssh":"enable",
+  "sshPassword":"raspberry",
+  "timeoutToGetOdooUID": 6.0,
+  "timeoutToCheckAttendance": 3.0,
+  "periodEvaluateReachability": 5.0,
+  "periodDisplayClock":10.0,
+  "timeToDisplayResultAfterClocking": 1.2,
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
-  "firmwareVersion": "v1.4.2",
+  "firmwareVersion": "v1.4.3",
   "language": "ENGLISH",
   "manufacturingData": {
     "firmwareAtShipment": "prior to v1.4.2",
@@ -19,6 +26,7 @@
     "db": [
       "1"
     ],
+    "https": false,
     "odoo_host": [
       "192.168.0.xx"
     ],

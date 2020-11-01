@@ -6,7 +6,7 @@ import logging
 from dicts import tz_dic
 
 import xmlrpc.client as xmlrpclib
-import socket
+from socket import setdefaulttimeout as setTimeout
 
 from . import Utils
 
@@ -14,139 +14,141 @@ _logger = logging.getLogger(__name__)
 
 class OdooXMLrpc:
     def __init__(self, Display):
-        self.display        = Display
-        self.datajson       = Utils.WORK_DIR + "dicts/data.json"
-        self.set_params()
+        self.display            = Display
+        self.adm                = False
+        self.getUIDfromOdoo()
         _logger.debug("Odoo XMLrpc Class Initialized")
 
     #@Utils.timer
-    def set_params(self):       
-        _logger.debug("Params config is %s " % os.path.isfile(self.datajson))
-        self.j_data = Utils.getJsonData(self.datajson)
+    def getUIDfromOdoo(self):
+        #print("in method getUIDfromOdoo , the Odoo Params are: ", Utils.settings["odooParameters"])
+        self.setTimeZone()
+        self.setOdooUrlTemplate()
+        self.setOdooIpPort()
+        self.setUserID()
+        print("got user id from Odoo ", self.uid)                                                                  
 
-        if self.j_data:
-            self.odooConnectedAtLeastOnce = True
-        else:
-            self.getOdooParamsFromDeviceCustomizationFile()
-
-        if self.j_data:
-            self.db     = self.j_data["db"][0]
-            self.user   = self.j_data["user_name"][0]
-            self.pswd   = self.j_data["user_password"][0]
-            self.host   = self.j_data["odoo_host"][0]
-            self.port   = self.j_data["odoo_port"][0]
-            self.adm    = self.j_data["admin_id"][0]
-            self.tz     = self.j_data["timezone"][0]
-
-            os.environ["TZ"] = tz_dic.tz_dic[self.tz]
+    def setTimeZone(self):
+        try:
+            os.environ["TZ"] = tz_dic.tz_dic[Utils.settings["odooParameters"]["timezone"][0]]
             time.tzset()
+            return True
+        except Exception as e:
+            print("exception in method setTimeZone: ", e)
+            return False               
 
-            if "https" not in self.j_data:
-                self.https_on = False
-                self.url_template = "http://%s" % self.host
+    def setOdooUrlTemplate(self):
+        try:
+            if  Utils.isOdooUsingHTTPS():
+                self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"][0]
             else:
-                self.https_on = True
-                self.url_template = "https://%s" % self.host
-
-            if self.port:
-                self.url_template += ":%s" % self.port
-            
-            self.odooIpPort = (self.host, int(self.port))
-            self.uid = self.getUserID()
-        else:
-            self.ensureNoDataJsonFile()
-
-            self.j_data = False
-            self.db = False
-            self.user = False
-            self.pswd = False
-            self.host = False
-            self.port = False
-            self.adm = False
-            self.tz = False
-            self.https_on = False
-            self.url_template = False
-            self.odooIpPort = False
-            self.uid = False
-        
-        if self.uid and not self.odooConnectedAtLeastOnce:
-            self.odooConnectedAtLeastOnce = True
-            self.storeOdooParamsInDeviceCustomizationFile()
-
-        _logger.debug("After set params method, Odoo UID : ", self.uid)
-
+                self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
+            if Utils.settings["odooParameters"]["odoo_port"][0]:
+                self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
+            # print("self.odooUrlTemplate ",self.odooUrlTemplate )
+            return True
+        except Exception as e:
+            self.odooUrlTemplate    = None
+            # print("exception in method setOdooUrlTemplate: ", e)
+            return False        
+               
+    def setOdooIpPort(self):
+        self.odooIpPort = None
+        try:
+            print( "Utils.settings[""odooParameters""][""odoo_port""][0] ",Utils.settings["odooParameters"]["odoo_port"][0])
+            if Utils.settings["odooParameters"]["odoo_port"]!=[""]: 
+                portNumber =  int(Utils.settings["odooParameters"]["odoo_port"][0])                          
+            elif Utils.isOdooUsingHTTPS():
+                portNumber =   443
+            self.odooIpPort = (Utils.settings["odooParameters"]["odoo_host"][0], portNumber)
+            return True
+        except Exception as e:
+            print("exception in method setOdooIpPort: ", e)
+            return False
+    
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(self.url_template + str(url))
+            serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
+            print("serverProxy ", serverProxy)
             return serverProxy
         except Exception as e:
             _logger.exception(e)
             return False
 
     #@Utils.timer
-    def getUserID(self):
+    def setUserID(self):
+        self.uid = False
+        returnValue = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            user_id = loginServerProxy.login(self.db, self.user, self.pswd)
+            setTimeout(float(Utils.settings["timeoutToGetOdooUID"]) or None)
+            #print("timeoutToGetOdooUID: ", float(Utils.settings["timeoutToGetOdooUID"]) or None )
+            user_id = loginServerProxy.login(
+                Utils.settings["odooParameters"]["db"][0],
+                Utils.settings["odooParameters"]["user_name"][0],
+                Utils.settings["odooParameters"]["user_password"][0])
             if user_id:
-                return user_id
-            return None
-        except ConnectionRefusedError:
+                print("got user id from Odoo ", user_id)
+                self.uid = user_id
+                Utils.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
+                returnValue =  True
+            else:
+                print("NO user id from Odoo ", user_id)
+                returnValue =  False
+        except ConnectionRefusedError as e:
+            print("ConnectionRefusedError checkattendance odoo ln139", e)
             _logger.debug(ConnectionRefusedError)
-            return None
+            returnValue =  False
+        except socket.timeout as e:
+            print("timeout checkattendance odoo ln139", e)
+            returnValue = False
         except OSError as osError:
+            print("osError checkattendance odoo ln139", osError)
             _logger.debug(OSError)
             if "No route to host" in str(osError):
                 self.display.display_msg("noRouteToHost")
                 time.sleep(1.5)
-            return None 
+            returnValue =  False 
         except Exception as e:
             _logger.exception(e)
-            return None
+            print("exception in method setUserID: ", e)
+            returnValue =  False
+        finally:
+            setTimeout(None)
+            return returnValue
     
     #@Utils.timer
     def isOdooPortOpen(self):
+        print("is Odoo Port Open? :", Utils.isIpPortOpen(self.odooIpPort) )
         return Utils.isIpPortOpen(self.odooIpPort)
 
     #@Utils.timer
     def checkAttendance(self, card):
+        res=False
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                serverProxy.transport.connection.timeout = 2
+                setTimeout(float(Utils.settings["timeoutToCheckAttendance"]) or None)
+                print("timeoutToCheckAttendance: ", float(Utils.settings["timeoutToCheckAttendance"]) or None )
                 res = serverProxy.execute(
-                    self.db,
+                    Utils.settings["odooParameters"]["db"][0],
                     self.uid,
-                    self.pswd,
+                    Utils.settings["odooParameters"]["user_password"][0],
                     "hr.employee",
                     "register_attendance",
                     card,
                 )
-            return res
         except Exception as e:
+            print("Odoo ln127 - checkAttendance - exception e:",e)
             _logger.exception(e)
-            return False
+            res = False
+        except socket.timeout as e:
+            print("timeout checkattendance odoo ln139", e)
+            res=False
         finally:
-            serverProxy.transport.connection.timeout = None
-        
-        print("-"*60)
-        print()
+            setTimeout(None)
+            return res
 
     def ensureNoDataJsonFile(self):
-        if os.path.isfile(self.datajson):
-            os.system("sudo rm " + self.datajson)
-    
-    def storeOdooParamsInDeviceCustomizationFile(self):
-        deviceCustomizationData = Utils.getJsonData(Utils.fileDeviceCustomization)
-        deviceCustomizationData["odooParameters"] = self.j_data
-        self.odooConnectedAtLeastOnce = True
-        deviceCustomizationData["odooConnectedAtLeastOnce"] = self.odooConnectedAtLeastOnce
-        Utils.storeJsonData(Utils.fileDeviceCustomization,deviceCustomizationData)
-        _logger.debug("wrote to deviceCustomizationData.json: ",self.j_data)
-    
-    def getOdooParamsFromDeviceCustomizationFile(self):
-        deviceCustomizationData = Utils.getJsonData(Utils.fileDeviceCustomization)
-        self.j_data = deviceCustomizationData["odooParameters"]
-        self.odooConnectedAtLeastOnce = deviceCustomizationData["odooConnectedAtLeastOnce"]
-        Utils.storeJsonData(self.datajson, self.j_data)
-        _logger.debug("wrote to data.json: ",self.j_data)
+        if os.path.isfile(Utils.fileDataJson):
+            os.system("sudo rm " + Utils.fileDataJson)

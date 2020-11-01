@@ -20,49 +20,24 @@
 		</div>
 	</section>
 
-	<section id="resultTableParameters">
+	<section id="adminCardChangedResult">
 		<div class="container-fluid double-top-padding">	
-			<table class="table-strip">
-				<thead>
-					<tr class="rowTitle">
-						<th scope="col" class="pl-1 pr-2">Parameters sent to Odoo</th>
-						<th scope="col" class="pl-1">Value</th>
-					</tr>
-				</thead>
-				<tbody>
-
-				<tr>
-					<td  class="pl-1"> Odoo Host </td>
-					<td  class="pl-1"> {{ result["odoo_host"][0] }} </td>
-				</tr>
-				<tr class="rowStrip">
-					<td class="pl-1"> Odoo Port </td>
-					<td class="pl-1"> {{ result["odoo_port"][0] }} </td>
-				</tr>
-				<tr>
-					<td class="pl-1"> Odoo User </td>
-					<td class="pl-1"> {{ result["user_name"][0] }} </td>
-				</tr>
-				<tr class="rowStrip">
-					<td class="pl-1"> Odoo Password </td>
-					<td class="password pl-1"> ********** </td>
-				</tr>
-				<tr>
-					<td class="pl-1"> Odoo Database </td>
-					<td class="pl-1"> {{ result["db"][0] }} </td>
-				</tr>
-				<tr class="rowStrip">
-					<td class="pl-1"> Admin ID </td>
-					<td class="pl-1"> {{ result["admin_id"][0] }} </td>
-				</tr>
-				<tr>
-					<td class="pl-1"> Timezone </td>
-					<td class="pl-1"> {{ result["timezone"][0] }} </td>
-				</tr>
-
-				</tbody>
-			</table>
+			<h5 class="formField"> {{ adminCardChangeResult[0] }}</h5>
+			<h5 class="formField"> {{ adminCardChangeResult[1] }}</h5>
 		</div>
 	</section>
+
+	<form action="/adminCardChanged" method="post">
+		{% if defineAgain %}
+			<section id="buttonDefineAgain">
+				<div class="container-fluid">
+					<p>
+						<button type="submit" name="Log in" value="Log in" class="btn btn-warning formField custom-button-submit">Define Admin Card Again</button>
+					</p>
+				</div>
+			</section>
+		{% endif %}
+
+	</form>
 
 </body>

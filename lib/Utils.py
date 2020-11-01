@@ -5,13 +5,18 @@ import os
 import socket
 import copy
 import functools
+import subprocess
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
 fileDataJson                  = WORK_DIR + "dicts/data.json"
+fileCredentials               = WORK_DIR + "dicts/credentials.json"
+
 settings                      = {}
 defaultMessagesDic            = {}
+credentialsDic                = {}
+defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
 
 def timer(func):
     @functools.wraps(func)
@@ -92,15 +97,24 @@ def getJsonData(filePath):
   try:
     with open(filePath) as f:
       data = json.load(f)
-    return data
+    return data  
   except Exception as e:
-      #_logger.exception(e):
+    print("exception while getting/loading data from json file: ", filePath, " -exception: ", e)
+    #_logger.exception(e):
     return None
 
 def storeJsonData(filePath,data):
   try:
     with open(filePath, 'w+') as f:
       json.dump(data,f, sort_keys=True, indent=2)
+    return True
+  except:
+    return False
+
+def beautifyJsonFile(filePath):
+  try:
+    data=getJsonData(filePath)
+    storeJsonData(filePath,data)
     return True
   except:
     return False
@@ -127,12 +141,16 @@ def isPingable(address):
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   try:
+    s.settimeout(2)
     canConnectResult = s.connect_ex(ipPort)
     if canConnectResult == 0:
+      #print("Utils - IP Port OPEN ", ipPort)
       isOpen = True
     else:
+      #print("Utils - IP Port CLOSED ", ipPort)
       isOpen = False
-  except:
+  except Exception as e:
+    print("Utils - exception in method isIpPortOpen: ", e)
     isOpen = False
   finally:
     s.close()
@@ -163,13 +181,23 @@ def storeOptionInDeviceCustomization(option,value):
     return False
 
 def getSettingsFromDeviceCustomization():
-  settings["language"]          = getOptionFromDeviceCustomization("language"         , defaultValue= "ENGLISH")
-  settings["showEmployeeName"]  = getOptionFromDeviceCustomization("showEmployeeName" , defaultValue= "yes")
-  settings["fileForMessages"]   = getOptionFromDeviceCustomization("fileForMessages"  , defaultValue= "messagesDicDefault.json")
-  settings["messagesDic"]       = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["SSIDreset"]         = getOptionFromDeviceCustomization("SSIDreset"  , defaultValue= "__RAS__")
-  settings["defaultMessagesDic"]= getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
-
+  settings["language"]                = getOptionFromDeviceCustomization("language"                 , defaultValue = "ENGLISH")
+  settings["showEmployeeName"]        = getOptionFromDeviceCustomization("showEmployeeName"         , defaultValue = "yes")
+  settings["fileForMessages"]         = getOptionFromDeviceCustomization("fileForMessages"          , defaultValue = "messagesDicDefault.json")
+  settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
+  settings["SSIDreset"]               = getOptionFromDeviceCustomization("SSIDreset"                , defaultValue = "__RAS__")
+  settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+  settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"           , defaultValue = None)
+  settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce" , defaultValue = False)
+  settings["flask"]                   = getOptionFromDeviceCustomization("flask"                    , defaultValue = defaultCredentialsDic)
+  settings["timeoutToGetOdooUID"]     = getOptionFromDeviceCustomization("timeoutToGetOdooUID"      , defaultValue = 6.0)
+  settings["ssh"]                     = getOptionFromDeviceCustomization("ssh"                      , defaultValue = "enable")
+  settings["sshPassword"]             = getOptionFromDeviceCustomization("sshPassword"              , defaultValue = "raspberry")  
+  settings["firmwareVersion"]         = getOptionFromDeviceCustomization("firmwareVersion"          , defaultValue = "v1.4.3+")
+  settings["timeoutToCheckAttendance"]          = getOptionFromDeviceCustomization("timeoutToCheckAttendance" , defaultValue = 3.0)
+  settings["periodEvaluateReachability"]        = getOptionFromDeviceCustomization("periodEvaluateReachability" , defaultValue = 5.0)
+  settings["periodDisplayClock"]                = getOptionFromDeviceCustomization("periodDisplayClock" , defaultValue = 10.0)
+  settings["timeToDisplayResultAfterClocking"]  = getOptionFromDeviceCustomization("timeToDisplayResultAfterClocking", defaultValue = 1.2)
 def getMsg(textKey):
   try:
     return settings["messagesDic"][textKey] 
@@ -197,29 +225,82 @@ def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
 def transferDataJsonToDeviceCustomization(deviceCustomizationDic):
   dataJsonOdooParameters = getJsonData(fileDataJson)
   if dataJsonOdooParameters:
-    #print("dataJson params:",  dataJsonOdooParameters)
-    #deviceCustomizationDic["odooParameters"] = {}
     deviceCustomizationDic["odooParameters"] = dataJsonOdooParameters
     deviceCustomizationDic["odooConnectedAtLeastOnce"] = True
   else:
     deviceCustomizationDic["odooConnectedAtLeastOnce"] = False
   return deviceCustomizationDic
 
+def storeOdooParamsInDeviceCustomization(newOdooParams):
+  try:
+    storeOptionInDeviceCustomization("odooParameters",newOdooParams)
+    return True
+  except:
+    return False
 
-def migrationToVersion1_4_2():
+def handleMigratioOfDeviceCustomizationFile():
+  '''
+  if there is no "DeviceCustomization" File,
+  take the sample file
+  if there is a "DeviceCustomization" File,
+  add the Fieldsin newOptionsList
+  '''
   deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
   deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
+  newOptionsList = ["SSIDreset","fileForMessages","firmwareVersion","ssh", "sshPassword", "timeoutToGetOdooUID", "timeoutToCheckAttendance", "periodEvaluateReachability", "periodDisplayClock", "timeToDisplayResultAfterClocking" ]
   if deviceCustomizationDic:
-    #add 
-    deviceCustomizationDic["SSIDreset"]       = deviceCustomizationSampleDic["SSIDreset"]
-    deviceCustomizationDic["fileForMessages"] = deviceCustomizationSampleDic["fileForMessages"]
-    deviceCustomizationDic["firmwareVersion"] = deviceCustomizationSampleDic["firmwareVersion"]
+    for option in newOptionsList:
+      if not(option in deviceCustomizationDic) and (option in deviceCustomizationSampleDic):
+        deviceCustomizationDic[option] = deviceCustomizationSampleDic[option]
   else:
     deviceCustomizationDic = copy.deepcopy(deviceCustomizationSampleDic)
     deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
-  print("deviceCustomizationDic: ", deviceCustomizationDic)
+  #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
 
+def handleMigrationOfCredentialsJson():
+  credentialsDic = getJsonData(fileCredentials)
+  if not credentialsDic:
+    credentialsDic = defaultCredentialsDic
+  storeOptionInDeviceCustomization("flask",credentialsDic)
 
-#getSettingsFromDeviceCustomization()
+def migrationToVersion1_4_2():
+  handleMigratioOfDeviceCustomizationFile()
+  handleMigrationOfCredentialsJson()
+  try:
+    data = getJsonData(fileDataJson)
+    print("read dict from data.json in method Utils.migrationToVersion1_4_2 ", data)
+    if data and storeOptionInDeviceCustomization("odooParameters",data): # in data.json the Odoo Params are stored when a successful connection was made
+      storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)    
+  except Exception as e:
+    print("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer data.json to deviceCustomization file: ", e)
+
+def isOdooUsingHTTPS():
+  if  "https" in settings["odooParameters"].keys():
+    if settings["odooParameters"]["https"]== ["https"]:
+      return True
+  return False
+
+
+  return credentialsDic
+
+def getOwnIpAddress():
+  command = "hostname -I | awk '{ print $1}' "
+  ipAddress = (subprocess.check_output(command, shell=True).decode("utf-8").strip("\n"))
+  storeOptionInDeviceCustomization("ownIpAddress",[ipAddress])
+  return ipAddress
+
+def enableSSH():
+  try:
+    os.system("sudo systemctl enable ssh")
+    os.system("sudo service ssh start")
+  except Exception as e:
+    print("Exception in method Utils.enableSSH: ", e)
+
+def disableSSH():
+  try:
+    os.system("sudo systemctl disable ssh")
+    os.system("sudo service ssh stop")
+  except Exception as e:
+    print("Exception in method Utils.disableSSH: ", e)
 

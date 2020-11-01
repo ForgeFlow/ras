@@ -12,3 +12,7 @@ sync_flag.*
 test.py
 src/pip-delete-this-directory.txt
 dicts/deviceCustomization.json
+dicts/deviceCustomizationPrior.json
+dicts/dataEtRH.json
+dicts/dataLuiS.json
+dicts/deviceCustomizationLuis.json

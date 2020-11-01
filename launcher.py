@@ -1,4 +1,4 @@
-#! /usr/bin/python3.5
+#! /usr/bin/python3.7
 import os
 import time
 import logging
@@ -16,7 +16,6 @@ from io import StringIO
 
 _logger = logging.getLogger(__name__)
 
-#Utils.getSettingsFromDeviceCustomization() # initialize device customization settings/options
 Utils.migrationToVersion1_4_2()
 Utils.getSettingsFromDeviceCustomization()
 
@@ -49,7 +48,6 @@ def mainLoop():
         traceback.print_exc(file=buff)
         _logger.error(buff.getvalue())
         raise e
-
 
 class RASFormatter(logging.Formatter):
     def format(self, record):

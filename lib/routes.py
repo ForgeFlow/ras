@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import logging
+import time
 
 from collections import OrderedDict
 
@@ -11,209 +12,147 @@ from dicts.tz_dic import tz_dic
 
 from werkzeug.serving import make_server
 
+from multiprocessing import Process
+
 import threading
 from . import Utils
 
 _logger = logging.getLogger(__name__)
 
+tz_sorted = OrderedDict(sorted(tz_dic.items()))
 
-def get_ip():
-    _logger.debug("Getting IP")
-    command = "hostname -I | awk '{ print $1}' "
-
-    ip_address = (
-        subprocess.check_output(command, shell=True).decode("utf-8").strip("\n")
-    )
-
-    return ip_address
+server = None
 
 class ServerThread(threading.Thread):
-    def __init__(self, app):
-        threading.Thread.__init__(self)
-        self.srv = make_server(str(get_ip()), 3000, app)
-        self.ctx = app.app_context()
-        self.ctx.push()
-        _logger.debug("ServerThread Class Initialized")
+	def __init__(self,srv):
+		threading.Thread.__init__(self)
+		self.srv = srv
 
-    def run(self):
-        _logger.debug("Serve forever")
-        self.srv.serve_forever()
-
-    def shutdown(self):
-        _logger.debug("Shutdown")
-        self.srv.shutdown()
+	def run(self):
+		self.srv.serve_forever()
 
 def startServerAdminCard(exitFlag):
-    global server
-    global app
-    global data
+	oldAdminCard = Utils.settings["odooParameters"]["admin_id"][0].lower()
+	app = Flask("odoo_new_admin_card")
+	app.secret_key = os.urandom(12)
+	Utils.getOwnIpAddress()
+	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	ctx = app.app_context()
+	ctx.push()
+	server = ServerThread(srv)
+	server.start()	
 
-    data =Utils.getJsonData(Utils.WORK_DIR + "dicts/data.json")
-    oldAdminCard = data["admin_id"][0].lower()
+	@app.route("/")
+	def form():
+		if session.get("logged_in"):
+			return render_template("reset_admin_form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000)
+		else:
+			return render_template("loginNewAdminCard.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000)
 
-    app = Flask("odoo_config_params")
-    app.secret_key = os.urandom(12)
-    server = ServerThread(app)
-    server.start()
-    
+	@app.route("/loginNewAdminCard", methods=["POST", "GET"])
+	def doLogin():
+		if request.method == "POST":			
+			if request.form.get("Log in") == "Log in":
+				if (request.form["password"] == Utils.settings["flask"]["new password"][0]):
+					session["logged_in"] = True
+					return form()
+				else:
+					#flash("wrong password!")
+					return form()
+			else:
+				return form()
+		else:
+			return form()
 
-    @app.route("/")
-    def form():
-        _logger.debug("inside form")
-        tz_sorted = OrderedDict(sorted(tz_dic.items()))
-        if not session.get("logged_in"):
-            return render_template("loginNewAdminCard.html")
-        else:
-            return render_template(
-                "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted
-            )
+	@app.route("/adminCardChanged", methods=["POST", "GET"])
+	def result():
+		if request.method == "POST":
+			if request.form.get("Log in") == "Log in":
+				return form()
+			else:
+				results = request.form
+				dic = results.to_dict(flat=False)
+				newAdminCard = dic["admin_id"][0].lower()
+				message = ["",""]
 
-    def reset_admin_form():
-        _logger.debug("reset admin form")
-        if not session.get("logged_in"):
-            return render_template("loginNewAdminCard.html")
-        else:
-            return render_template("reset_admin_form.html", IP=str(get_ip()), port=3000)
+				if newAdminCard == oldAdminCard :
+					message[0] = "You just introduced the old Admin Card."
+					message[1] = "Please introduce a new Admin Card."
+					defineAgain = True
+					return render_template("adminCardChanged.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, adminCardChangeResult = message, defineAgain = defineAgain)
+				else:
+					Utils.settings["odooParameters"]["admin_id"] = dic["admin_id"]
 
-    @app.route("/reset_admin_card", methods=["POST"])
-    def reset_admin_card_result():
-        if request.method == "POST":
-            results = request.form
-            dic = results.to_dict(flat=False)
-            newAdminCard = dic["admin_id"][0].lower()
+					Utils.storeOptionInDeviceCustomization("odooParameters",Utils.settings["odooParameters"])
 
-            if newAdminCard == oldAdminCard :
-                flash("No valid AdminCard. Already in system")
-                return reset_admin_form()
+					message[0] = "The new Admin Card is " + dic["admin_id"][0]
+					message[1] = "and was succesfully updated in Odoo."
+					defineAgain = False
 
-            data["admin_id"] = dic["admin_id"]
+					exitFlag.set() # end all the threads
+					return render_template("adminCardChanged.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, adminCardChangeResult = message, defineAgain = defineAgain)
+		else:
+			return render_template("reset_admin_form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000)
 
-            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", data)
-
-            exitFlag.set() # end all the threads
-
-            return render_template("result.html", result=data)
-
-    @app.route("/result", methods=["POST", "GET"])
-    def result():
-        if request.method == "POST":
-            results = request.form
-            dic = results.to_dict(flat=False)
-            # with open(Utils.WORK_DIR + "dicts/data.json", "w+") as outfile:
-            #     json.dump(dic, outfile)
-            return render_template("result.html", result=dic)
-
-    @app.route("/login", methods=["POST"])
-    def do_admin_login():
-        if request.form.get("Reset credentials") == "Reset credentials":
-            return render_template("change.html")
-        elif request.form.get("Log in") == "Log in":
-            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
-            if (
-                request.form["password"] == json_data["new password"][0]
-                and request.form["username"] == json_data["username"][0]
-            ):
-                session["logged_in"] = True
-            else:
-                flash("wrong password!")
-            return form()
-        elif request.form.get("Reset AdminCard") == "Reset AdminCard":
-            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
-            if (
-                request.form["password"] == json_data["new password"][0]
-                and request.form["username"] == json_data["username"][0]
-            ):
-                session["logged_in"] = True
-            else:
-                flash("wrong password!")
-            return reset_admin_form()
-        else:
-            return form()
-
-    @app.route("/change", methods=["POST", "GET"])
-    def change_credentials():
-        if request.method == "POST":
-            result = request.form
-            dic = result.to_dict(flat=False)
-            print(dic)
-            jsonarray = json.dumps(dic)
-            json_file = open(Utils.WORK_DIR + "dicts/credentials.json")
-            json_data = json.load(json_file)
-            json_file.close()
-            print(json_data["new password"][0])
-            if (
-                str(dic["old password"][0]) == json_data["new password"][0]
-                and str(dic["username"][0]) == json_data["username"][0]
-            ):
-                with open(Utils.WORK_DIR + "dicts/credentials.json", "w+") as outfile:
-                    json.dump(dic, outfile)
-                print(jsonarray)
-            else:
-                flash("wrong password!")
-            return form()
+	return srv
 
 def startServerOdooParams(exitFlag):
-    global server
-    global app
+	app = Flask("odoo_config_params")
+	app.secret_key = os.urandom(12)
+	Utils.getOwnIpAddress()
+	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	ctx = app.app_context()
+	ctx.push()
+	server = ServerThread(srv)
+	server.start()	
 
-    app = Flask("odoo_config_params")
-    app.secret_key = os.urandom(12)
-    server = ServerThread(app)
-    server.start()
-    
+	@app.route("/")
+	def form():
+		if session.get("logged_in"):
+			return render_template("form.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, tz_dic=tz_sorted)
+		else:
+			return render_template("login.html")
 
-    @app.route("/")
-    def form():
-        _logger.debug("inside form")
-        tz_sorted = OrderedDict(sorted(tz_dic.items()))
-        if not session.get("logged_in"):
-            return render_template("login.html")
-        else:
-            return render_template( "form.html", IP=str(get_ip()), port=3000, tz_dic=tz_sorted)
+	@app.route("/result", methods=["POST", "GET"])
+	def result():
+		#if request.method == "POST":
+		results = request.form
+		dic = results.to_dict(flat=False)
+		Utils.storeOptionInDeviceCustomization("odooParameters",dic)
+		exitFlag.set() # end all the threads   
+		return render_template("result.html", result=dic)
+		#else:
+			#return exitFlag.set()
 
-    @app.route("/result", methods=["POST", "GET"])
-    def result():
-        if request.method == "POST":
-            results = request.form
-            dic = results.to_dict(flat=False)
-            Utils.storeJsonData(Utils.WORK_DIR + "dicts/data.json", dic)
-            exitFlag.set() # end all the threads          
-            return render_template("result.html", result=dic)
+	@app.route("/login", methods=["POST", "GET"])
+	def do_admin_login():
+		if request.method == "POST":			
+			if request.form.get("Reset credentials") == "Reset credentials":
+				return render_template("change.html")
+			elif request.form.get("Log in") == "Log in":
+				#print("routes 190 - do_admin_login, credentialsDic ", Utils.settings["flask"]["new password"][0], )
+				if (request.form["password"] == Utils.settings["flask"]["new password"][0]):
+					session["logged_in"] = True
+				else:
+					flash("wrong password!")
+				return form()
+			else:
+				return form()
+		else:
+			return form()
 
-    @app.route("/login", methods=["POST"])
-    def do_admin_login():
-        if request.form.get("Reset credentials") == "Reset credentials":
-            return render_template("change.html")
-        elif request.form.get("Log in") == "Log in":
-            data =Utils.getJsonData(Utils.WORK_DIR + "dicts/credentials.json")
-            if (
-                request.form["password"]     == data["new password"][0]
-                and request.form["username"] == data["username"][0]
-            ):
-                session["logged_in"] = True
-            else:
-                flash("wrong password!")
-            return form()
-        else:
-            return form()
+	@app.route("/change", methods=["POST", "GET"])
+	def change_credentials():
+		if request.method == "POST":
+			result = request.form
+			dataFromTheForm = result.to_dict(flat=False)
+			if (str(dataFromTheForm["old password"][0]) == Utils.settings["flask"]["new password"][0]):
+					Utils.storeOptionInDeviceCustomization("flask", dataFromTheForm)
+			else:
+					flash("wrong password!")
+			return form()
+		else:
+			return form()
+	
+	return srv
 
-    @app.route("/change", methods=["POST", "GET"])
-    def change_credentials():
-        if request.method == "POST":
-            result = request.form
-            dataFromTheForm = result.to_dict(flat=False)
-            storedData = Utils.getJsonData(Utils.WORK_DIR + "dicts/credentials.json")
-            if (    str(dataFromTheForm["old password"][0]) == storedData["new password"][0]
-                    and str(dataFromTheForm["username"][0]) == storedData["username"][0]      ):
-                Utils.storeJsonData(Utils.WORK_DIR + "dicts/credentials.json", dataFromTheForm)
-            else:
-                flash("wrong password!")
-            return form()
-
-def stop_server():
-    global server
-    server.shutdown()

@@ -21,8 +21,7 @@ class Tasks:
 
 		self.Clock = Clocking.Clocking(Odoo, Hardware)
 		self.ask_twice = ask_twice  # list of tasks to ask 'are you sure?' upon selection
-		self.get_ip = routes.get_ip
-
+		
 		self.wifiStable = self.Clock.wifiStable
 
 		self.periodPollCardReader 							= 0.2  # second
@@ -39,6 +38,7 @@ class Tasks:
 				"showRFID"				: self.showRFID,
 				"updateFirmware"	: self.updateFirmware,
 				"shouldEmployeeNameBeDisplayed": self.shouldEmployeeNameBeDisplayed,
+				"shouldSshBeEnabled": self.shouldSshBeEnabled,
 				"resetWifi"				: self.resetWifi,
 				"resetOdoo"				: self.getOdooUIDwithNewParameters,
 				"getNewAdminCard"	: self.getNewAdminCard,
@@ -54,6 +54,7 @@ class Tasks:
 				"showRFID"				,
 				"updateFirmware"	,
 				"shouldEmployeeNameBeDisplayed",
+				"shouldSshBeEnabled",
 				"resetWifi"				,
 				"resetOdoo"				,
 				"getNewAdminCard"	,
@@ -67,6 +68,7 @@ class Tasks:
 		self.currentMenuOption = 0
 
 		self.listOfYesNo =['yes', 'no']
+		self.listOfEnableDisable =['enable', 'disable']
 
 	 ########### LANGUAGES ####################
 		self.listOfLanguages = Utils.getListOfLanguages(["ENGLISH"])
@@ -87,21 +89,26 @@ class Tasks:
 
 		_logger.debug("Enter New Admin Card on Flask app")
 
+		self.Disp.displayWithIP('browseForNewAdminCard')
+
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		self.Disp.displayWithIP('browseForNewAdminCard')
+		srv = routes.startServerAdminCard(exitFlag)
 		
 		pollCardReader = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
+		serverKiller = threading.Thread(target=self.threadServerKiller, args=(
+															self.periodPollCardReader,exitFlag,srv))
 
-		routes.startServerAdminCard(exitFlag)
 		pollCardReader.start()
+		serverKiller.start()
 
 		pollCardReader.join()
-		self.Disp.display_msg("newAdmCardDefined")
-		routes.stop_server()
+		serverKiller.join()
 
-		data = Utils.getJsonData(Utils.WORK_DIR + "dicts/data.json")
+		self.Disp.display_msg("newAdmCardDefined")
+
+		data = Utils.settings["odooParameters"]
 		self.Odoo.adm = data["admin_id"][0]
 		self.Buzz.Play("back_to_menu")
 
@@ -114,12 +121,20 @@ class Tasks:
 		self.Disp.showCard(self.Reader.card)
 		self.Buzz.Play("cardswiped")
 
+	def threadServerKiller(self, period, exitFlag, srv):
+		_logger.debug('Thread Server Killer started')
+		while not exitFlag.isSet():		
+			exitFlag.wait(period)
+		print("Tasks ln 123 . srv shutdown: ", srv)
+		srv.shutdown()
+		_logger.debug('Thread Server Killer stopped')
+
 	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
 		_logger.debug('Thread Poll Card Reader started')
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
-				if self.Reader.card.lower() == self.Odoo.adm.lower():
+				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
 					_logger.debug("ADMIN CARD was swipped\n")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
@@ -151,19 +166,18 @@ class Tasks:
 		def threadDisplayClock(period):
 			self.Clock.isOdooReachable() 
 			_logger.debug('Thread Display Clock started')
-			minutes = False
 			while not exitFlag.isSet():
-				if not (time.localtime().tm_min == minutes): 
-					minutes = time.localtime().tm_min 
-					self.Disp._display_time(self.Clock.wifiStatusMessage, self.Clock.odooStatusMessage) 
+				#print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
+				if not self.Disp.lockForTheClock:	
+					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
 			_logger.debug('Thread Display Clock stopped')
  
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		periodEvaluateReachability          = 60    # seconds		
-		periodDisplayClock                  = 1     # seconds
+		periodEvaluateReachability = Utils.settings["periodEvaluateReachability"]   # seconds		
+		periodDisplayClock         =  Utils.settings["periodDisplayClock"]  # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
@@ -193,16 +207,12 @@ class Tasks:
 
 		_logger.debug("choose Language")
 
-		textPositionOrigin = (0,6)
-		textSize = 15
-		banner = "-"*18
 		self.currentLanguageOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
-			text = banner +"\n" + currentLanguageOption +"\n"+ banner
-			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			self.Disp.display_msg(currentLanguageOption)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:
 				self.Buzz.Play("OK")
@@ -243,16 +253,20 @@ class Tasks:
 		def warnGithubNotPingable():
 			_logger.warn("Github not pingable: Unable to Update Firmware")
 			self.Buzz.Play("FALSE")
+			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("ERRUpdate")
 			time.sleep(2)
 			self.Disp.clear_display()
+			self.Disp.lockForTheClock = False
 
 		def warnNoWiFiSignal():
-			self.Disp.display_msg("no_wifi")
+			self.Disp.lockForTheClock = True
 			self.Buzz.Play("FALSE")
+			self.Disp.display_msg("no_wifi")
 			time.sleep(0.5)
 			self.Buzz.Play("back_to_menu")
-			time.sleep(2)			
+			time.sleep(2)
+			self.Disp.lockForTheClock = False			
 
 		if self.wifiStable():
 			if Utils.isPingable("github.com"):
@@ -289,25 +303,29 @@ class Tasks:
 			exitFlag = threading.Event()
 			exitFlag.clear()
 
+			srv = routes.startServerOdooParams(exitFlag)
+
 			pollCardReader 					= threading.Thread(target=self.threadPollCardReader, args=(
 																self.periodPollCardReader,exitFlag,self.displayCard_and_Buzz,))
 			checkBothButtonsPressed = threading.Thread(target=self.threadCheckBothButtonsPressed, args=(
 																self.periodCheckBothButtonsPressed, self.howLongShouldBeBothButtonsPressed, exitFlag))
+			serverKiller = threading.Thread(target=self.threadServerKiller, args=(
+																self.periodPollCardReader,exitFlag,srv))
 
 			pollCardReader.start()
 			checkBothButtonsPressed.start()
-			routes.startServerOdooParams(exitFlag)
+			serverKiller.start()
 
 			checkBothButtonsPressed.join()
 			pollCardReader.join()
-			routes.stop_server()
+			serverKiller.join()
 
-			self.Odoo.set_params()
+			self.Odoo.getUIDfromOdoo()
 
+			self.Disp.lockForTheClock = True
 			if self.Odoo.uid:
+				self.Buzz.Play("OK")				
 				self.Disp.display_msg("gotUID")
-				self.Buzz.Play("OK")
-				self.Odoo.storeOdooParamsInDeviceCustomizationFile()
 				self.nextTask = self.defaultNextTask
 			else:
 				self.Disp.display_msg("noUID")
@@ -315,6 +333,7 @@ class Tasks:
 				self.nextTask = "resetOdoo"
 
 		else:
+			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
 			self.nextTask = "ensureWiFiAndOdoo"
@@ -322,8 +341,10 @@ class Tasks:
 		time.sleep(3)
 		self.Disp.clear_display()
 		self.Buzz.Play("back_to_menu")
+		self.Disp.lockForTheClock = False
 
 	def showVersion(self):
+			self.Disp.lockForTheClock = True
 			origin = (34, 20)
 			size = 24
 			text = FIRMWARE_VERSION
@@ -331,23 +352,28 @@ class Tasks:
 			self.Disp.displayMsgRaw(message)
 			time.sleep(2)
 			self.nextTask = self.defaultNextTask
+			self.Disp.lockForTheClock = False
 
 	def shutdownSafe(self):
+			self.Disp.lockForTheClock = True
 			_logger.debug("Shutting down safe")
 			time.sleep(0.2)
 			self.Disp.display_msg("shuttingDown")
 			time.sleep(3)
 			self.Disp.clear_display()
+			#self.Disp.lockForTheClock = False
 			os.system("sudo shutdown now")
 			time.sleep(60)
-			sys,exit(0)
+			sys.exit(0)
 
 	def reboot(self):
+		self.Disp.lockForTheClock = True
 		_logger.debug("Rebooting")
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
 		time.sleep(3)
 		self.Disp.clear_display()
+		#self.Disp.lockForTheClock = False
 		os.system("sudo reboot")
 		time.sleep(60)
 		sys,exit(0)
@@ -397,9 +423,8 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		_logger.debug("odooConnectedAtLeastOnce? is ", self.Odoo.odooConnectedAtLeastOnce)
-		if not self.Odoo.odooConnectedAtLeastOnce:
-			_logger.debug("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+		if not Utils.settings["odooConnectedAtLeastOnce"]:
+			#print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 		
@@ -424,8 +449,7 @@ class Tasks:
 
 		while not self.B_OK.pressed:
 			textCurrentOption = self.listOfYesNo[currentOption]
-			message = self.Disp.getMsgTranslated(textCurrentOption)
-			self.Disp.displayMsgRaw(message)
+			self.Disp.display_msg(textCurrentOption)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 
 			if self.B_Down.pressed:
@@ -434,6 +458,35 @@ class Tasks:
 		self.Buzz.Play("OK")
 		self.Disp.showEmployeeName = textCurrentOption
 		Utils.storeOptionInDeviceCustomization("showEmployeeName",textCurrentOption)
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
+
+	def shouldSshBeEnabled(self):
+		def goOneDownInTheMenu(currentOption):
+			self.Buzz.Play("down")
+			currentOption  += 1
+			if currentOption  > len(self.listOfEnableDisable)-1:
+					currentOption  = 0
+			return currentOption
+
+		currentOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			textCurrentOption = self.listOfEnableDisable[currentOption]
+			self.Disp.display_msg(textCurrentOption)
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+
+			if self.B_Down.pressed:
+				currentOption = goOneDownInTheMenu(currentOption)
+
+		self.Buzz.Play("OK")
+		if textCurrentOption == "enable":
+			Utils.enableSSH()
+		else:
+			Utils.disableSSH()
+		Utils.storeOptionInDeviceCustomization("ssh",textCurrentOption)
 		
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask

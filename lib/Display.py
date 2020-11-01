@@ -12,31 +12,36 @@ _logger = logging.getLogger(__name__)
 
 class Display:
     def __init__(self):
-        self.font_ttf = Utils.WORK_DIR + "fonts/Orkney.ttf"
+        self.fontRoboto = Utils.WORK_DIR + "fonts/Roboto-Medium.ttf"
+        self.fontOrkney = Utils.WORK_DIR + "fonts/Orkney.ttf"
         self.img_path = Utils.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
         _logger.debug("Display Class Initialized")
-        self.font1 = ImageFont.truetype(self.font_ttf, 30)
-        self.font2 = ImageFont.truetype(self.font_ttf, 14)
-        self.font3 = ImageFont.truetype(self.font_ttf, 22)
+        self.fontClockTime = ImageFont.truetype(self.fontRoboto, 42)
+        self.fontClockInfos = ImageFont.truetype(self.fontRoboto, 14)
+        self.font3 = ImageFont.truetype(self.fontRoboto, 22)
+        self.font4 = ImageFont.truetype(self.fontOrkney, 14)
         self.display_msg("connecting")
+        self.lockForTheClock = False                      
 
-    def _display_time(self, wifi_quality, odoo_m):
-        with canvas(self.device) as draw:
-            hour = time.strftime("%H:%M", time.localtime())
-            num_ones = hour.count("1")
-            if num_ones == 0:
-                draw.text((23, 19), hour, font=self.font1, fill="white")
-            elif num_ones == 1:
-                draw.text((25, 19), hour, font=self.font1, fill="white")
-            elif num_ones == 2:
-                draw.text((28, 19), hour, font=self.font1, fill="white")
-            elif num_ones == 3:
-                draw.text((31, 19), hour, font=self.font1, fill="white")
-            else:
-                draw.text((34, 19), hour, font=self.font1, fill="white")
-            draw.text((0, 0), wifi_quality+"\n"*7+"-"*17, font=self.font2, fill="white", align="center")
-            draw.text((0, 52), odoo_m, font=self.font2, fill="white", align="center")
+    def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
+        if not self.lockForTheClock:
+            with canvas(self.device) as draw:
+                hour = time.strftime("%H:%M", time.localtime())
+                num_ones = hour.count("1")
+                if num_ones == 0:
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+                elif num_ones == 1:
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+                elif num_ones == 2:
+                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+                elif num_ones == 3:
+                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+                else:
+                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+                draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
+                draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
+                draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
 
     def showCard(self,card):
         with canvas(self.device) as draw:
@@ -46,7 +51,7 @@ class Display:
                 draw.text((15, 20), card, font=self.font3, fill="white")
 
     def displayLogo(self):
-        logo = Image.open(self.img_path + "eficent.png").convert("RGBA")
+        logo = Image.open(self.img_path + "thingsLogo04_128.png").convert("RGBA")
         fff = Image.new(logo.mode, logo.size, (0,) * 4)
 
         background = Image.new("RGBA", self.device.size, "black")
@@ -59,7 +64,7 @@ class Display:
     def displayGreetings(self):
 
         self.displayLogo()
-        time.sleep(1.2)
+        time.sleep(2.4)
         self.display_msg("welcome")
         time.sleep(1.2)
         self.clear_display()
@@ -68,13 +73,15 @@ class Display:
         origin = message[0]
         size = message[1]
         text = message[2]
-        font = ImageFont.truetype(self.font_ttf, size)
+        font = ImageFont.truetype(self.fontRoboto, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
         _logger.debug("Displaying message: " + text)
 
+
     #@Utils.timer
     def display_msg(self, textKey, employee_name = None):
+        #self.clear_display()
         message = Utils.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and Utils.settings["showEmployeeName"] == "yes":
@@ -90,7 +97,7 @@ class Display:
     
     def displayWithIP(self, textKey):
         message = Utils.getMsgTranslated(textKey)
-        message[2] = message[2].replace("-IpPlaceholder-",routes.get_ip(),1)
+        message[2] = message[2].replace("-IpPlaceholder-",Utils.getOwnIpAddress(),1)
         self.displayMsgRaw(message)
 
     def clear_display(self):

@@ -1,82 +1,105 @@
- * {
-   box-sizing: border-box;
- }
-
- *:focus {
-   outline: none;
- }
-
- body {
-   font-family: Arial;
-   background-color: #3498DB;
-   padding: 50px;
- }
-
- .login {
-   margin: 20px auto;
-   width: 300px;
- }
-
- .login-screen {
-   background-color: #FFF;
-   padding: 20px;
-   border-radius: 5px
- }
-
- .app-title {
+body {
+   font-family: 'Roboto', sans-serif;
    text-align: center;
-   color: #777;
+   background-color: #c5f5ff;
  }
 
- .login-form {
-   text-align: center;
+.left-aligned {
+  text-align: left;
+}
+
+.container-fluid{
+  padding: 1% 15%;
+}
+
+.double-top-padding {
+  padding: 1% 15% 1% 15%;
+}
+
+.table-strip {
+  font-size: 2.5rem;
  }
 
- .control-group {
-   margin-bottom: 10px;
- }
+ .rowTitle {
+  background-color: #0c7b93;
+  color: white;
+}
 
- input {
-   text-align: center;
-   background-color: #ECF0F1;
-   border: 2px solid transparent;
-   border-radius: 3px;
-   font-size: 16px;
-   font-weight: 200;
-   padding: 10px 0;
-   width: 250px;
-   transition: border .5s;
- }
+ .rowStrip {
+  background-color: darkgray;
+  color: white;
+}
 
- input:focus {
-   border: 2px solid #3498DB;
-   box-shadow: none;
- }
 
- .btn {
-   border: 2px solid transparent;
-   background: #8cb5d1;
-   color: #ffffff;
-   font-size: 16px;
-   line-height: 25px;
-   padding: 10px 0;
-   text-decoration: none;
-   text-shadow: none;
-   border-radius: 3px;
-   box-shadow: none;
-   transition: 0.25s;
-   display: block;
-   width: 250px;
-   margin: 5 auto;
- }
+.logo-padding {
+  padding: 2% 15% 3% 15%; 
+}
 
- .btn:hover {
-   background-color: #2980B9;
- }
+.formField{
+  font-size: 2.5rem;
+  border-radius: 5px;
+}
 
- .login-link {
-   font-size: 12px;
-   color: #444;
-   display: block;
-   margin-top: 12px;
- }
+.custom-button-submit {
+  background-color: #0c7b93;
+  color: white;
+  border-color: orange;
+  border-width: 6px;
+}
+
+.bton-secondary {
+  background-color: #27496d;
+  color:   #00cbf6;
+  /* color:   #00a8cc; */
+}
+
+.labelGrey {
+  color: grey;
+  font-size: 1.8rem;
+}
+
+::placeholder { 
+  color: #d4d8d8; 
+  opacity: 1; 
+}
+
+.checkbox-label {
+    margin-left: 0.9rem;
+    font-size: 2.5rem;
+}
+
+.checkbox-input {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+@media (min-width: 990px) {
+
+  .formField{
+    font-size: 1rem;
+  }
+
+  .table-strip {
+    font-size: 1rem;
+   }
+
+  .logoSize {
+    max-width:20%;
+  }
+
+  .checkbox-label {
+    margin-left: 0.5rem;
+    font-size: 1rem;
+  } 
+
+  .checkbox-input {
+      width: 1rem;
+      height: 1rem;
+  }
+
+  .labelGrey {
+    color: grey;
+    font-size: 0.8rem;
+  }
+
+}
