@@ -176,8 +176,8 @@ class Tasks:
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		periodEvaluateReachability          = 2    # seconds		
-		periodDisplayClock                  = 1   # seconds
+		periodEvaluateReachability = Utils.settings["periodEvaluateReachability"]   # seconds		
+		periodDisplayClock         =  Utils.settings["periodDisplayClock"]  # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))

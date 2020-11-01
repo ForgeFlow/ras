@@ -3,6 +3,8 @@
   "sshPassword":"raspberry",
   "timeoutToGetOdooUID": 6.0,
   "timeoutToCheckAttendance": 3.0,
+  "periodEvaluateReachability": 5.0,
+  "periodDisplayClock":10.0,
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
   "firmwareVersion": "v1.4.3",
