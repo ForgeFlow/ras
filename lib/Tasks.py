@@ -167,7 +167,7 @@ class Tasks:
 			self.Clock.isOdooReachable() 
 			_logger.debug('Thread Display Clock started')
 			while not exitFlag.isSet():
-				print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
+				#print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
 				if not self.Disp.lockForTheClock:	
 					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
@@ -207,15 +207,11 @@ class Tasks:
 
 		_logger.debug("choose Language")
 
-		# textPositionOrigin = (0,6)
-		# textSize = 15
-		# banner = "-"*18
 		self.currentLanguageOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
-			#text = banner +"\n" + currentLanguageOption +"\n"+ banner
 			self.Disp.display_msg(currentLanguageOption)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:

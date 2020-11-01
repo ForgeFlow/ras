@@ -10,7 +10,6 @@ from socket import setdefaulttimeout as setTimeout
 
 from . import Utils
 
-print("name socket.setdefaulttimeout in Odoo :", setTimeout)
 _logger = logging.getLogger(__name__)
 
 class OdooXMLrpc:
@@ -46,11 +45,11 @@ class OdooXMLrpc:
                 self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
             if Utils.settings["odooParameters"]["odoo_port"][0]:
                 self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
-            print("self.odooUrlTemplate ",self.odooUrlTemplate )
+            # print("self.odooUrlTemplate ",self.odooUrlTemplate )
             return True
         except Exception as e:
             self.odooUrlTemplate    = None
-            print("exception in method setOdooUrlTemplate: ", e)
+            # print("exception in method setOdooUrlTemplate: ", e)
             return False        
                
     def setOdooIpPort(self):
@@ -83,7 +82,7 @@ class OdooXMLrpc:
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
             setTimeout(float(Utils.settings["timeoutToGetOdooUID"]) or None)
-            print("timeoutToGetOdooUID: ", float(Utils.settings["timeoutToGetOdooUID"]) or None )
+            #print("timeoutToGetOdooUID: ", float(Utils.settings["timeoutToGetOdooUID"]) or None )
             user_id = loginServerProxy.login(
                 Utils.settings["odooParameters"]["db"][0],
                 Utils.settings["odooParameters"]["user_name"][0],

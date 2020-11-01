@@ -104,7 +104,7 @@ class Clocking:
             self.odooReachabilityMessage = Utils.getMsgTranslated("clockScreen_databaseNotConnected")[2]
             self.odooReachable = False
             #_logger.warn(msg)
-        print("odooReachabilityMessage", self.odooReachabilityMessage)
+        #print("odooReachabilityMessage", self.odooReachabilityMessage)
         #print("isOdoo reachable: ", self.odooReachable)
         _logger.debug(time.localtime(), "\n self.odooReachabilityMessage ", self.odooReachabilityMessage, "\n self.wifiSignalQualityMessage ", self.wifiSignalQualityMessage)        
         return self.odooReachable
@@ -112,7 +112,7 @@ class Clocking:
     #@Utils.timer
     def doTheClocking(self):
         try:
-            print("self.OdooReachable in dotheclocking", self.odooReachable)
+            #print("self.OdooReachable in dotheclocking", self.odooReachable)
             if self.odooReachable:
                 res = self.Odoo.checkAttendance(self.Reader.card)
                 if res:
