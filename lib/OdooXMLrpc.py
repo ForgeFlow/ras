@@ -82,7 +82,8 @@ class OdooXMLrpc:
         returnValue = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            setTimeout(6)
+            setTimeout(float(Utils.settings["timeoutToGetOdooUID"]) or None)
+            print("timeoutToGetOdooUID: ", float(Utils.settings["timeoutToGetOdooUID"]) or None )
             user_id = loginServerProxy.login(
                 Utils.settings["odooParameters"]["db"][0],
                 Utils.settings["odooParameters"]["user_name"][0],

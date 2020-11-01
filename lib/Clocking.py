@@ -126,7 +126,7 @@ class Clocking:
                 self.msg = "comm_failed"
         except Exception as e:
             _logger.exception(e) # Reset parameters for Odoo because fails when start and odoo is not running
-            print("exception in dotheclocking e:", e)
+            # print("exception in dotheclocking e:", e)
             if self.isOdooReachable():
                 self.msg = "ContactAdm"  # No Odoo Connection: Contact Your Admin
             else:
@@ -140,7 +140,7 @@ class Clocking:
         self.Disp.lockForTheClock = True
         self.msg = "comm_failed"
         self.Disp.display_msg("connecting")
-        print("clocking ln142 - odoo uid ", self.Odoo.uid)
+        # print("clocking ln142 - odoo uid ", self.Odoo.uid)
         if not self.Odoo.uid:
             print("first if in card logging")
             self.msg = "ContactAdm"  # There was no successful Odoo Connection (no uid) since turning the device on:
@@ -148,7 +148,7 @@ class Clocking:
             self.Odoo.getUIDfromOdoo()  # be sure that always uid is set to the last Odoo status (if connected)
 
         if self.Odoo.uid and self.odooReachable: # check if the uid was set after running SetParams
-            print("second if in card logging")
+            # print("do the Clocking ")
             if self.wifiStable():
                 self.doTheClocking()
             else:

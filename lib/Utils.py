@@ -190,7 +190,11 @@ def getSettingsFromDeviceCustomization():
   settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"           , defaultValue = None)
   settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce" , defaultValue = False)
   settings["flask"]                   = getOptionFromDeviceCustomization("flask"                    , defaultValue = defaultCredentialsDic)
-  
+  settings["timeoutToGetOdooUID"]     = getOptionFromDeviceCustomization("timeoutToGetOdooUID"      , defaultValue = 6.0)
+  settings["ssh"]                     = getOptionFromDeviceCustomization("ssh"                      , defaultValue = "enable")
+  settings["sshPassword"]             = getOptionFromDeviceCustomization("sshPassword"              , defaultValue = "raspberry")  
+  settings["firmwareVersion"]         = getOptionFromDeviceCustomization("firmwareVersion"          , defaultValue = "v1.4.3+")
+
 def getMsg(textKey):
   try:
     return settings["messagesDic"][textKey] 
@@ -240,7 +244,7 @@ def handleMigratioOfDeviceCustomizationFile():
   '''
   deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
   deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
-  newOptionsList = ["SSIDreset","fileForMessages","firmwareVersion","ssh", "sshPassword" ]
+  newOptionsList = ["SSIDreset","fileForMessages","firmwareVersion","ssh", "sshPassword", "timeoutToGetOdooUID" ]
   if deviceCustomizationDic:
     for option in newOptionsList:
       if not(option in deviceCustomizationDic) and (option in deviceCustomizationSampleDic):
