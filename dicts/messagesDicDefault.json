@@ -389,6 +389,58 @@
       ".. connexion...\n\n\n--------------"
     ]
   },
+  "disable": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "DISABLE\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      18,
+      "DESHABILITAR\n\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      20,
+      "D\u00c9SACTIVER\n\n\n------------------"
+    ]
+  },
+  "enable": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "ENABLE\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      18,
+      "HABILITAR\n\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      20,
+      "ACTIVER\n\n\n------------------"
+    ]
+  },
   "getNewAdminCard": {
     "ENGLISH": [
       [
@@ -446,6 +498,84 @@
     "ESPA\u00d1OL",
     "FRAN\u00c7AIS"
   ],
+  "ENGLISH": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ]
+  },
+  "ESPA\u00d1OL": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ]
+  },
+  "FRAN\u00c7AIS": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ]
+  },
   "newAdmCardDefined": {
     "ENGLISH": [
       [
@@ -756,6 +886,32 @@
       ],
       14,
       "appuyez sur OK\npour l'option:\nAfficher le nom\nde l'EMPLOY\u00c9\n-------------------------"
+    ]
+  },
+  "shouldSshBeEnabled": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "press OK to\nchoose if ssh\nshould be\nenabled\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "pulse OK para\nelegir si ssh\ndebe estar\nhabilitado\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour l'option:\nActiver\nSSH\n--------------------------"
     ]
   },
   "showRFID": {

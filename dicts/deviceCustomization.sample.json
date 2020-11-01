@@ -1,4 +1,6 @@
 {
+  "ssh":"enable",
+  "sshPassword":"raspberry",
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
   "firmwareVersion": "v1.4.3",

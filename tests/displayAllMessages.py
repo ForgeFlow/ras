@@ -17,8 +17,8 @@ initiallyStoredLanguage = Utils.settings["language"]
 initiallyFileForMessages = Utils.settings["fileForMessages"]
 
 try:
-  #Utils.storeOptionInDeviceCustomization("fileForMessages","messagesDicDefault.json")
-  Utils.storeOptionInDeviceCustomization("fileForMessages","messagesDicEtRH.json")
+  Utils.storeOptionInDeviceCustomization("fileForMessages","messagesDicDefault.json")
+  #Utils.storeOptionInDeviceCustomization("fileForMessages","messagesDicEtRH.json")
 
   Utils.getSettingsFromDeviceCustomization()
 

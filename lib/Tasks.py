@@ -38,6 +38,7 @@ class Tasks:
 				"showRFID"				: self.showRFID,
 				"updateFirmware"	: self.updateFirmware,
 				"shouldEmployeeNameBeDisplayed": self.shouldEmployeeNameBeDisplayed,
+				"shouldSshBeEnabled": self.shouldSshBeEnabled,
 				"resetWifi"				: self.resetWifi,
 				"resetOdoo"				: self.getOdooUIDwithNewParameters,
 				"getNewAdminCard"	: self.getNewAdminCard,
@@ -53,6 +54,7 @@ class Tasks:
 				"showRFID"				,
 				"updateFirmware"	,
 				"shouldEmployeeNameBeDisplayed",
+				"shouldSshBeEnabled",
 				"resetWifi"				,
 				"resetOdoo"				,
 				"getNewAdminCard"	,
@@ -66,6 +68,7 @@ class Tasks:
 		self.currentMenuOption = 0
 
 		self.listOfYesNo =['yes', 'no']
+		self.listOfEnableDisable =['enable', 'disable']
 
 	 ########### LANGUAGES ####################
 		self.listOfLanguages = Utils.getListOfLanguages(["ENGLISH"])
@@ -204,16 +207,16 @@ class Tasks:
 
 		_logger.debug("choose Language")
 
-		textPositionOrigin = (0,6)
-		textSize = 15
-		banner = "-"*18
+		# textPositionOrigin = (0,6)
+		# textSize = 15
+		# banner = "-"*18
 		self.currentLanguageOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
-			text = banner +"\n" + currentLanguageOption +"\n"+ banner
-			self.Disp.displayMsgRaw([textPositionOrigin, textSize, text])
+			#text = banner +"\n" + currentLanguageOption +"\n"+ banner
+			self.Disp.display_msg(currentLanguageOption)
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:
 				self.Buzz.Play("OK")
@@ -459,6 +462,35 @@ class Tasks:
 		self.Buzz.Play("OK")
 		self.Disp.showEmployeeName = textCurrentOption
 		Utils.storeOptionInDeviceCustomization("showEmployeeName",textCurrentOption)
+		
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		self.nextTask = self.defaultNextTask
+
+	def shouldSshBeEnabled(self):
+		def goOneDownInTheMenu(currentOption):
+			self.Buzz.Play("down")
+			currentOption  += 1
+			if currentOption  > len(self.listOfEnableDisable)-1:
+					currentOption  = 0
+			return currentOption
+
+		currentOption = 0
+		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+
+		while not self.B_OK.pressed:
+			textCurrentOption = self.listOfEnableDisable[currentOption]
+			self.Disp.display_msg(textCurrentOption)
+			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+
+			if self.B_Down.pressed:
+				currentOption = goOneDownInTheMenu(currentOption)
+
+		self.Buzz.Play("OK")
+		if textCurrentOption = "enable":
+			Utils.enableSSH()
+		else:
+			Utils.disableSSH()
+		Utils.storeOptionInDeviceCustomization("ssh",textCurrentOption)
 		
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask

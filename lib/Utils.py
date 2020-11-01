@@ -12,7 +12,7 @@ fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
 fileDataJson                  = WORK_DIR + "dicts/data.json"
 fileCredentials               = WORK_DIR + "dicts/credentials.json"
-#fileCredentialsSample         = WORK_DIR + "dicts/credentials.sample.json"
+
 settings                      = {}
 defaultMessagesDic            = {}
 credentialsDic                = {}
@@ -236,14 +236,15 @@ def handleMigratioOfDeviceCustomizationFile():
   if there is no "DeviceCustomization" File,
   take the sample file
   if there is a "DeviceCustomization" File,
-  add the Fields: "SSIDreset","fileForMessages","firmwareVersion"
+  add the Fieldsin newOptionsList
   '''
   deviceCustomizationDic        = getJsonData(fileDeviceCustomization)
   deviceCustomizationSampleDic  = getJsonData(fileDeviceCustomizationSample)
+  newOptionsList = ["SSIDreset","fileForMessages","firmwareVersion","ssh", "sshPassword" ]
   if deviceCustomizationDic:
-    deviceCustomizationDic["SSIDreset"]       = deviceCustomizationSampleDic["SSIDreset"]
-    deviceCustomizationDic["fileForMessages"] = deviceCustomizationSampleDic["fileForMessages"]
-    deviceCustomizationDic["firmwareVersion"] = deviceCustomizationSampleDic["firmwareVersion"]
+    for option in newOptionsList:
+      if not(option in deviceCustomizationDic) and (option in deviceCustomizationSampleDic):
+        deviceCustomizationDic[option] = deviceCustomizationSampleDic[option]
   else:
     deviceCustomizationDic = copy.deepcopy(deviceCustomizationSampleDic)
     deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
@@ -281,4 +282,18 @@ def getOwnIpAddress():
   ipAddress = (subprocess.check_output(command, shell=True).decode("utf-8").strip("\n"))
   storeOptionInDeviceCustomization("ownIpAddress",[ipAddress])
   return ipAddress
+
+def enableSSH():
+  try:
+    os.system("sudo service ssh enable")
+    os.system("sudo service ssh start")
+  except Exception as e:
+    print("Exception in method Utils.enableSSH: ", e)
+
+def disableSSH():
+  try:
+    os.system("sudo service ssh disable")
+    os.system("sudo service ssh start")
+  except Exception as e:
+    print("Exception in method Utils.disableSSH: ", e)
 
