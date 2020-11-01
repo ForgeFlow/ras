@@ -1,0 +1,267 @@
+{
+  "browseForNewOdooParams": {
+    "ENGLISH": [
+      [
+        2,
+        0
+      ],
+      14,
+      "Browse to\n-IpPlaceholder-:3000\nto introduce new\nEtRH Parameters\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Navege a\n-IpPlaceholder-:3000\npara definir nuevos\nPar\u00e1metros EtRH\n--------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Ouvrez l'URL\n-IpPlaceholder-:3000\npour definir les\nParam\u00e8tres EtRH\n-------------------------\n"
+    ]
+  },
+  "clockScreen_databaseNotConnected": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH disconnected\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH desconectado\n-----------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH d\u00e9connect\u00e9\n-------------------------\n"
+    ]
+  },
+  "clockScreen_databaseOK": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH connected\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH conectado\n-------------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "EtRH connect\u00e9\n------------------------\n"
+    ]
+  },
+  "comm_failed": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Error while\ncommunicating\nwith EtRH\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        1,
+        0
+      ],
+      18,
+      "Error mientras\ncomunicando\ncon EtRH\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Echec de\nla connexion\navec EtRH\n\n---------------------"
+    ]
+  },
+  "gotUID": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Communication\nwith EtRH\nestablished\n\n-----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Communicaci\u00f3n\ncon EtRH\nestablecida\n\n------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        4
+      ],
+      16,
+      "Connexion \u00e9tablie\navec votre\nserveur EtRH\n\n-----------------"
+    ]
+  },
+  "listOfLanguages": [
+    "ENGLISH",
+    "ESPA\u00d1OL",
+    "FRAN\u00c7AIS"
+  ],
+  "noRouteToHost": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "No route\nto EtRH\ndatabase\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Sin ruta a\nla base de\ndatos de EtRH\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        3
+      ],
+      17,
+      "Pas de route\nvers la base de\ndonn\u00e9es EtRH\n\n---------------------"
+    ]
+  },
+  "noUID": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "Could not\nget an\nEtRH UID\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      19,
+      "No fu\u00e9 posible\nconseguir una\nUID en EtRH\n\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      19,
+      "Pas possible\nd'obtenir une\nUID en EtRH\n\n---------------------"
+    ]
+  },
+  "odoo_failed": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Communication\nwith EtRH FAILED,\nplease check\nthe Parameters\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "La comunicaci\u00f3n\ncon EtRH ha fallado\nPor favor, revise\nlos PAR\u00c1METROS\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      13,
+      "Echec de la connexion\navec le serveur EtRH\nVeuillez, v\u00e9rifier\nvos PARAM\u00c8TRES\n------------------"
+    ]
+  },
+  "resetOdoo": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK to\nRESET the EtRH\nparameters\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        5
+      ],
+      16,
+      "OK para resetear\n los par\u00e1metros\nde EtRH\n\n------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour r\u00e9initialiser\nles param\u00e8tres\nd'EtRH\n\n-------------------------"
+    ]
+  },
+  "welcome": {
+    "ENGLISH": [
+      [
+        0,
+        4
+      ],
+      17,
+      "Welcome to the\nRFID attendance\nsystem\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        2
+      ],
+      17,
+      "Sistema de\nControl\nde Presencia\npor RFID\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        2,
+        5
+      ],
+      15,
+      "Bienvenue sur\nvotre badgeuse\nconnect\u00e9e \u00e0 EtRH\n\n------------------"
+    ]
+  }
+}

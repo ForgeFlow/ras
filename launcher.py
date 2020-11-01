@@ -1,4 +1,4 @@
-#! /usr/bin/python3.5
+#! /usr/bin/python3.7
 import os
 import time
 import logging
@@ -8,100 +8,64 @@ format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
 
 from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
 from lib import Display, CardReader, PasBuz, Button
-from lib import OdooXMLrpc, Tasks
-from lib import second_fixup_watchdog
-from lib import fixup_watchdog
-from lib import fixup
+from lib import OdooXMLrpc, Tasks, Utils
+
 import traceback
 from io import StringIO
 
 
 _logger = logging.getLogger(__name__)
 
-Buz = PasBuz.PasBuz(PinsBuzzer)
+Utils.migrationToVersion1_4_2()
+Utils.getSettingsFromDeviceCustomization()
+
+Buzz = PasBuz.PasBuz(PinsBuzzer)
 Disp = Display.Display()
 Reader = CardReader.CardReader()
 B_Down = Button.Button(PinsDown)
 B_OK = Button.Button(PinsOK)
-Hardware = [Buz, Disp, Reader, B_Down, B_OK]
+Hardware = [Buzz, Disp, Reader, B_Down, B_OK]
 
-Odoo = OdooXMLrpc.OdooXMLrpc()  # communicate via xlm
+Odoo = OdooXMLrpc.OdooXMLrpc(Disp)  
 Tasks = Tasks.Tasks(Odoo, Hardware)
 
-
-def ask_twice():
-    # user asked twice before executing -'are you sure?'
-    Buz.Play("OK")
-    Disp.display_msg("sure?")
-    B_OK.pressed = False  # avoid false positives
-    B_Down.pressed = False
-    time.sleep(0.4)  # allow time to take the finger
-    # away from the button
-    while not (B_OK.pressed or B_Down.pressed):  # wait answer
-        pass
-
-    if B_OK.pressed:  # OK pressed for a second time
-
-        Tasks.selected()  # The selected Task is run.
-        # When the Admin Card is swiped
-        # the Program returns here again.
-    else:
-        Buz.Play("down")
-        time.sleep(0.4)  # allow time to take the finger
-        # away from the button
-        B_OK.pressed = False  # avoid false positives
-        B_Down.pressed = False
-
-
-def main_loop():
-    # The Main Loop only ends when the option to reboot is chosen.
-    # In all the Tasks, when the Admin Card is swiped,
-    # the program returns to this Loop, where a new Task
-    # can be selected using the OK and Down Buttons.
+def mainLoop():
     try:
-        Disp.initial_display()
-        # if not Tasks.wifi_active():  # make sure that the Terminal is
-        #     Tasks.reset_wifi()  # connected to a WiFi
-        if not Odoo.user:  # make sure that we have
-            Tasks.reset_odoo()  # access to an odoo db
-        Tasks.selected()  # when the terminal is switched on it goes
-        # to the predefined Task (begin_option)
-        B_OK.pressed = False  # avoid false positives
-        B_Down.pressed = False
+        Disp.displayGreetings()
 
-        while not Tasks.reboot:
-            Disp.display_msg(Tasks.option_name())
-            if B_OK.pressed:
-                if Tasks.option_name() in Tasks.ask_twice:
-                    ask_twice()
-                else:
-                    Tasks.selected()
-            elif B_Down.pressed:
-                Tasks.down()
-            _logger.debug("Tasks.reboot = " + str(Tasks.reboot))
-            B_OK.pressed = False
-            B_Down.pressed = False
+        Tasks.nextTask = "ensureWiFiAndOdoo"
 
-        Disp.display_msg("shut_down")
-        time.sleep(1.5)
-        Disp.clear_display()
-        os.system("sudo reboot")
+        while True:
+            if Tasks.nextTask:
+                Disp.display_msg("connecting")
+                Tasks.executeNextTask()
+            else:
+                Tasks.chooseTaskFromMenu()
+
+
     except Exception as e:
         buff = StringIO()
         traceback.print_exc(file=buff)
         _logger.error(buff.getvalue())
         raise e
 
-
 class RASFormatter(logging.Formatter):
     def format(self, record):
         record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
+log_file = '/var/log/ras.log'
+
+if not os.path.isfile(log_file):
+    os.system("sudo touch "+log_file)
+
+os.system("sudo chmod 777 "+log_file)
 
 handler = logging.handlers.TimedRotatingFileHandler(
-    filename="/var/log/ras.log", when="D", interval=1, backupCount=30
+    filename = log_file, when="D", interval=1, backupCount=30
 )
+
 handler.setFormatter(RASFormatter(format))
 logging.getLogger().addHandler(handler)
-main_loop()
+
+mainLoop()

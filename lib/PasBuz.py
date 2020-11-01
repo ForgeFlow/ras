@@ -20,7 +20,10 @@ class PasBuz:
     def Play(self, msg):
         _logger.debug("Playing PasBuz")
         self.InitBuz()
-        data = dic[msg]
+        try:
+            data = dic[msg]
+        except:
+            data = dic["FALSE"] # if there is no melody for a message, play melody for FALSE
 
         while data:
             self.PlayBuz(data[0])

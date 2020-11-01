@@ -1,0 +1,1203 @@
+{
+  " ": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      20,
+      " "
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      20,
+      " "
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      20,
+      " "
+    ]
+  },
+  "ContactAdm": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Contact\nyour\nAdministrator\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "P\u00f3ngase en\ncontacto con\nsu Inform\u00e1tico\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Contactez votre\n Responsable\nInformatique\n\n---------------------"
+    ]
+  },
+  "ERRUpdate": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Unable to update,\nGitHub is not\navailable\n\n---------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Update no es\nposible, GitHub\nno responde\n\n----------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      15,
+      "Mise \u00e0 jour\nimpossible, GitHub\nne r\u00e9pond pas\n\n---------------"
+    ]
+  },
+  "FALSE": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      21,
+      "NOT\nAUTHORIZED\n\n---------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        5
+      ],
+      20,
+      "NO\nAUTORIZADO\n\n----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      21,
+      "BADGE NON\n RECONNU\n\n------------------"
+    ]
+  },
+  "browseForNewAdminCard": {
+    "ENGLISH": [
+      [
+        2,
+        0
+      ],
+      14,
+      "Browse to\n-IpPlaceholder-:3000\nto define a new\nAdmin Card\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Navege a\n-IpPlaceholder-:3000\npara definir otra\nTARJETA ADMIN\n---------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Ouvrez l\u00b4URL\n-IpPlaceholder-:3000\npour un nouveau\nBADGE ADMIN\n-------------------------\n"
+    ]
+  },
+  "browseForNewOdooParams": {
+    "ENGLISH": [
+      [
+        2,
+        0
+      ],
+      14,
+      "Browse to\n-IpPlaceholder-:3000\nto introduce new\nOdoo Parameters\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Navege a\n-IpPlaceholder-:3000\npara definir nuevos\nPar\u00e1metros Odoo\n--------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Ouvrez l\"URL\n-IpPlaceholder-:3000\npour definir les\nParam\u00e8tres Odoo\n-------------------------\n"
+    ]
+  },
+  "check_in": {
+    "ENGLISH": [
+      [
+        0,
+        3
+      ],
+      16,
+      ">>> CHECK IN .....\n-EmployeePlaceholder-\n\n\n-----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        3
+      ],
+      16,
+      ">>>> Entrada ......\n-EmployeePlaceholder-\n\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      16,
+      ">>> BIENVENUE ...\n-EmployeePlaceholder-\n\n\n-------------"
+    ]
+  },
+  "check_out": {
+    "ENGLISH": [
+      [
+        0,
+        3
+      ],
+      16,
+      "CHECK OUT >>>>>\n-EmployeePlaceholder-\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        3
+      ],
+      16,
+      "...... Salida >>>>>\n-EmployeePlaceholder-\n\n\n----------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      16,
+      "... AU REVOIR >>>\n-EmployeePlaceholder-\n\n\n-------------"
+    ]
+  },
+  "chooseLanguage": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK\nto change\nLANGUAGE\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "pulse OK\npara cambiar\nel IDIOMA\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "appuyez sur OK\npour changer\n la LANGUE\n\n---------------------"
+    ]
+  },
+  "clockScreen_databaseNotConnected": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo disconnected\n-----------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo desconectado\n-----------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo d\u00e9connect\u00e9\n-------------------------\n"
+    ]
+  },
+  "clockScreen_databaseOK": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo connected\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo conectado\n-------------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Odoo connect\u00e9\n------------------------\n"
+    ]
+  },
+  "clocking": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK\nto begin\nCLOCKING\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "pulse OK\npara empezar\na fichar\n\n----------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "appuyez sur OK\npour\ncommencer\n\n---------------------"
+    ]
+  },
+  "comm_failed": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Error while\ncommunicating\nwith Odoo\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        1,
+        0
+      ],
+      18,
+      "Error mientras\ncomunicando\ncon Odoo\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Echec de\nla connexion\navec Odoo\n\n---------------------"
+    ]
+  },
+  "configure_wifi": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "1. Connect to AP\n-SSIDresetPlaceholder-\n2. Browse to \n192.168.42.1\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "1. Con\u00e9ctese al AP\n-SSIDresetPlaceholder-\n2. Navege a \n192.168.42.1\n-------------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "1. Connectez-vous\nau SSID -SSIDresetPlaceholder-\n2. Ouvrez l\u00b4URL \n192.168.42.1\n-------------------------\n"
+    ]
+  },
+  "connecting": {
+    "ENGLISH": [
+      [
+        0,
+        18
+      ],
+      20,
+      "..connecting...\n\n\n--------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        20
+      ],
+      19,
+      "..conectando...\n\n\n----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        18
+      ],
+      20,
+      ".. connexion...\n\n\n--------------"
+    ]
+  },
+  "disable": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "DISABLE\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      18,
+      "DESHABILITAR\n\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      20,
+      "D\u00c9SACTIVER\n\n\n------------------"
+    ]
+  },
+  "enable": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "ENABLE\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      18,
+      "HABILITAR\n\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      20,
+      "ACTIVER\n\n\n------------------"
+    ]
+  },
+  "getNewAdminCard": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK to\nchange the\nADMIN CARD\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "pulse OK para\ncambiar la\ntarjeta ADMIN\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "appuyez sur OK\npour changer le\nbadge ADMIN\n\n---------------------"
+    ]
+  },
+  "gotUID": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Communication\nwith Odoo\nestablished\n\n-----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Communicaci\u00f3n\ncon Odoo\nestablecida\n\n------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        4
+      ],
+      16,
+      "Connexion \u00e9tablie\navec votre\nserveur Odoo\n\n-----------------"
+    ]
+  },
+  "listOfLanguages": [
+    "ENGLISH",
+    "ESPA\u00d1OL",
+    "FRAN\u00c7AIS"
+  ],
+  "ENGLISH": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nENGLISH\n\n\n--------------------------"
+    ]
+  },
+  "ESPA\u00d1OL": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nESPA\u00d1OL\n\n\n--------------------------"
+    ]
+  },
+  "FRAN\u00c7AIS": {
+    "ENGLISH": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        6
+      ],
+      15,
+      "\nFRAN\u00c7AIS\n\n\n--------------------------"
+    ]
+  },
+  "newAdmCardDefined": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "New Admin\nRFID Card\ndefined\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      19,
+      "Nueva Tarjeta\nAdmin\nalmacenada\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        2
+      ],
+      16,
+      "Votre nouveau\nbadge ADMIN est\npris en compte\n\n---------------------"
+    ]
+  },
+  "no": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "NO\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      24,
+      "NO\n\n\n----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      24,
+      "NON\n\n\n----------------"
+    ]
+  },
+  "noRouteToHost": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "No route\nto host\ndatabase\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      17,
+      "Sin ruta a\nla base de\ndatos del host\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        3
+      ],
+      17,
+      "Pas de route\nvers la base de\ndonn\u00e9es h\u00f4te\n\n---------------------"
+    ]
+  },
+  "noUID": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "Could not\nget an\nOdoo UID\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      19,
+      "No fu\u00e9 posible\nconseguir una\nUID en Odoo\n\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      19,
+      "Pas possible\nd'obtenir une\nUID d'Odoo\n\n---------------------"
+    ]
+  },
+  "noWiFiSignal": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "No WiFi signal\n-------------------------\n"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "No hay se\u00f1al WiFi\n-------------------------\n"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Aucun Signal WIFI\n-------------------------\n"
+    ]
+  },
+  "no_wifi": {
+    "ENGLISH": [
+      [
+        0,
+        8
+      ],
+      20,
+      "No\nWiFi Signal\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        8
+      ],
+      20,
+      "No hay\nSe\u00f1al WiFi\n\n------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        8
+      ],
+      20,
+      "Aucun Signal\nWIFI d\u00e9tect\u00e9\n\n-----------------"
+    ]
+  },
+  "odoo_failed": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "Communication\nwith Odoo FAILED,\nplease check\nthe Parameters\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "La comunicaci\u00f3n\ncon Odoo ha fallado\nPor favor, revise\nlos PAR\u00c1METROS\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      13,
+      "Echec de la connexion\navec le serveur Odoo\nVeuillez, v\u00e9rifier\nvos PARAM\u00c8TRES\n------------------"
+    ]
+  },
+  "reboot": {
+    "ENGLISH": [
+      [
+        3,
+        6
+      ],
+      20,
+      "press OK\nto REBOOT\n\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      19,
+      "pulse OK para\nREINICIAR\nel terminal\n\n------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      17,
+      "appuyez sur OK\npour\nRED\u00c9MARRER\n\n---------------------"
+    ]
+  },
+  "rebooting": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      22,
+      "REBOOTING\n\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Reinicializando\nel terminal\n-rebooting-\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        18
+      ],
+      18,
+      "RED\u00c9MARRAGE\n\n\n---------------------"
+    ]
+  },
+  "resetOdoo": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK to\nRESET the Odoo\nparameters\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        5
+      ],
+      16,
+      "OK para resetear\n los par\u00e1metros\nde Odoo\n\n------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour r\u00e9initialiser\nles param\u00e8tres\nd'Odoo\n\n-------------------------"
+    ]
+  },
+  "resetWifi": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK to\nRESET the WiFi\nparameters\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "pulse OK para\nresetear la\nconexi\u00f3n WiFi\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour r\u00e9initialiser\nles param\u00e8tres\nWIFI\n\n-------------------------"
+    ]
+  },
+  "shouldEmployeeNameBeDisplayed": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "press OK to\nchoose if the\nemployee name\nshould be shown\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "pulse OK para\ndeterminar si se\nmuestra el nombre\ndel EMPLEADO\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour l'option:\nAfficher le nom\nde l'EMPLOY\u00c9\n-------------------------"
+    ]
+  },
+  "shouldSshBeEnabled": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      14,
+      "press OK to\nchoose if ssh\nshould be\nenabled\n--------------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "pulse OK para\nelegir si ssh\ndebe estar\nhabilitado\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour l'option:\nActiver\nSSH\n--------------------------"
+    ]
+  },
+  "showRFID": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "press OK\nto read\nRFID codes\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "pulse OK para\nleer los\nc\u00f3digos RFID\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "appuyez sur OK\npour lire\nle code RFID\n\n---------------------"
+    ]
+  },
+  "showVersion": {
+    "ENGLISH": [
+      [
+        2,
+        0
+      ],
+      18,
+      "press OK to see\nthe Firmware\nVERSION\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        2,
+        0
+      ],
+      18,
+      "pulse OK para\nver la VERSION\ndel Firmware\n\n-----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour afficher la\nversion du\nFirmware\n\n--------------------------"
+    ]
+  },
+  "shutdownSafe": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "press OK to\nsafe\nSHUTDOWN\n\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      14,
+      "pulse OK para\n-- APAGAR --\nel terminal\n-shutdown-\n\n--------------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      14,
+      "appuyez sur OK\npour \u00e9teindre la\nbadgeuse en\ns\u00e9curit\u00e9\n\n-------------------------"
+    ]
+  },
+  "shuttingDown": {
+    "ENGLISH": [
+      [
+        0,
+        5
+      ],
+      22,
+      "SHUTTING\nDOWN\n\n\n------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Apagando\nel terminal\n-shutting down-\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        10
+      ],
+      18,
+      "ARR\u00caT\nEN COURS\n\n\n---------------------"
+    ]
+  },
+  "sure?": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "ARE YOU SURE?\nPress OK again\nif you are sure\n\n-------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        4
+      ],
+      16,
+      "EST\u00c1 SEGURO?\nPulse OK otra vez\nsi est\u00e1 seguro\n\n-------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        2,
+        4
+      ],
+      16,
+      "\u00caTES-VOUS S\u00dbR?\nAppuyez sur OK\npour confirmer\n\n-------------------"
+    ]
+  },
+  "swipecard": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Please\nswipe\nyour card\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Por favor\npase una\ntarjeta\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Veuillez\npr\u00e9senter\nvotre badge\n\n---------------------"
+    ]
+  },
+  "update": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Updating\nthe\nFirmware\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Actualizando\nel\nFirmware\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      18,
+      "Mise \u00e0 jour\ndu Firmware\nen cours\n\n---------------------"
+    ]
+  },
+  "updateFirmware": {
+    "ENGLISH": [
+      [
+        0,
+        0
+      ],
+      19,
+      "press OK\nto UPDATE\nthe Firmware\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        0
+      ],
+      19,
+      "pulse OK para\nactualizar\nel Firmware\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        0
+      ],
+      17,
+      "appuyez sur OK\npour mettre \u00e0\njour le Firmware\n\n---------------------"
+    ]
+  },
+  "wait": {
+    "ENGLISH": [
+      [
+        0,
+        5
+      ],
+      22,
+      "Please\nwait\n\n-----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        5
+      ],
+      22,
+      "Espere\npor favor\n\n------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        5
+      ],
+      22,
+      "Veuillez\npatienter\n\n------------------"
+    ]
+  },
+  "welcome": {
+    "ENGLISH": [
+      [
+        0,
+        4
+      ],
+      17,
+      "Welcome to the\nRFID attendance\nsystem\n\n---------------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        2
+      ],
+      17,
+      "Sistema de\nControl\nde Presencia\npor RFID\n\n---------------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        2,
+        5
+      ],
+      15,
+      "Bienvenue sur\nvotre badgeuse\nconnect\u00e9e \u00e0 Odoo\n\n------------------"
+    ]
+  },
+  "yes": {
+    "ENGLISH": [
+      [
+        0,
+        16
+      ],
+      24,
+      "YES\n\n\n----------------"
+    ],
+    "ESPA\u00d1OL": [
+      [
+        0,
+        16
+      ],
+      24,
+      "S\u00cd\n\n\n----------------"
+    ],
+    "FRAN\u00c7AIS": [
+      [
+        0,
+        16
+      ],
+      24,
+      "OUI\n\n\n----------------"
+    ]
+  }
+}
