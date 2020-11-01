@@ -81,7 +81,7 @@ class Display:
 
     #@Utils.timer
     def display_msg(self, textKey, employee_name = None):
-        self.clear_display()
+        #self.clear_display()
         message = Utils.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and Utils.settings["showEmployeeName"] == "yes":
