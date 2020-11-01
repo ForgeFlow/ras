@@ -20,7 +20,7 @@ class Clocking:
         self.wifi = False
         #self.wifi_con = Wireless("wlan0")
 
-        self.timeToDisplayResult = 1.4 # in seconds
+        self.timeToDisplayResult = Utils.settings["timeToDisplayResultAfterClocking"] #1.4 # in seconds
 
         self.msg = False    # determines Melody to play and/or Text to display depending on Event happened: for example check in,
                             # check out, communication with odoo not possible ...
