@@ -486,7 +486,7 @@ class Tasks:
 				currentOption = goOneDownInTheMenu(currentOption)
 
 		self.Buzz.Play("OK")
-		if textCurrentOption = "enable":
+		if textCurrentOption == "enable":
 			Utils.enableSSH()
 		else:
 			Utils.disableSSH()

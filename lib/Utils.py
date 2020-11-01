@@ -285,15 +285,15 @@ def getOwnIpAddress():
 
 def enableSSH():
   try:
-    os.system("sudo service ssh enable")
+    os.system("sudo systemctl enable ssh")
     os.system("sudo service ssh start")
   except Exception as e:
     print("Exception in method Utils.enableSSH: ", e)
 
 def disableSSH():
   try:
-    os.system("sudo service ssh disable")
-    os.system("sudo service ssh start")
+    os.system("sudo systemctl disable ssh")
+    os.system("sudo service ssh stop")
   except Exception as e:
     print("Exception in method Utils.disableSSH: ", e)
 
