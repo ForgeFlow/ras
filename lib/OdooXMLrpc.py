@@ -128,7 +128,8 @@ class OdooXMLrpc:
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                setTimeout(3)
+                setTimeout(float(Utils.settings["timeoutToCheckAttendance"]) or None)
+                print("timeoutToCheckAttendance: ", float(Utils.settings["timeoutToCheckAttendance"]) or None )
                 res = serverProxy.execute(
                     Utils.settings["odooParameters"]["db"][0],
                     self.uid,
