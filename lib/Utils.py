@@ -7,6 +7,8 @@ import copy
 import functools
 import subprocess
 
+from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
@@ -25,7 +27,7 @@ def timer(func):
         value = func(*args, **kwargs)
         toc = time.perf_counter()
         elapsed_time = toc - tic
-        print("Elapsed time: {1:0.4f} seconds - Function: {0}".format(func, elapsed_time))
+        loggerDEBUG("Elapsed time: {1:0.4f} seconds - Function: {0}".format(func, elapsed_time))
         return value
     return wrapper_timer
 
@@ -99,7 +101,7 @@ def getJsonData(filePath):
       data = json.load(f)
     return data  
   except Exception as e:
-    print("exception while getting/loading data from json file: ", filePath, " -exception: ", e)
+    loggerDEBUG(f"exception while getting/loading data from json file: {filePath} -exception: {e}")
     #_logger.exception(e):
     return None
 
@@ -144,13 +146,11 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
     s.settimeout(2)
     canConnectResult = s.connect_ex(ipPort)
     if canConnectResult == 0:
-      #print("Utils - IP Port OPEN ", ipPort)
       isOpen = True
     else:
-      #print("Utils - IP Port CLOSED ", ipPort)
       isOpen = False
   except Exception as e:
-    print("Utils - exception in method isIpPortOpen: ", e)
+    loggerDEBUG("Utils - exception in method isIpPortOpen: ", e)
     isOpen = False
   finally:
     s.close()
@@ -198,6 +198,7 @@ def getSettingsFromDeviceCustomization():
   settings["periodEvaluateReachability"]        = getOptionFromDeviceCustomization("periodEvaluateReachability" , defaultValue = 5.0)
   settings["periodDisplayClock"]                = getOptionFromDeviceCustomization("periodDisplayClock" , defaultValue = 10.0)
   settings["timeToDisplayResultAfterClocking"]  = getOptionFromDeviceCustomization("timeToDisplayResultAfterClocking", defaultValue = 1.2)
+
 def getMsg(textKey):
   try:
     return settings["messagesDic"][textKey] 
@@ -255,7 +256,6 @@ def handleMigratioOfDeviceCustomizationFile():
   else:
     deviceCustomizationDic = copy.deepcopy(deviceCustomizationSampleDic)
     deviceCustomizationDic = transferDataJsonToDeviceCustomization(deviceCustomizationDic)
-  #print("deviceCustomizationDic: ", deviceCustomizationDic)
   storeJsonData(fileDeviceCustomization,deviceCustomizationDic)
 
 def handleMigrationOfCredentialsJson():
@@ -269,20 +269,18 @@ def migrationToVersion1_4_2():
   handleMigrationOfCredentialsJson()
   try:
     data = getJsonData(fileDataJson)
-    print("read dict from data.json in method Utils.migrationToVersion1_4_2 ", data)
+    loggerDEBUG(f"read dict from data.json in method Utils.migrationToVersion1_4_2 {data}")
     if data and storeOptionInDeviceCustomization("odooParameters",data): # in data.json the Odoo Params are stored when a successful connection was made
       storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)    
   except Exception as e:
-    print("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer data.json to deviceCustomization file: ", e)
+    loggerDEBUG("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer"+ \
+       f"data.json to deviceCustomization file:{e}")
 
 def isOdooUsingHTTPS():
   if  "https" in settings["odooParameters"].keys():
     if settings["odooParameters"]["https"]== ["https"]:
       return True
   return False
-
-
-  return credentialsDic
 
 def getOwnIpAddress():
   command = "hostname -I | awk '{ print $1}' "
@@ -295,12 +293,12 @@ def enableSSH():
     os.system("sudo systemctl enable ssh")
     os.system("sudo service ssh start")
   except Exception as e:
-    print("Exception in method Utils.enableSSH: ", e)
+    loggerDEBUG(f"Exception in method Utils.enableSSH:{e}")
 
 def disableSSH():
   try:
     os.system("sudo systemctl disable ssh")
     os.system("sudo service ssh stop")
   except Exception as e:
-    print("Exception in method Utils.disableSSH: ", e)
+    loggerDEBUG(f"Exception in method Utils.disableSSH:{e}")
 

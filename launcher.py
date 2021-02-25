@@ -1,71 +1,42 @@
 #! /usr/bin/python3.7
+# import systemd
+import subprocess
 import os
 import time
-import logging
-import logging.handlers
 
-format = "%(asctime)s %(pid)s %(levelname)s %(name)s: %(message)s"
-
-from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
-from lib import Display, CardReader, PasBuz, Button
-from lib import OdooXMLrpc, Tasks, Utils
-
-import traceback
-from io import StringIO
-
-
-_logger = logging.getLogger(__name__)
-
-Utils.migrationToVersion1_4_2()
-Utils.getSettingsFromDeviceCustomization()
-
-Buzz = PasBuz.PasBuz(PinsBuzzer)
-Disp = Display.Display()
-Reader = CardReader.CardReader()
-B_Down = Button.Button(PinsDown)
-B_OK = Button.Button(PinsOK)
-Hardware = [Buzz, Disp, Reader, B_Down, B_OK]
-
-Odoo = OdooXMLrpc.OdooXMLrpc(Disp)  
-Tasks = Tasks.Tasks(Odoo, Hardware)
-
-def mainLoop():
+def ensureModuleInstalled(mymodule):
+    command= "sudo pip3 install " + mymodule
     try:
-        Disp.displayGreetings()
+        completed = subprocess.run(command.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT)
+        print(f'shell command {command} - returncode: {completed.returncode}')
+        if completed.returncode == 0:
+            return True
+        else:
+            return False
+    except:
+        print(f"error on shell command: {command}")
+        return False        
 
-        Tasks.nextTask = "ensureWiFiAndOdoo"
-
-        while True:
-            if Tasks.nextTask:
-                Disp.display_msg("connecting")
-                Tasks.executeNextTask()
-            else:
-                Tasks.chooseTaskFromMenu()
+def installModules(modules_to_be_installed):
+    for module_name in modules_to_be_installed:
+        while not ensureModuleInstalled(module_name):
+            time.sleep(0.01)
 
 
-    except Exception as e:
-        buff = StringIO()
-        traceback.print_exc(file=buff)
-        _logger.error(buff.getvalue())
-        raise e
+# be sure to make python package imports from v1.4.3 to v1.4.4
 
-class RASFormatter(logging.Formatter):
-    def format(self, record):
-        record.pid = os.getpid()
-        return logging.Formatter.format(self, record)
+modules_to_be_installed = [  \
+    "systemd-python",
+    "python-decouple",
+    "pyzmq",
+    "colorama",
+    "setproctitle",
+    "psutil" ]
 
-log_file = '/var/log/ras.log'
+installModules(modules_to_be_installed)
 
-if not os.path.isfile(log_file):
-    os.system("sudo touch "+log_file)
+from common.common import runShellCommand
 
-os.system("sudo chmod 777 "+log_file)
-
-handler = logging.handlers.TimedRotatingFileHandler(
-    filename = log_file, when="D", interval=1, backupCount=30
-)
-
-handler.setFormatter(RASFormatter(format))
-logging.getLogger().addHandler(handler)
-
-mainLoop()
+runShellCommand("sudo python3 rasManager.py")

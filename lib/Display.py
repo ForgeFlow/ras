@@ -7,6 +7,7 @@ from .demo_opts import get_device
 from dicts.ras_dic import display_driver
 from . import routes
 from . import Utils
+from connectivity.helpers import isInterfaceUp, internetReachable
 
 _logger = logging.getLogger(__name__)
 
@@ -22,26 +23,39 @@ class Display:
         self.font3 = ImageFont.truetype(self.fontRoboto, 22)
         self.font4 = ImageFont.truetype(self.fontOrkney, 14)
         self.display_msg("connecting")
-        self.lockForTheClock = False                      
+        self.lockForTheClock = False 
+        self.odooReachabilityMessage  = " "                  
 
-    def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
+    def display_hours_and_minutes(self,draw):
+        hour = time.strftime("%H:%M", time.localtime())
+        num_ones = hour.count("1")
+        if num_ones == 0:
+            draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+        elif num_ones == 1:
+            draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+        elif num_ones == 2:
+            draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+        elif num_ones == 3:
+            draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+        else:
+            draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+
+    def getInternetQualityMessage(self):
+        internetQualityMessage = "no signal"
+        if internetReachable():
+            if isInterfaceUp("eth0"):
+                internetQualityMessage = "Ethernet"
+            elif isInterfaceUp("wlan0"):
+                internetQualityMessage = "WiFi OK"           
+        return internetQualityMessage
+
+    def _display_time(self):
         if not self.lockForTheClock:
+            internetQualityMessage = self.getInternetQualityMessage()
             with canvas(self.device) as draw:
-                hour = time.strftime("%H:%M", time.localtime())
-                num_ones = hour.count("1")
-                if num_ones == 0:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 1:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 2:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 3:
-                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-                else:
-                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-                draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
-                draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
-                draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
+                self.display_hours_and_minutes(draw)
+                draw.text((0, 0), internetQualityMessage +"\n"*7+"-"*26, font=self.fontClockInfos, fill="white", align="center")
+                draw.text((0, 51), self.odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
 
     def showCard(self,card):
         with canvas(self.device) as draw:

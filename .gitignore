@@ -16,3 +16,5 @@ dicts/deviceCustomizationPrior.json
 dicts/dataEtRH.json
 dicts/dataLuiS.json
 dicts/deviceCustomizationLuis.json
+.env
+data/ras3.log
