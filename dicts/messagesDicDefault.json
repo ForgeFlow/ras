@@ -106,27 +106,27 @@
   "browseForNewAdminCard": {
     "ENGLISH": [
       [
-        2,
+        0,
         0
       ],
-      14,
-      "Browse to\n-IpPlaceholder-:3000\nto define a new\nAdmin Card\n-------------------------\n"
+      12,
+      "Browse to\n-IpPlaceholder-:3000\nto define a new\nAdmin Card\n------------------------------\n"
     ],
     "ESPA\u00d1OL": [
       [
         0,
         0
       ],
-      14,
-      "Navege a\n-IpPlaceholder-:3000\npara definir otra\nTARJETA ADMIN\n---------------------\n"
+      12,
+      "Navege a\n-IpPlaceholder-:3000\npara definir otra\nTARJETA ADMIN\n--------------------------\n"
     ],
     "FRAN\u00c7AIS": [
       [
         0,
         0
       ],
-      14,
-      "Ouvrez l\u00b4URL\n-IpPlaceholder-:3000\npour un nouveau\nBADGE ADMIN\n-------------------------\n"
+      12,
+      "Ouvrez l\u00b4URL\n-IpPlaceholder-:3000\npour un nouveau\nBADGE ADMIN\n------------------------------\n"
     ]
   },
   "browseForNewOdooParams": {
@@ -687,7 +687,7 @@
         0
       ],
       14,
-      "No WiFi signal\n-------------------------\n"
+      "No WiFi signal\n\n\n\n\n\n\n-----\n"
     ],
     "ESPA\u00d1OL": [
       [
@@ -695,7 +695,7 @@
         0
       ],
       14,
-      "No hay se\u00f1al WiFi\n-------------------------\n"
+      "No hay se\u00f1al WiFi\n\n\n\n\n\n\n-----\n"
     ],
     "FRAN\u00c7AIS": [
       [
@@ -703,7 +703,7 @@
         0
       ],
       14,
-      "Aucun Signal WIFI\n-------------------------\n"
+      "Aucun Signal WIFI\n\n\n\n\n\n\n-----\n"
     ]
   },
   "no_wifi": {

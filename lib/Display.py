@@ -39,8 +39,11 @@ class Display:
                     draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
                 else:
                     draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-                draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
-                draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
+                if "\u2022" in wifiSignalQualityMessage:
+                    draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
+                    draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
+                else:
+                    draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*18, font=self.font4, fill="white", align="center")
                 draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
 
     def showCard(self,card):
@@ -87,8 +90,13 @@ class Display:
             if employee_name and Utils.settings["showEmployeeName"] == "yes":
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
-                lastName = employeeName[1][0:14]         
-                message[2] = message[2].replace('-EmployeePlaceholder-',firstName+"\n"+lastName,1)
+                nameToDisplay = firstName
+                try:
+                    lastName = employeeName[1][0:14]
+                    nameToDisplay = nameToDisplay + "\n"+lastName
+                except:
+                    _logger.debug("Name has no lastName to Display")         
+                message[2] = message[2].replace('-EmployeePlaceholder-',nameToDisplay,1)
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
         if '-SSIDresetPlaceholder-' in message[2]:

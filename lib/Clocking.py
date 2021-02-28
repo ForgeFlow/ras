@@ -35,7 +35,7 @@ class Clocking:
         iwconfig_out = subprocess.check_output("iwconfig wlan0", shell=True).decode("utf-8")
         if "Access Point: Not-Associated" in iwconfig_out:
             wifiActive = False
-            _logger.warn("No Access Point Associated, i.e. no WiFi connected." % wifiActive)
+            _logger.warn("No Access Point Associated, i.e. no WiFi connected.")
         else:
             wifiActive = True
         return wifiActive
