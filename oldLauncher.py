@@ -1,5 +1,5 @@
 #! /usr/bin/python3.7
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 def main():
     from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
@@ -21,7 +21,7 @@ def main():
     try:
         Disp.displayGreetings()
 
-        Tasks.nextTask = "ensureWiFiAndOdoo"
+        Tasks.nextTask = "ensureOdoo" # TODO should be only ensure Odoo
 
         while True:
             if Tasks.nextTask:

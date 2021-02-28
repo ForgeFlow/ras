@@ -6,7 +6,7 @@ import threading
 from . import Clocking, Utils, routes
 from dicts.ras_dic import ask_twice, FIRMWARE_VERSION
 
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from connectivity.helpers import internetReachable
 
 class Tasks:
@@ -37,13 +37,12 @@ class Tasks:
 				"updateFirmware"	: self.updateFirmware,
 				"shouldEmployeeNameBeDisplayed": self.shouldEmployeeNameBeDisplayed,
 				"shouldSshBeEnabled": self.shouldSshBeEnabled,
-				"resetWifi"				: self.resetWifi,
 				"resetOdoo"				: self.getOdooUIDwithNewParameters,
 				"getNewAdminCard"	: self.getNewAdminCard,
 				"showVersion"			: self.showVersion,
 				"shutdownSafe"		: self.shutdownSafe,
 				"reboot"					: self.reboot,
-				"ensureWiFiAndOdoo": self.ensureWiFiAndOdoo
+				"ensureOdoo"			: self.ensureOdoo # should be only ensure odoo
 		}
 
 		self.listOfTasksInMenu = [  # The Tasks appear in the Menu in the same order as here.
@@ -53,7 +52,6 @@ class Tasks:
 				"updateFirmware"	,
 				"shouldEmployeeNameBeDisplayed",
 				"shouldSshBeEnabled",
-				"resetWifi"				,
 				"resetOdoo"				,
 				"getNewAdminCard"	,
 				"showVersion"			,
@@ -276,21 +274,8 @@ class Tasks:
 			warnNoWiFiSignal()
 			self.nextTask = self.defaultNextTask
 
-	def resetWifi(self):
-		loggerDEBUG("Reset WI-FI")
-		self.Disp.display_msg("configure_wifi")
-		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
-		os.system("sudo wifi-connect --portal-ssid " + Utils.settings["SSIDreset"])
-		self.Buzz.Play("back_to_menu")
-		self.nextTask = self.defaultNextTask
-
-	def isWifiWorking(self):
-		loggerDEBUG("checking if wifi works, i.e. if 1.1.1.1 pingable")
-		return Utils.isPingable("1.1.1.1")
-
 	def getOdooUIDwithNewParameters(self):
 		loggerDEBUG("getOdooUIDwithNewParameters")
-		#self.ensureThatWifiWorks()
 		if internetReachable():
 			self.Disp.displayWithIP('browseForNewOdooParams')
 
@@ -333,7 +318,7 @@ class Tasks:
 			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
-			self.nextTask = "ensureWiFiAndOdoo"
+			self.nextTask = "ensureOdoo"
 
 		time.sleep(3)
 		self.Disp.clear_display()
@@ -415,21 +400,12 @@ class Tasks:
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
 
-	def ensureThatWifiWorks(self):
-		if not self.isWifiWorking(): 
-			self.resetWifi()
-
-	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+	def ensureOdoo(self): 
 		if not Utils.settings["odooConnectedAtLeastOnce"]:
-			#print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+			loggerDEBUG("Odoo UID in ensureOdoo", self.Odoo.uid)
 			while not self.Odoo.uid:
-				self.getOdooUIDwithNewParameters()
-		
+				self.getOdooUIDwithNewParameters()		
 		self.nextTask = self.defaultNextTask
-
-	def ensureWiFiAndOdoo(self):
-		self.ensureThatWifiWorks()
-		self.ensureThatOdooHasBeenReachedAtLeastOnce()
 
 	def shouldEmployeeNameBeDisplayed(self):
 		def goOneDownInTheMenu(currentOption):

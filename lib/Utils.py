@@ -7,7 +7,7 @@ import copy
 import functools
 import subprocess
 
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"

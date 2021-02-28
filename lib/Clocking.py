@@ -5,7 +5,7 @@ import threading
 
 from . import routes, Utils
 
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 from connectivity.helpers import internetReachable
 

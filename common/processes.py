@@ -2,7 +2,7 @@ import psutil
 
 from common import constants as co
 from common.common import prettyPrint as pp
-from common.logger import loggerDEBUG, loggerERROR
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 def isProcessRunning(processName):
     '''
@@ -50,8 +50,9 @@ def on_terminate(process):
     print(f"process {process} terminated with exit code {process.returncode}")
 
 def terminateProcess(process): # process is an instance of psutil.Process()
-    loggerDEBUG(f"terminating PID {process.pid}")
+    loggerDEBUG(f"method terminating process {process.pid}")
     try:
+        loggerDEBUG(f"terminating PID {process.pid}")
         process.terminate()
     except Exception as e:
         loggerERROR(f"exception {e} while terminating PID {process.pid}")
