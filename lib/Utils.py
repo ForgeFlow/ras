@@ -282,7 +282,7 @@ def isOdooUsingHTTPS():
   return False
 
 
-  return credentialsDic
+  #return credentialsDic
 
 def getOwnIpAddress():
   command = "hostname -I | awk '{ print $1}' "
@@ -304,3 +304,19 @@ def disableSSH():
   except Exception as e:
     print("Exception in method Utils.disableSSH: ", e)
 
+def runShellCommand_and_returnOutput(command):
+  try:
+    completed = subprocess.check_output(command, shell=True)
+    #loggerDEBUG(f'shell command {command} - returncode: {completed}')
+    return str(completed)
+  except:
+    #loggerERROR(f"error on shell command: {command}")
+    return False
+
+def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
+  answer = runShellCommand_and_returnOutput(
+    'nmcli dev | grep '+ typeConnection +' | grep -w "connected"')
+  if answer:
+    return True
+  else:
+    return False
