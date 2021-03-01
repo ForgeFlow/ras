@@ -81,11 +81,11 @@ def startServerAdminCard(exitFlag):
 					defineAgain = True
 					return render_template("adminCardChanged.html", IP=str(Utils.settings["ownIpAddress"][0]), port=3000, adminCardChangeResult = message, defineAgain = defineAgain)
 				else:
-					Utils.settings["odooParameters"]["admin_id"] = dic["admin_id"]
+					Utils.settings["odooParameters"]["admin_id"] = [newAdminCard]
 
 					Utils.storeOptionInDeviceCustomization("odooParameters",Utils.settings["odooParameters"])
 
-					message[0] = "The new Admin Card is " + dic["admin_id"][0]
+					message[0] = "The new Admin Card is " + newAdminCard
 					message[1] = "and was succesfully updated in Odoo."
 					defineAgain = False
 
