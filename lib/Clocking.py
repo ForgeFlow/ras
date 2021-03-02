@@ -77,25 +77,29 @@ class Clocking:
                 self.wifiSignalQualityMessage = "Ethernet down"
                 self.wifi = False
         else:
-            if self.wifiActive():
-                strength = int(self.get_status()["Signal level"])  # in dBm
-                if strength >= 79:
-                    self.wifiSignalQualityMessage  = "\u2022" * 1 + "o" * 4
-                    self.wifi = False
-                elif strength >= 75:
-                    self.wifiSignalQualityMessage  = "\u2022" * 2 + "o" * 3
-                    self.wifi = True
-                elif strength >= 65:
-                    self.wifiSignalQualityMessage  = "\u2022" * 3 + "o" * 2
-                    self.wifi = True
-                elif strength >= 40:
-                    self.wifiSignalQualityMessage  = "\u2022" * 4 + "o" * 1
-                    self.wifi = True
+            if Utils.isPingable("1.1.1.1"):
+                if self.wifiActive():
+                    strength = int(self.get_status()["Signal level"])  # in dBm
+                    if strength >= 79:
+                        self.wifiSignalQualityMessage  = "\u2022" * 1 + "o" * 4
+                        self.wifi = False
+                    elif strength >= 75:
+                        self.wifiSignalQualityMessage  = "\u2022" * 2 + "o" * 3
+                        self.wifi = True
+                    elif strength >= 65:
+                        self.wifiSignalQualityMessage  = "\u2022" * 3 + "o" * 2
+                        self.wifi = True
+                    elif strength >= 40:
+                        self.wifiSignalQualityMessage  = "\u2022" * 4 + "o" * 1
+                        self.wifi = True
+                    else:
+                        self.wifiSignalQualityMessage  = "\u2022" * 5
+                        self.wifi = True
                 else:
-                    self.wifiSignalQualityMessage  = "\u2022" * 5
-                    self.wifi = True
+                    self.wifiSignalQualityMessage  = Utils.getMsgTranslated("noWiFiSignal")[2]
+                    self.wifi = False
             else:
-                self.wifiSignalQualityMessage  = Utils.getMsgTranslated("noWiFiSignal")[2]
+                self.wifiSignalQualityMessage  = "WiFi down"
                 self.wifi = False
         
         return self.wifi
