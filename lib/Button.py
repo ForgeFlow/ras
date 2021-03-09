@@ -1,10 +1,8 @@
 import time
-import logging
 
 import RPi.GPIO as GPIO
 
-_logger = logging.getLogger(__name__)
-
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 class Button:
     def __init__(self, pins):
@@ -16,26 +14,15 @@ class Button:
         GPIO.setup(self.pin_power, GPIO.OUT)
         GPIO.output(self.pin_power, 0)
         self.pressed = False
-        _logger.debug("Button Class Initialized")
+        loggerDEBUG("Button Class Initialized")
     
     def poweroff(self):
         GPIO.output(self.pin_power, 0)
-        _logger.debug("Button Power off")
+        loggerDEBUG("Button Power off")
 
     def poweron(self):
         GPIO.output(self.pin_power, 1)
-        _logger.debug("Button Power on")
-
-    # def scan(self):
-    #     if not self.pressed and GPIO.input(self.pin_signal) == GPIO.HIGH:
-    #         self.pressed = True
-    #         #_logger.debug('Button Pressed')
-    #         print('Button Pressed')
-    #     elif self.pressed and GPIO.input(self.pin_signal) == GPIO.LOW:
-    #         self.pressed = False
-    #         #_logger.debug('Button not pressed')
-    #         print('Button not pressed')
-    #     time.sleep(0.02)   
+        loggerDEBUG("Button Power on")   
 
     def threadWaitTilPressed(self, exitFlag, period):
         self.pressed = False

@@ -7,6 +7,8 @@ import copy
 import functools
 import subprocess
 
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
 fileDeviceCustomizationSample = WORK_DIR + "dicts/deviceCustomization.sample.json"
@@ -130,13 +132,34 @@ def storeOptionInJsonFile(filePath,option,optionValue):
   else:
       return False
 
+def isSuccesRunningSubprocess(command):
+    try:
+        completed = subprocess.run(command.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT)
+        loggerINFO(f'shell command {command} - returncode: {completed.returncode}')
+        if completed.returncode == 0:
+            return True
+        else:
+            return False
+    except:
+        loggerERROR(f"error - shell command: {command}")
+        return False  
+
+
 def isPingable(address):
-  response = os.system("ping -c 1 " + address)
-  if response == 0:
-      pingstatus = True
-  else:
-      pingstatus = False # ping returned an error
-  return pingstatus
+  command = "ping -c 1 " + address
+  return isSuccesRunningSubprocess(command)
+
+  # response = os.system("ping -c 1 " + address)
+  # if response == 0:
+  #     pingstatus = True
+  # else:
+  #     pingstatus = False # ping returned an error
+  # return pingstatus
+
+def internetReachable():
+  return isPingable("1.1.1.1")
 
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -198,6 +221,7 @@ def getSettingsFromDeviceCustomization():
   settings["periodEvaluateReachability"]        = getOptionFromDeviceCustomization("periodEvaluateReachability" , defaultValue = 5.0)
   settings["periodDisplayClock"]                = getOptionFromDeviceCustomization("periodDisplayClock" , defaultValue = 10.0)
   settings["timeToDisplayResultAfterClocking"]  = getOptionFromDeviceCustomization("timeToDisplayResultAfterClocking", defaultValue = 1.2)
+
 def getMsg(textKey):
   try:
     return settings["messagesDic"][textKey] 

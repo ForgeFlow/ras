@@ -6,19 +6,18 @@ import RPi.GPIO as GPIO
 
 from dicts.buzzer_dic import dic  # dic with melodies
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 GPIO.setwarnings(False)
-
 
 class PasBuz:
     def __init__(self, pins):
         self.PinBuz = pins[0]  # signal Pin
         self.PinPower = pins[1]
-        _logger.debug("PasBuz Class Initialized")
+        loggerDEBUG("PasBuz Class Initialized")
 
     def Play(self, msg):
-        _logger.debug("Playing PasBuz")
+        loggerDEBUG(f"Playing PasBuz: {msg}")
         self.InitBuz()
         try:
             data = dic[msg]

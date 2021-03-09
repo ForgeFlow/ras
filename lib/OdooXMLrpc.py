@@ -10,23 +10,23 @@ from socket import setdefaulttimeout as setTimeout
 
 from . import Utils
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 class OdooXMLrpc:
     def __init__(self, Display):
         self.display            = Display
         self.adm                = False
         self.getUIDfromOdoo()
-        _logger.debug("Odoo XMLrpc Class Initialized")
+        loggerINFO("Odoo XMLrpc Class Initialized")
 
     #@Utils.timer
     def getUIDfromOdoo(self):
-        #print("in method getUIDfromOdoo , the Odoo Params are: ", Utils.settings["odooParameters"])
+        loggerINFO(f"in method getUIDfromOdoo , the Odoo Params are: {Utils.settings['odooParameters']}")
         self.setTimeZone()
         self.setOdooUrlTemplate()
         self.setOdooIpPort()
         self.setUserID()
-        print("got user id from Odoo ", self.uid)                                                                  
+        loggerINFO(f"got user id from Odoo {self.uid}")                                                                  
 
     def setTimeZone(self):
         try:
@@ -34,7 +34,7 @@ class OdooXMLrpc:
             time.tzset()
             return True
         except Exception as e:
-            print("exception in method setTimeZone: ", e)
+            loggerERROR(f"exception in method setTimeZone: {e}")
             return False               
 
     def setOdooUrlTemplate(self):
@@ -45,17 +45,16 @@ class OdooXMLrpc:
                 self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
             if Utils.settings["odooParameters"]["odoo_port"][0]:
                 self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
-            # print("self.odooUrlTemplate ",self.odooUrlTemplate )
+            loggerINFO(f"self.odooUrlTemplate is {self.odooUrlTemplate}")
             return True
         except Exception as e:
             self.odooUrlTemplate    = None
-            # print("exception in method setOdooUrlTemplate: ", e)
+            loggerERROR(f"exception in method setOdooUrlTemplate: {e}")
             return False        
                
     def setOdooIpPort(self):
         self.odooIpPort = None
         try:
-            print( "Utils.settings[""odooParameters""][""odoo_port""][0] ",Utils.settings["odooParameters"]["odoo_port"][0])
             if Utils.settings["odooParameters"]["odoo_port"]!=[""]: 
                 portNumber =  int(Utils.settings["odooParameters"]["odoo_port"][0])                          
             elif Utils.isOdooUsingHTTPS():
@@ -63,16 +62,15 @@ class OdooXMLrpc:
             self.odooIpPort = (Utils.settings["odooParameters"]["odoo_host"][0], portNumber)
             return True
         except Exception as e:
-            print("exception in method setOdooIpPort: ", e)
+            loggerERROR(f"exception in method setOdooIpPort: {e}")
             return False
     
     def getServerProxy(self, url):
         try:
             serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
-            print("serverProxy ", serverProxy)
             return serverProxy
         except Exception as e:
-            _logger.exception(e)
+            loggerWARNING(f"getServerProxy exception {e}")
             return False
 
     #@Utils.timer
@@ -82,36 +80,32 @@ class OdooXMLrpc:
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
             setTimeout(float(Utils.settings["timeoutToGetOdooUID"]) or None)
-            #print("timeoutToGetOdooUID: ", float(Utils.settings["timeoutToGetOdooUID"]) or None )
             user_id = loginServerProxy.login(
                 Utils.settings["odooParameters"]["db"][0],
                 Utils.settings["odooParameters"]["user_name"][0],
                 Utils.settings["odooParameters"]["user_password"][0])
             if user_id:
-                print("got user id from Odoo ", user_id)
+                loggerINFO(f"got user id from Odoo ")
                 self.uid = user_id
                 Utils.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
                 returnValue =  True
             else:
-                print("NO user id from Odoo ", user_id)
+                loggerINFO(f"NO user id from Odoo {user_id}")
                 returnValue =  False
         except ConnectionRefusedError as e:
-            print("ConnectionRefusedError checkattendance odoo ln139", e)
-            _logger.debug(ConnectionRefusedError)
+            loggerDEBUG(f"ConnectionRefusedError {e}")
             returnValue =  False
         except socket.timeout as e:
-            print("timeout checkattendance odoo ln139", e)
+            loggerDEBUG(f"timeout checkattendance {e}")
             returnValue = False
         except OSError as osError:
-            print("osError checkattendance odoo ln139", osError)
-            _logger.debug(OSError)
+            loggerDEBUG(f"osError checkattendance {osError}")
             if "No route to host" in str(osError):
                 self.display.display_msg("noRouteToHost")
                 time.sleep(1.5)
             returnValue =  False 
         except Exception as e:
-            _logger.exception(e)
-            print("exception in method setUserID: ", e)
+            loggerERROR(f"exception in method setUserID: {e}")
             returnValue =  False
         finally:
             setTimeout(None)
@@ -119,8 +113,9 @@ class OdooXMLrpc:
     
     #@Utils.timer
     def isOdooPortOpen(self):
-        print("is Odoo Port Open? :", Utils.isIpPortOpen(self.odooIpPort) )
-        return Utils.isIpPortOpen(self.odooIpPort)
+        isOpen = Utils.isIpPortOpen(self.odooIpPort)
+        loggerDEBUG(f"is Odoo Port Open? :{isOpen}")
+        return isOpen
 
     #@Utils.timer
     def checkAttendance(self, card):
@@ -129,7 +124,6 @@ class OdooXMLrpc:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
                 setTimeout(float(Utils.settings["timeoutToCheckAttendance"]) or None)
-                print("timeoutToCheckAttendance: ", float(Utils.settings["timeoutToCheckAttendance"]) or None )
                 res = serverProxy.execute(
                     Utils.settings["odooParameters"]["db"][0],
                     self.uid,
@@ -139,11 +133,10 @@ class OdooXMLrpc:
                     card,
                 )
         except Exception as e:
-            print("Odoo ln127 - checkAttendance - exception e:",e)
-            _logger.exception(e)
+            loggerWARNING(f"checkAttendance exception {e}")
             res = False
         except socket.timeout as e:
-            print("timeout checkattendance odoo ln139", e)
+            loggerWARNING(f"timeout during checkattendance {e}")
             res=False
         finally:
             setTimeout(None)

@@ -7,7 +7,8 @@ import threading
 from . import Clocking, Utils, routes
 from dicts.ras_dic import ask_twice, FIRMWARE_VERSION
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+#from Utils import internetReachable
 
 class Tasks:
 	def __init__(self, Odoo, Hardware):
@@ -24,7 +25,7 @@ class Tasks:
 		
 		self.wifiStable = self.Clock.wifiStable
 
-		self.periodPollCardReader 							= 0.2  # second
+		self.periodPollCardReader 				= 0.2  # second
 		self.periodCheckBothButtonsPressed     	= 1     # seconds
 		self.howLongShouldBeBothButtonsPressed 	= 7     # seconds (dont set higher, buttons will not react - issue with current hardware)
 
@@ -76,7 +77,7 @@ class Tasks:
 
 		self.currentLanguageOption = 0		
 
-		_logger.debug("Tasks Class Initialized")
+		loggerDEBUG("Tasks Class Initialized")
 
 	def executeNextTask(self):
 			self.Buzz.Play("OK")
@@ -87,7 +88,7 @@ class Tasks:
 
 	def getNewAdminCard(self):  # opens a server to set a new AdminCard
 
-		_logger.debug("Enter New Admin Card on Flask app")
+		loggerDEBUG("Enter New Admin Card on Flask app")
 
 		self.Disp.displayWithIP('browseForNewAdminCard')
 
@@ -122,20 +123,20 @@ class Tasks:
 		self.Buzz.Play("cardswiped")
 
 	def threadServerKiller(self, period, exitFlag, srv):
-		_logger.debug('Thread Server Killer started')
+		loggerDEBUG('Thread Server Killer started')
 		while not exitFlag.isSet():		
 			exitFlag.wait(period)
 		print("Tasks ln 123 . srv shutdown: ", srv)
 		srv.shutdown()
-		_logger.debug('Thread Server Killer stopped')
+		loggerDEBUG('Thread Server Killer stopped')
 
 	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
-		_logger.debug('Thread Poll Card Reader started')
+		loggerDEBUG('Thread Poll Card Reader started')
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
 				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
-					_logger.debug("ADMIN CARD was swipped\n")
+					loggerDEBUG("ADMIN CARD was swipped\n")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
 																			# to enter in the loop again (avoid closed loop)
@@ -143,35 +144,35 @@ class Tasks:
 				else:
 					whatToDoWithCard()			
 			exitFlag.wait(period)
-		_logger.debug('Thread Poll Card Reader stopped')
+		loggerDEBUG('Thread Poll Card Reader stopped')
 
 	def threadCheckBothButtonsPressed(self, period, howLong, exitFlag):
-		_logger.debug('Thread CheckBothButtonsPressed started')
+		loggerDEBUG('Thread CheckBothButtonsPressed started')
 		while not exitFlag.isSet():
 			if Utils.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
 				self.nextTask = "getNewAdminCard"
 				exitFlag.set()
-		_logger.debug('Thread CheckBothButtonsPressed stopped')        
+		loggerDEBUG('Thread CheckBothButtonsPressed stopped')        
 
 	def clocking(self):
-		_logger.debug('Entering Clocking Option')
+		loggerDEBUG('Entering Clocking Option')
 
 		def threadEvaluateReachability(period):
-				_logger.debug('Thread Get Messages started')
+				loggerDEBUG('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
 						exitFlag.wait(period)
-				_logger.debug('Thread Get Messages stopped')
+				loggerDEBUG('Thread Get Messages stopped')
 
 		def threadDisplayClock(period):
 			self.Clock.isOdooReachable() 
-			_logger.debug('Thread Display Clock started')
+			loggerDEBUG('Thread Display Clock started')
 			while not exitFlag.isSet():
 				#print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
 				if not self.Disp.lockForTheClock:	
 					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
-			_logger.debug('Thread Display Clock stopped')
+			loggerDEBUG('Thread Display Clock stopped')
  
 		exitFlag = threading.Event()
 		exitFlag.clear()
@@ -195,7 +196,7 @@ class Tasks:
 		displayClock.join()
 		checkBothButtonsPressed.join()
 
-		_logger.debug('Exiting Clocking Option')
+		loggerDEBUG('Exiting Clocking Option')
 
 	def chooseLanguage(self):
 		def goOneLanguageDownInTheMenu():
@@ -203,9 +204,9 @@ class Tasks:
 			self.currentLanguageOption  += 1
 			if self.currentLanguageOption  > self.maxLanguageOptions:
 					self.currentLanguageOption  = 0
-			_logger.debug("Button Down in Language Menu")
+			loggerDEBUG("Button Down in Language Menu")
 
-		_logger.debug("choose Language")
+		loggerDEBUG("choose Language")
 
 		self.currentLanguageOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
@@ -226,7 +227,7 @@ class Tasks:
 
 	def showRFID(self):
 
-		_logger.debug("Show RFID reader")
+		loggerDEBUG("Show RFID reader")
 		self.Disp.display_msg("swipecard")
 		exitFlag = threading.Event()
 		exitFlag.clear()
@@ -241,14 +242,14 @@ class Tasks:
 
 	def updateFirmware(self):
 		def doFirmwareUpdate():
-			_logger.debug("Updating Firmware")
+			loggerDEBUG("Updating Firmware")
 			self.Disp.display_msg("update")
 			os.chdir(Utils.WORK_DIR)
 			os.system("sudo git fetch origin v1.4-release")
 			os.system("sudo git reset --hard origin/v1.4-release")
 			self.Buzz.Play("OK")
 			time.sleep(0.5)
-			_logger.debug("Next Task set to  " + str(self.nextTask))
+			loggerDEBUG(f"Next Task set to {str(self.nextTask)}")
 		
 		def warnGithubNotPingable():
 			_logger.warn("Github not pingable: Unable to Update Firmware")
@@ -280,7 +281,7 @@ class Tasks:
 			self.nextTask = self.defaultNextTask
 
 	def resetWifi(self):
-		_logger.debug("Reset WI-FI")
+		loggerDEBUG("Reset WI-FI")
 		self.Disp.display_msg("configure_wifi")
 		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
 		os.system("sudo wifi-connect --portal-ssid " + Utils.settings["SSIDreset"])
@@ -288,11 +289,11 @@ class Tasks:
 		self.nextTask = self.defaultNextTask
 
 	def isWifiWorking(self):
-		_logger.debug("checking if wifi works, i.e. if 1.1.1.1 pingable")
+		loggerDEBUG("checking if wifi works, i.e. if 1.1.1.1 pingable")
 		return Utils.isPingable("1.1.1.1")
 
 	def getOdooUIDwithNewParameters(self):
-		_logger.debug("getOdooUIDwithNewParameters")
+		loggerDEBUG("getOdooUIDwithNewParameters")
 		#self.ensureThatWifiWorks()
 		if self.wifiStable():
 			self.Disp.displayWithIP('browseForNewOdooParams')
@@ -356,7 +357,7 @@ class Tasks:
 
 	def shutdownSafe(self):
 			self.Disp.lockForTheClock = True
-			_logger.debug("Shutting down safe")
+			loggerDEBUG("Shutting down safe")
 			time.sleep(0.2)
 			self.Disp.display_msg("shuttingDown")
 			time.sleep(3)
@@ -368,7 +369,7 @@ class Tasks:
 
 	def reboot(self):
 		self.Disp.lockForTheClock = True
-		_logger.debug("Rebooting")
+		loggerDEBUG("Rebooting")
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
 		time.sleep(3)
@@ -395,7 +396,7 @@ class Tasks:
 		def checkAskTwice_and_eventuallySetNextTask():
 			self.Buzz.Play("OK")
 			if self.listOfTasksInMenu[self.currentMenuOption] in self.ask_twice:
-				_logger.debug("Task in ask twice list")
+				loggerDEBUG("Task in ask twice list")
 				askTwice()
 			else:
 				setNextTask()
@@ -405,7 +406,7 @@ class Tasks:
 				self.currentMenuOption  += 1
 				if self.currentMenuOption  > self.maxMenuOptions:
 						self.currentMenuOption  = 0
-				_logger.debug("Button Down in Main Menu")
+				loggerDEBUG("Button Down in Main Menu")
 
 		self.nextTask = None
 		self.currentMenuOption = 0
@@ -413,7 +414,7 @@ class Tasks:
 			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
 			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:		
-				_logger.debug("OK pressed - current Menu Option is: ", self.listOfTasksInMenu[self.currentMenuOption])
+				loggerDEBUG(f"OK pressed - current Menu Option is: {self.listOfTasksInMenu[self.currentMenuOption]}", )
 				checkAskTwice_and_eventuallySetNextTask()
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
@@ -442,7 +443,7 @@ class Tasks:
 					currentOption  = 0
 			return currentOption
 
-		_logger.debug("shouldEmployeeNameBeDisplayed")
+		loggerDEBUG("shouldEmployeeNameBeDisplayed")
 
 		currentOption = 0
 		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)

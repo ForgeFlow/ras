@@ -26,7 +26,7 @@ import time
 import spi
 import logging
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 class CardReader:
 #  NRSTPD = 22
@@ -134,7 +134,7 @@ class CardReader:
   def __init__(self, dev='/dev/spidev0.0', spd=200):
     self.card = False
     self.spi = spi.openSPI(device=dev,speed=spd)
-    _logger.debug("after openSPI")
+    loggerDEBUG("after openSPI -MFRC ")
     self.MFRC522_Init()
 
   def Write_MFRC522(self, addr, val):
@@ -469,4 +469,4 @@ class CardReader:
 
     self.card = card
     if card:
-      _logger.debug(time.localtime(), "self.card ", self.card)
+      loggerDEBUG(f"from MFRC CardReader - card: {self.card} read @ {time.localtime()}")

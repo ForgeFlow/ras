@@ -8,7 +8,7 @@ from dicts.ras_dic import display_driver
 from . import routes
 from . import Utils
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 class Display:
     def __init__(self):
@@ -16,7 +16,7 @@ class Display:
         self.fontOrkney = Utils.WORK_DIR + "fonts/Orkney.ttf"
         self.img_path = Utils.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
-        _logger.debug("Display Class Initialized")
+        loggerDEBUG("Display Class Initialized")
         self.fontClockTime = ImageFont.truetype(self.fontRoboto, 42)
         self.fontClockInfos = ImageFont.truetype(self.fontRoboto, 14)
         self.font3 = ImageFont.truetype(self.fontRoboto, 22)
@@ -79,7 +79,7 @@ class Display:
         font = ImageFont.truetype(self.fontRoboto, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
-        _logger.debug("Displaying message: " + text)
+        loggerDEBUG(f"Displaying message: {text}")
 
 
     #@Utils.timer
@@ -95,7 +95,7 @@ class Display:
                     lastName = employeeName[1][0:14]
                     nameToDisplay = nameToDisplay + "\n"+lastName
                 except:
-                    _logger.debug("Name has no lastName to Display")         
+                    loggerDEBUG("Name has no lastName to Display")         
                 message[2] = message[2].replace('-EmployeePlaceholder-',nameToDisplay,1)
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
@@ -111,4 +111,4 @@ class Display:
     def clear_display(self):
         with canvas(self.device) as draw:
             draw.multiline_text((0, 0), " ")
-            _logger.debug("Clear display")
+            loggerDEBUG("Clear display")
