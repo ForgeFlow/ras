@@ -3,12 +3,13 @@ import os
 import sys
 import logging
 import threading
+from hashlib import blake2b
 
 from . import Clocking, Utils, routes
 from dicts.ras_dic import ask_twice, FIRMWARE_VERSION
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
-#from Utils import internetReachable
+from common import constants as co
 
 class Tasks:
 	def __init__(self, Odoo, Hardware):
@@ -46,7 +47,7 @@ class Tasks:
 				"showVersion"			: self.showVersion,
 				"shutdownSafe"		: self.shutdownSafe,
 				"reboot"					: self.reboot,
-				"ensureWiFiAndOdoo": self.ensureWiFiAndOdoo
+				"ensureInternetAndOdoo": self.ensureInternetAndOdoo
 		}
 
 		self.listOfTasksInMenu = [  # The Tasks appear in the Menu in the same order as here.
@@ -123,20 +124,20 @@ class Tasks:
 		self.Buzz.Play("cardswiped")
 
 	def threadServerKiller(self, period, exitFlag, srv):
-		loggerDEBUG('Thread Server Killer started')
+		loggerINFO('Thread Server Killer started')
 		while not exitFlag.isSet():		
 			exitFlag.wait(period)
 		print("Tasks ln 123 . srv shutdown: ", srv)
 		srv.shutdown()
-		loggerDEBUG('Thread Server Killer stopped')
+		loggerINFO('Thread Server Killer stopped')
 
 	def threadPollCardReader(self, period, exitFlag, whatToDoWithCard):
-		loggerDEBUG('Thread Poll Card Reader started')
+		loggerINFO('Thread Poll Card Reader started')
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
 				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
-					loggerDEBUG("ADMIN CARD was swipped\n")
+					loggerINFO("ADMIN CARD was swipped\n")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
 																			# to enter in the loop again (avoid closed loop)
@@ -144,35 +145,35 @@ class Tasks:
 				else:
 					whatToDoWithCard()			
 			exitFlag.wait(period)
-		loggerDEBUG('Thread Poll Card Reader stopped')
+		loggerINFO('Thread Poll Card Reader stopped')
 
 	def threadCheckBothButtonsPressed(self, period, howLong, exitFlag):
-		loggerDEBUG('Thread CheckBothButtonsPressed started')
+		loggerINFO('Thread CheckBothButtonsPressed started')
 		while not exitFlag.isSet():
 			if Utils.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
 				self.nextTask = "getNewAdminCard"
 				exitFlag.set()
-		loggerDEBUG('Thread CheckBothButtonsPressed stopped')        
+		loggerINFO('Thread CheckBothButtonsPressed stopped')        
 
 	def clocking(self):
-		loggerDEBUG('Entering Clocking Option')
+		loggerINFO('Entering Clocking Option')
 
 		def threadEvaluateReachability(period):
-				loggerDEBUG('Thread Get Messages started')
+				loggerINFO('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
 						exitFlag.wait(period)
-				loggerDEBUG('Thread Get Messages stopped')
+				loggerINFO('Thread Get Messages stopped')
 
 		def threadDisplayClock(period):
 			self.Clock.isOdooReachable() 
-			loggerDEBUG('Thread Display Clock started')
+			loggerINFO('Thread Display Clock started')
 			while not exitFlag.isSet():
 				#print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
 				if not self.Disp.lockForTheClock:	
 					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
 				exitFlag.wait(period)
-			loggerDEBUG('Thread Display Clock stopped')
+			loggerINFO('Thread Display Clock stopped')
  
 		exitFlag = threading.Event()
 		exitFlag.clear()
@@ -281,16 +282,12 @@ class Tasks:
 			self.nextTask = self.defaultNextTask
 
 	def resetWifi(self):
-		loggerDEBUG("Reset WI-FI")
+		loggerINFO("Reset WiFi - Define a new SSID using wifi-connect")
 		self.Disp.display_msg("configure_wifi")
 		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
 		os.system("sudo wifi-connect --portal-ssid " + Utils.settings["SSIDreset"])
 		self.Buzz.Play("back_to_menu")
 		self.nextTask = self.defaultNextTask
-
-	def isWifiWorking(self):
-		loggerDEBUG("checking if wifi works, i.e. if 1.1.1.1 pingable")
-		return Utils.isPingable("1.1.1.1")
 
 	def getOdooUIDwithNewParameters(self):
 		loggerDEBUG("getOdooUIDwithNewParameters")
@@ -337,7 +334,7 @@ class Tasks:
 			self.Disp.lockForTheClock = True
 			self.Disp.display_msg("no_wifi")
 			self.Buzz.Play("FALSE")
-			self.nextTask = "ensureWiFiAndOdoo"
+			self.nextTask = "ensureInternetAndOdoo"
 
 		time.sleep(3)
 		self.Disp.clear_display()
@@ -419,20 +416,86 @@ class Tasks:
 			elif self.B_Down.pressed:
 				goOneOptionDownInTheMenu()
 
-	def ensureThatWifiWorks(self):
-		if not self.isWifiWorking(): 
+	def ensureThatInternetIsAvailable(self):
+		if not Utils.internetReachable(): # wether ethernet nor wifi available
 			self.resetWifi()
 
-	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+	def ensureFirstOdooConnection_LocalManagement(self):
 		if not Utils.settings["odooConnectedAtLeastOnce"]:
-			#print("Odoo UID in ensureThatOdooHasBeenReachedAtLeastOnce", self.Odoo.uid)
+			loggerINFO("Terminal LOCALLY managed: ensureFirstOdooConnection Odoo UID initiated")
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
+
+	def getMachineID(self):
+		try:
+			with open(co.MACHINE_ID_FILE,"r")as f:
+				machine_id= bytes(f.readline().replace('\n',''), encoding='utf8')
+			loggerDEBUG(f"got machine ID: {machine_id}")
+		except Exception as e:
+			loggerERROR(f"Exception while retreiving Machine ID from its file: {e}")
+			machine_id = None
+		if not machine_id:
+			#TODO generate machine_id randomly and write it to machineID
+			loggerINFO(f"No MACHINE ID found. A random MACHINE ID will be generated and saved.")
+			pass
+		return machine_id
+
+	def getHashedMachineId(self):
+
+		machine_id = self.getMachineID()
+
+		hashed_machine_id = blake2b( \
+			machine_id,
+			digest_size=co.HASH_DIGEST_SIZE,
+			key=co.HASH_KEY,
+			salt=co.HASH_SALT,
+			person=co.HASH_PERSON_REGISTER_TERMINAL, 
+			).hexdigest()
+
+		return hashed_machine_id
+
+	def registerTerminalInOdoo(self, hashed_machine_id):
+		#gets 1) Terminal_ID and 2) RoutefromOdooToDevice 3)RoutefromDeviceToOdoo
+		loggerINFO(f"hashed machine ID: {hashed_machine_id}")
+		#send to odoo:
+		# 1) hashed machine id
+		# 2) type of device (RAS2 for example)
+		# 3) version number of the firmware
+		# 4) serial number of the device
+		# ---> deviceCustomization json
+
+		
+		# Download Messages and Settings from Odoo (?)
+		terminal_ID_in_Odoo = 1
+		loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
+		Utils.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
+		return terminal_ID_in_Odoo
+
+	def getNewTerminalIDinOdoo(self):
+		hashed_machine_id = self.getHashedMachineId()
+		self.registerTerminalInOdoo(hashed_machine_id)
+
+	def ensureFirstOdooConnection_RemoteManagement(self):
+		loggerINFO("Terminal REMOTELY managed: ensure get Terminal ID in Odoo - initiated")
+		while not Utils.settings["terminalIDinOdoo"]:
+			# Display: Terminal has To be Accepted in Odoo To Continue
+			# msg="Accept_In_Odoo_To_Continue"
+			self.getNewTerminalIDinOdoo()
+
+		# TODO getRouteToOdoo
+		pass
+
+
+	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+		if "remotely" in Utils.settings["terminalSetupManagement"]:
+			self.ensureFirstOdooConnection_RemoteManagement()
+		else:
+			self.ensureFirstOdooConnection_LocalManagement()
 		
 		self.nextTask = self.defaultNextTask
 
-	def ensureWiFiAndOdoo(self):
-		self.ensureThatWifiWorks()
+	def ensureInternetAndOdoo(self):
+		self.ensureThatInternetIsAvailable()
 		self.ensureThatOdooHasBeenReachedAtLeastOnce()
 
 	def shouldEmployeeNameBeDisplayed(self):

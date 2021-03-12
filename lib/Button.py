@@ -18,11 +18,11 @@ class Button:
     
     def poweroff(self):
         GPIO.output(self.pin_power, 0)
-        loggerDEBUG("Button Power off")
+        loggerINFO("Button Power off")
 
     def poweron(self):
         GPIO.output(self.pin_power, 1)
-        loggerDEBUG("Button Power on")   
+        loggerINFO("Button Power on")   
 
     def threadWaitTilPressed(self, exitFlag, period):
         self.pressed = False

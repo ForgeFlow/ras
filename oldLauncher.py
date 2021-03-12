@@ -21,7 +21,7 @@ def main():
     try:
         Disp.displayGreetings()
 
-        Tasks.nextTask = "ensureWiFiAndOdoo" # TODO should be only ensure Odoo
+        Tasks.nextTask = "ensureInternetAndOdoo" # TODO should be only ensure Odoo
 
         while True:
             if Tasks.nextTask:

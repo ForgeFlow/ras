@@ -79,7 +79,7 @@ class Display:
         font = ImageFont.truetype(self.fontRoboto, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
-        loggerDEBUG(f"Displaying message: {text}")
+        loggerINFO(f"Displaying message: {text}")
 
 
     #@Utils.timer

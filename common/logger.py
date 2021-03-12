@@ -4,20 +4,26 @@ from systemd import journal
 import common.constants as co
 
 logger = logging.getLogger('ras')
+
 logger.setLevel(logging.DEBUG) 
 
+formatter = logging.Formatter('%(asctime)s %(name)s %(processName)s %(levelname)s: %(message)s')
+
 fileHandler = logging.FileHandler(co.LOG_FILE)
-fileHandler.setLevel(logging.DEBUG)
+fileHandler.setLevel(logging.INFO)
+logger.addHandler(fileHandler)
+fileHandler.setFormatter(formatter)
 
 consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
-
-logger.addHandler(fileHandler)
 logger.addHandler(consoleHandler)
+consoleHandler.setFormatter(formatter)
+
 logger.addHandler(journal.JournalHandler())
 
-formatter = logging.Formatter('%(asctime)s %(name)s %(processName)s %(levelname)s: %(message)s')
-consoleHandler.setFormatter(formatter)
+
+
+
 
 def loggerDEBUG(message):
   logger.debug(message)

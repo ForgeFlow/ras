@@ -137,7 +137,7 @@ def isSuccesRunningSubprocess(command):
         completed = subprocess.run(command.split(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT)
-        loggerINFO(f'shell command {command} - returncode: {completed.returncode}')
+        loggerDEBUG(f'shell command {command} - returncode: {completed.returncode}')
         if completed.returncode == 0:
             return True
         else:
@@ -204,23 +204,33 @@ def storeOptionInDeviceCustomization(option,value):
     return False
 
 def getSettingsFromDeviceCustomization():
-  settings["language"]                = getOptionFromDeviceCustomization("language"                 , defaultValue = "ENGLISH")
-  settings["showEmployeeName"]        = getOptionFromDeviceCustomization("showEmployeeName"         , defaultValue = "yes")
-  settings["fileForMessages"]         = getOptionFromDeviceCustomization("fileForMessages"          , defaultValue = "messagesDicDefault.json")
+  settingsList_And_DefaultValues = {
+    'language': "ENGLISH",
+    "showEmployeeName":"yes",
+    "fileForMessages":"messagesDicDefault.json",
+    "SSIDreset": "__RAS__",
+    "odooParameters": None,
+    "odooConnectedAtLeastOnce": False,
+    "flask": defaultCredentialsDic,
+    "timeoutToGetOdooUID": 6.0,
+    "ssh": "enable",
+    "sshPassword": "raspberry",
+    "firmwareVersion": "v1.4.3+",
+    "timeoutToCheckAttendance": 3.0,
+    "periodEvaluateReachability": 5.0,
+    "periodDisplayClock": 10.0,
+    "timeToDisplayResultAfterClocking": 1.2,
+    "terminalSetupManagement": "locally, on the terminal",
+    "terminalIDinOdoo": None,
+    "hashed_machine_id": None
+  }
+
+  for key, value in settingsList_And_DefaultValues.items():
+    settings[key] = getOptionFromDeviceCustomization(key, defaultValue = value)
+
   settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["SSIDreset"]               = getOptionFromDeviceCustomization("SSIDreset"                , defaultValue = "__RAS__")
   settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
-  settings["odooParameters"]          = getOptionFromDeviceCustomization("odooParameters"           , defaultValue = None)
-  settings["odooConnectedAtLeastOnce"]= getOptionFromDeviceCustomization("odooConnectedAtLeastOnce" , defaultValue = False)
-  settings["flask"]                   = getOptionFromDeviceCustomization("flask"                    , defaultValue = defaultCredentialsDic)
-  settings["timeoutToGetOdooUID"]     = getOptionFromDeviceCustomization("timeoutToGetOdooUID"      , defaultValue = 6.0)
-  settings["ssh"]                     = getOptionFromDeviceCustomization("ssh"                      , defaultValue = "enable")
-  settings["sshPassword"]             = getOptionFromDeviceCustomization("sshPassword"              , defaultValue = "raspberry")  
-  settings["firmwareVersion"]         = getOptionFromDeviceCustomization("firmwareVersion"          , defaultValue = "v1.4.3+")
-  settings["timeoutToCheckAttendance"]          = getOptionFromDeviceCustomization("timeoutToCheckAttendance" , defaultValue = 3.0)
-  settings["periodEvaluateReachability"]        = getOptionFromDeviceCustomization("periodEvaluateReachability" , defaultValue = 5.0)
-  settings["periodDisplayClock"]                = getOptionFromDeviceCustomization("periodDisplayClock" , defaultValue = 10.0)
-  settings["timeToDisplayResultAfterClocking"]  = getOptionFromDeviceCustomization("timeToDisplayResultAfterClocking", defaultValue = 1.2)
+
 
 def getMsg(textKey):
   try:

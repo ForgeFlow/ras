@@ -17,3 +17,8 @@ PERIOD_THERMAL_MANAGER = 10 # in seconds
 WAIT_PERIOD_FOR_PROCESS_GRACEFUL_TERMINATION = 10 # in seconds
 PERIOD_MAIN_THREAD = 10 # in seconds
 
+MACHINE_ID_FILE = config("MACHINE_ID_FILE")
+HASH_KEY = bytes(config("HASH_KEY"), encoding='utf8')
+HASH_SALT = bytes(config("HASH_SALT"), encoding='utf8')
+HASH_DIGEST_SIZE = int(config("HASH_DIGEST_SIZE"))
+HASH_PERSON_REGISTER_TERMINAL = bytes(config("HASH_PERSON_REGISTER_TERMINAL"), encoding='utf8')

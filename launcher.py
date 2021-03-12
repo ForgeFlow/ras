@@ -34,7 +34,7 @@ loggerINFO(f'running on python version: {sys.version}')
 
 managed_essential_processes = { # key(=process name) : (pythonmodule where the process is defined (= process name))
     #"internet_connectivity_d": "connectivity.manager",
-    #"thermal_d": "thermal.manager",
+    "thermal_d": "thermal.manager",
     "RAS_Launcher_d":"oldLauncher"  
 }
 
@@ -69,7 +69,7 @@ def terminate_managed_process(name):
 
 def preimport_managed_process(name):
     module = managed_processes[name]
-    loggerINFO(f"preimporting {module}")
+    loggerDEBUG(f"preimporting {module}")
     importlib.import_module(module)
 
 def start_all_managed_processes():
@@ -86,14 +86,14 @@ def terminate_non_essential_managed_processes():
 
 def log_begin_manager_thread():
     loggerINFO(f"starting manager thread") 
-    loggerINFO({"environ": os.environ})
+    loggerDEBUG({"environ": os.environ})
 
 def log_running_processes_list():
     #running_list = ["%s%s\u001b[0m" % ("\u001b[32m" if running[p].is_alive() else "\u001b[31m", p) for p in running]
     running_alive = [p for p in running if running[p].is_alive()]
     running_dead = [p for p in running if p not in running_alive]
-    loggerDEBUG("alive: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
-    loggerDEBUG("dead: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
+    loggerINFO("alive: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
+    loggerINFO("dead: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
 
 def manager_thread():
     ras_subscriber = Subscriber("5556")
@@ -109,7 +109,7 @@ def manager_thread():
         if topic == "thermal":
             counter, temperature, load_5min, memUsed = \
                 message.split()     
-            loggerDEBUG(f"thermal update nr.{counter}: T {temperature}°C," + \
+            loggerINFO(f"thermal update nr.{counter}: T {temperature}°C," + \
                 f" CPU load 5 min avg {load_5min}%, mem used {memUsed}%")
 
         if False: #thermal.isCritical()
