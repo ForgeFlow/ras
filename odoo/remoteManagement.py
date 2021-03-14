@@ -17,8 +17,10 @@ def getPayload(settings_to_send):
     return payload
 
 def registerTerminalInOdoo():
-    #gets 1) Terminal_ID and 2) RoutefromOdooToDevice 3)RoutefromDeviceToOdoo
-    #loggerINFO(f"hashed machine ID: {hashed_machine_id}")
+    terminal_ID_in_Odoo     = None
+    routefromDeviceToOdoo   = None
+    routefromOdooToDevice   = None
+
     try:
         requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_REGISTER_GATE
         headers     = {'Content-Type': 'application/json'}
@@ -49,15 +51,19 @@ def registerTerminalInOdoo():
         print("Status code: ", response.status_code)
         print("Printing Entire Post Response")
         print(response.json())
+        answer = json.loads(response.json())
         
         # Download Messages and Settings from Odoo (?)
-        terminal_ID_in_Odoo = 1
+        terminal_ID_in_Odoo = answer['terminal_ID_in_Odoo']
+        routefromDeviceToOdoo = answer["routefromDeviceToOdoo"]
+        routefromOdooToDevice = answer["routefromOdooToDevice"]
     except Exception as e:
         loggerERROR(f"Could not register Terminal in Odoo - Exception {e}")
-        terminal_ID_in_Odoo = None
 
     loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
     ut.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
+    ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",routefromDeviceToOdoo)
+    ut.storeOptionInDeviceCustomization("routefromOdooToDevice",routefromOdooToDevice)
     
     return terminal_ID_in_Odoo
 

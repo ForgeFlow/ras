@@ -229,7 +229,7 @@ def getSettingsFromDeviceCustomization():
     "routefromOdooToDevice": None,
     "routefromDeviceToOdoo": None,
     "manufacturingData": None,
-    "location": "unknown",
+    "location": "to be defined",
     "RoutefromOdooToDevice": None,
     "RoutefromDeviceToOdoo": None
   }
