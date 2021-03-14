@@ -6,9 +6,6 @@ def main():
     from lib import Display, CardReader, PasBuz, Button
     from lib import OdooXMLrpc, Tasks, Utils
 
-    Utils.migrationToVersion1_4_2()
-    Utils.getSettingsFromDeviceCustomization()
-
     Buzz = PasBuz.PasBuz(PinsBuzzer)
     Disp = Display.Display()
     Reader = CardReader.CardReader()

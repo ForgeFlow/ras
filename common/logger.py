@@ -22,9 +22,6 @@ consoleHandler.setFormatter(formatter)
 logger.addHandler(journal.JournalHandler())
 
 
-
-
-
 def loggerDEBUG(message):
   logger.debug(message)
 

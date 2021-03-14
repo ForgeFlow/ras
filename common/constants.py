@@ -22,3 +22,5 @@ HASH_KEY = bytes(config("HASH_KEY"), encoding='utf8')
 HASH_SALT = bytes(config("HASH_SALT"), encoding='utf8')
 HASH_DIGEST_SIZE = int(config("HASH_DIGEST_SIZE"))
 HASH_PERSON_REGISTER_TERMINAL = bytes(config("HASH_PERSON_REGISTER_TERMINAL"), encoding='utf8')
+
+ROUTE_REGISTER_GATE = config("ROUTE_REGISTER_GATE")

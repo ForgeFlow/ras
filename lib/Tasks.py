@@ -6,10 +6,11 @@ import threading
 from hashlib import blake2b
 
 from . import Clocking, Utils, routes
-from dicts.ras_dic import ask_twice, FIRMWARE_VERSION
+from dicts.ras_dic import ask_twice
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common import constants as co
+import odoo.remoteManagement as odooRemote
 
 class Tasks:
 	def __init__(self, Odoo, Hardware):
@@ -345,7 +346,7 @@ class Tasks:
 			self.Disp.lockForTheClock = True
 			origin = (34, 20)
 			size = 24
-			text = FIRMWARE_VERSION
+			text = ut.settings["firmwareVersion"]
 			message = [origin,size,text]
 			self.Disp.displayMsgRaw(message)
 			time.sleep(2)
@@ -426,69 +427,9 @@ class Tasks:
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 
-	def getMachineID(self):
-		try:
-			with open(co.MACHINE_ID_FILE,"r")as f:
-				machine_id= bytes(f.readline().replace('\n',''), encoding='utf8')
-			loggerDEBUG(f"got machine ID: {machine_id}")
-		except Exception as e:
-			loggerERROR(f"Exception while retreiving Machine ID from its file: {e}")
-			machine_id = None
-		if not machine_id:
-			#TODO generate machine_id randomly and write it to machineID
-			loggerINFO(f"No MACHINE ID found. A random MACHINE ID will be generated and saved.")
-			pass
-		return machine_id
-
-	def getHashedMachineId(self):
-
-		machine_id = self.getMachineID()
-
-		hashed_machine_id = blake2b( \
-			machine_id,
-			digest_size=co.HASH_DIGEST_SIZE,
-			key=co.HASH_KEY,
-			salt=co.HASH_SALT,
-			person=co.HASH_PERSON_REGISTER_TERMINAL, 
-			).hexdigest()
-
-		return hashed_machine_id
-
-	def registerTerminalInOdoo(self, hashed_machine_id):
-		#gets 1) Terminal_ID and 2) RoutefromOdooToDevice 3)RoutefromDeviceToOdoo
-		loggerINFO(f"hashed machine ID: {hashed_machine_id}")
-		#send to odoo:
-		# 1) hashed machine id
-		# 2) type of device (RAS2 for example)
-		# 3) version number of the firmware
-		# 4) serial number of the device
-		# ---> deviceCustomization json
-
-		
-		# Download Messages and Settings from Odoo (?)
-		terminal_ID_in_Odoo = 1
-		loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
-		Utils.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
-		return terminal_ID_in_Odoo
-
-	def getNewTerminalIDinOdoo(self):
-		hashed_machine_id = self.getHashedMachineId()
-		self.registerTerminalInOdoo(hashed_machine_id)
-
-	def ensureFirstOdooConnection_RemoteManagement(self):
-		loggerINFO("Terminal REMOTELY managed: ensure get Terminal ID in Odoo - initiated")
-		while not Utils.settings["terminalIDinOdoo"]:
-			# Display: Terminal has To be Accepted in Odoo To Continue
-			# msg="Accept_In_Odoo_To_Continue"
-			self.getNewTerminalIDinOdoo()
-
-		# TODO getRouteToOdoo
-		pass
-
-
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
 		if "remotely" in Utils.settings["terminalSetupManagement"]:
-			self.ensureFirstOdooConnection_RemoteManagement()
+			odooRemote.ensureFirstOdooConnection_RemoteManagement()
 		else:
 			self.ensureFirstOdooConnection_LocalManagement()
 		

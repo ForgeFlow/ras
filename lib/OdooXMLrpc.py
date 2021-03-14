@@ -8,9 +8,12 @@ from dicts import tz_dic
 import xmlrpc.client as xmlrpclib
 from socket import setdefaulttimeout as setTimeout
 
-from . import Utils
+#from . import Utils
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+import odoo.odoo as od
+import lib.Utils as ut
+import common.common as cc
 
 class OdooXMLrpc:
     def __init__(self, Display):
@@ -19,75 +22,38 @@ class OdooXMLrpc:
         self.getUIDfromOdoo()
         loggerINFO("Odoo XMLrpc Class Initialized")
 
-    #@Utils.timer
+    #@ut.timer
     def getUIDfromOdoo(self):
-        loggerINFO(f"in method getUIDfromOdoo , the Odoo Params are: {Utils.settings['odooParameters']}")
-        self.setTimeZone()
-        self.setOdooUrlTemplate()
-        self.setOdooIpPort()
+        loggerINFO(f"in method getUIDfromOdoo , the Odoo Params are: {ut.settings['odooParameters']}")
+        cc.setTimeZone()
+        self.odooUrlTemplate    = ut.settings["odooUrlTemplate"] # can be deleted?
+        self.odooIpPort         = ut.settings["odooIpPort"] # can be deleted?
         self.setUserID()
-        loggerINFO(f"got user id from Odoo {self.uid}")                                                                  
-
-    def setTimeZone(self):
-        try:
-            os.environ["TZ"] = tz_dic.tz_dic[Utils.settings["odooParameters"]["timezone"][0]]
-            time.tzset()
-            return True
-        except Exception as e:
-            loggerERROR(f"exception in method setTimeZone: {e}")
-            return False               
-
-    def setOdooUrlTemplate(self):
-        try:
-            if  Utils.isOdooUsingHTTPS():
-                self.odooUrlTemplate = "https://%s" % Utils.settings["odooParameters"]["odoo_host"][0]
-            else:
-                self.odooUrlTemplate = "http://%s" % Utils.settings["odooParameters"]["odoo_host"][0]                
-            if Utils.settings["odooParameters"]["odoo_port"][0]:
-                self.odooUrlTemplate += ":%s" % Utils.settings["odooParameters"]["odoo_port"][0]
-            loggerINFO(f"self.odooUrlTemplate is {self.odooUrlTemplate}")
-            return True
-        except Exception as e:
-            self.odooUrlTemplate    = None
-            loggerERROR(f"exception in method setOdooUrlTemplate: {e}")
-            return False        
-               
-    def setOdooIpPort(self):
-        self.odooIpPort = None
-        try:
-            if Utils.settings["odooParameters"]["odoo_port"]!=[""]: 
-                portNumber =  int(Utils.settings["odooParameters"]["odoo_port"][0])                          
-            elif Utils.isOdooUsingHTTPS():
-                portNumber =   443
-            self.odooIpPort = (Utils.settings["odooParameters"]["odoo_host"][0], portNumber)
-            return True
-        except Exception as e:
-            loggerERROR(f"exception in method setOdooIpPort: {e}")
-            return False
+        loggerINFO(f"Got user id from Odoo {self.uid}")             
     
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
+            serverProxy = xmlrpclib.ServerProxy(ut.settings["odooUrlTemplate"] + str(url))
             return serverProxy
         except Exception as e:
             loggerWARNING(f"getServerProxy exception {e}")
             return False
 
-    #@Utils.timer
+    #@ut.timer
     def setUserID(self):
         self.uid = False
         returnValue = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            setTimeout(float(Utils.settings["timeoutToGetOdooUID"]) or None)
+            setTimeout(float(ut.settings["timeoutToGetOdooUID"]) or None)
             user_id = loginServerProxy.login(
-                Utils.settings["odooParameters"]["db"][0],
-                Utils.settings["odooParameters"]["user_name"][0],
-                Utils.settings["odooParameters"]["user_password"][0])
+                ut.settings["odooParameters"]["db"][0],
+                ut.settings["odooParameters"]["user_name"][0],
+                ut.settings["odooParameters"]["user_password"][0])
             if user_id:
                 loggerINFO(f"got user id from Odoo ")
                 self.uid = user_id
-                Utils.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
+                ut.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
                 returnValue =  True
             else:
                 loggerINFO(f"NO user id from Odoo {user_id}")
@@ -111,23 +77,17 @@ class OdooXMLrpc:
             setTimeout(None)
             return returnValue
     
-    #@Utils.timer
-    def isOdooPortOpen(self):
-        isOpen = Utils.isIpPortOpen(self.odooIpPort)
-        loggerDEBUG(f"is Odoo Port Open? :{isOpen}")
-        return isOpen
-
-    #@Utils.timer
+    #@ut.timer
     def checkAttendance(self, card):
         res=False
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                setTimeout(float(Utils.settings["timeoutToCheckAttendance"]) or None)
+                setTimeout(float(ut.settings["timeoutToCheckAttendance"]) or None)
                 res = serverProxy.execute(
-                    Utils.settings["odooParameters"]["db"][0],
+                    ut.settings["odooParameters"]["db"][0],
                     self.uid,
-                    Utils.settings["odooParameters"]["user_password"][0],
+                    ut.settings["odooParameters"]["user_password"][0],
                     "hr.employee",
                     "register_attendance",
                     card,
@@ -143,5 +103,5 @@ class OdooXMLrpc:
             return res
 
     def ensureNoDataJsonFile(self):
-        if os.path.isfile(Utils.fileDataJson):
-            os.system("sudo rm " + Utils.fileDataJson)
+        if os.path.isfile(ut.fileDataJson):
+            os.system("sudo rm " + ut.fileDataJson)

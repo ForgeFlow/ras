@@ -5,6 +5,7 @@ import logging
 import threading
 
 from . import routes, Utils
+import lib.Utils as ut
 
 _logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class Clocking:
         self.wifi = False
         #self.wifi_con = Wireless("wlan0")
 
-        self.timeToDisplayResult = Utils.settings["timeToDisplayResultAfterClocking"] #1.4 # in seconds
+        self.timeToDisplayResult = ut.settings["timeToDisplayResultAfterClocking"] #1.4 # in seconds
 
         self.msg = False    # determines Melody to play and/or Text to display depending on Event happened: for example check in,
                             # check out, communication with odoo not possible ...
@@ -67,17 +68,17 @@ class Clocking:
                     resultdict[datumname] = datum
         return resultdict
 
-    #@Utils.timer
+    #@ut.timer
     def wifiStable(self):
-        if Utils.isTypeOfConnection_Connected("ethernet"):
-            if Utils.isPingable("1.1.1.1"):
+        if ut.isTypeOfConnection_Connected("ethernet"):
+            if ut.isPingable("1.1.1.1"):
                 self.wifiSignalQualityMessage = "Ethernet"
                 self.wifi = True
             else:
                 self.wifiSignalQualityMessage = "Ethernet down"
                 self.wifi = False
         else:
-            if Utils.isPingable("1.1.1.1"):
+            if ut.isPingable("1.1.1.1"):
                 if self.wifiActive():
                     strength = int(self.get_status()["Signal level"])  # in dBm
                     if strength >= 79:
@@ -96,7 +97,7 @@ class Clocking:
                         self.wifiSignalQualityMessage  = "\u2022" * 5
                         self.wifi = True
                 else:
-                    self.wifiSignalQualityMessage  = Utils.getMsgTranslated("noWiFiSignal")[2]
+                    self.wifiSignalQualityMessage  = ut.getMsgTranslated("noWiFiSignal")[2]
                     self.wifi = False
             else:
                 self.wifiSignalQualityMessage  = "WiFi down"
@@ -104,16 +105,16 @@ class Clocking:
         
         return self.wifi
 
-    #@Utils.timer
+    #@ut.timer
     def isOdooReachable(self):
-        if self.wifiStable() and Utils.isIpPortOpen(self.Odoo.odooIpPort) and not self.Odoo.uid:
+        if self.wifiStable() and ut.isIpPortOpen(ut.settings["odooIpPort"]) and not self.Odoo.uid:
             self.Odoo.getUIDfromOdoo()
 
-        if self.wifiStable() and Utils.isIpPortOpen(self.Odoo.odooIpPort) and self.Odoo.uid:
-            self.odooReachabilityMessage = Utils.getMsgTranslated("clockScreen_databaseOK")[2]
+        if self.wifiStable() and ut.isIpPortOpen(ut.settings["odooIpPort"]) and self.Odoo.uid:
+            self.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseOK")[2]
             self.odooReachable = True
         else:
-            self.odooReachabilityMessage = Utils.getMsgTranslated("clockScreen_databaseNotConnected")[2]
+            self.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseNotConnected")[2]
             self.odooReachable = False
             #_logger.warn(msg)
         #print("odooReachabilityMessage", self.odooReachabilityMessage)
@@ -121,7 +122,7 @@ class Clocking:
         _logger.debug(time.localtime(), "\n self.odooReachabilityMessage ", self.odooReachabilityMessage, "\n self.wifiSignalQualityMessage ", self.wifiSignalQualityMessage)        
         return self.odooReachable
 
-    #@Utils.timer
+    #@ut.timer
     def doTheClocking(self):
         try:
             #print("self.OdooReachable in dotheclocking", self.odooReachable)
@@ -147,7 +148,7 @@ class Clocking:
             #print("isOdooReachable: ", self.odooReachable )
         _logger.info("Clocking sync returns: %s" % self.msg)
 
-    #@Utils.timer
+    #@ut.timer
     def card_logging(self):
         self.Disp.lockForTheClock = True
         self.msg = "comm_failed"

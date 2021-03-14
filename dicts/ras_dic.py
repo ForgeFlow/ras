@@ -1,6 +1,3 @@
-# FIRMWARE Version
-FIRMWARE_VERSION = "v1.4.5"
-
 # driver to be used by luma.core
 display_driver = "sh1106"
 

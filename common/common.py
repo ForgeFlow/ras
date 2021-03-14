@@ -4,8 +4,14 @@ pPrint = PrettyPrinter(indent=1).pprint
 #import time
 import subprocess
 import os
+import time
+
+from hashlib import blake2b
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+from . import constants as co
+import lib.Utils as ut
+from dicts import tz_dic
 
 def prettyPrint(message):
     pPrint(message)
@@ -32,3 +38,40 @@ def runShellCommand_and_returnOutput(command):
     except:
         loggerERROR(f"error on shell command: {command}")
         return False
+
+def setTimeZone():
+    try:
+        timezone = tz_dic.tz_dic[ut.settings["odooParameters"]["timezone"][0]]
+        os.environ["TZ"] = timezone
+        time.tzset()
+        return timezone
+    except Exception as e:
+        loggerERROR(f"exception in method setTimeZone: {e}")
+        return None
+
+def getMachineID():
+    try:
+        with open(co.MACHINE_ID_FILE,"r")as f:
+            machine_id= bytes(f.readline().replace('\n',''), encoding='utf8')
+        #loggerDEBUG(f"got machine ID: {machine_id}")
+    except Exception as e:
+        loggerERROR(f"Exception while retreiving Machine ID from its file: {e}")
+        machine_id = None
+    if not machine_id:
+        #TODO generate machine_id randomly and write it to machineID
+        loggerINFO(f"No MACHINE ID found.") # A random MACHINE ID will be generated and saved. 
+        pass
+    return machine_id 
+
+def getHashedMachineId():
+    machine_id = getMachineID()
+
+    hashed_machine_id = blake2b( \
+        machine_id,
+        digest_size=co.HASH_DIGEST_SIZE,
+        key=co.HASH_KEY,
+        salt=co.HASH_SALT,
+        person=co.HASH_PERSON_REGISTER_TERMINAL, 
+        ).hexdigest()
+
+    return hashed_machine_id

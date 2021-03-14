@@ -8,6 +8,8 @@ import functools
 import subprocess
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+import odoo.odoo as od
+import common.common as cc
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
@@ -101,7 +103,7 @@ def getJsonData(filePath):
       data = json.load(f)
     return data  
   except Exception as e:
-    print("exception while getting/loading data from json file: ", filePath, " -exception: ", e)
+    loggerDEBUG(f"exception while accessing file: {filePath} -exception: {e}")
     #_logger.exception(e):
     return None
 
@@ -222,15 +224,27 @@ def getSettingsFromDeviceCustomization():
     "timeToDisplayResultAfterClocking": 1.2,
     "terminalSetupManagement": "locally, on the terminal",
     "terminalIDinOdoo": None,
-    "hashed_machine_id": None
+    "hashed_machine_id": None,
+    "installedPythonModules": [],
+    "routefromOdooToDevice": None,
+    "routefromDeviceToOdoo": None,
+    "manufacturingData": None,
+    "location": "unknown",
+    "RoutefromOdooToDevice": None,
+    "RoutefromDeviceToOdoo": None
   }
 
   for key, value in settingsList_And_DefaultValues.items():
     settings[key] = getOptionFromDeviceCustomization(key, defaultValue = value)
 
+  settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()
+  settings["odooIpPort"]          = od.setOdooIpPort()
+  settings["ownIpAddress"]        = getOwnIpAddress()
   settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
   settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
 
+  #loggerDEBUG(f"settings dic is: {settings}")
+  storeJsonData(fileDeviceCustomization,settings)
 
 def getMsg(textKey):
   try:
@@ -303,11 +317,11 @@ def migrationToVersion1_4_2():
   handleMigrationOfCredentialsJson()
   try:
     data = getJsonData(fileDataJson)
-    print("read dict from data.json in method Utils.migrationToVersion1_4_2 ", data)
+    loggerDEBUG(f"read dict from data.json {data}")
     if data and storeOptionInDeviceCustomization("odooParameters",data): # in data.json the Odoo Params are stored when a successful connection was made
       storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)    
   except Exception as e:
-    print("Exception in method Utils.migrationToVersion1_4_2 while trying to transfer data.json to deviceCustomization file: ", e)
+    loggerDEBUG(f"Exception-transfer data.json to deviceCustomization file: {e}")
 
 def isOdooUsingHTTPS():
   if  "https" in settings["odooParameters"].keys():
@@ -321,7 +335,7 @@ def isOdooUsingHTTPS():
 def getOwnIpAddress():
   command = "hostname -I | awk '{ print $1}' "
   ipAddress = (subprocess.check_output(command, shell=True).decode("utf-8").strip("\n"))
-  storeOptionInDeviceCustomization("ownIpAddress",[ipAddress])
+  #storeOptionInDeviceCustomization("ownIpAddress",ipAddress)
   return ipAddress
 
 def enableSSH():

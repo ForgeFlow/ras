@@ -1,5 +1,10 @@
 #! /usr/bin/python3.7
-from launcherModuleInstaller import installModules
+from moduleInstaller import installModules
+
+from lib.Utils import getSettingsFromDeviceCustomization, migrationToVersion1_4_2
+
+migrationToVersion1_4_2()
+getSettingsFromDeviceCustomization()
 
 modules_to_be_installed = [  \
     "systemd-python",
@@ -27,7 +32,7 @@ from colorama import Fore as cf
 
 from common import constants as co
 from common.launcher import launcher
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from messaging.messaging import SubscriberMultipart as Subscriber
 
 loggerINFO(f'running on python version: {sys.version}')
@@ -86,10 +91,9 @@ def terminate_non_essential_managed_processes():
 
 def log_begin_manager_thread():
     loggerINFO(f"starting manager thread") 
-    loggerDEBUG({"environ": os.environ})
+    #loggerDEBUG({"environ": os.environ})
 
 def log_running_processes_list():
-    #running_list = ["%s%s\u001b[0m" % ("\u001b[32m" if running[p].is_alive() else "\u001b[31m", p) for p in running]
     running_alive = [p for p in running if running[p].is_alive()]
     running_dead = [p for p in running if p not in running_alive]
     loggerINFO("alive: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
