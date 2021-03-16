@@ -6,45 +6,107 @@ from luma.core.render import canvas
 from .demo_opts import get_device
 from dicts.ras_dic import display_driver
 from . import routes
-from . import Utils
+import lib.Utils as ut
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+from common.common import runShellCommand_and_returnOutput
 
 class Display:
     def __init__(self):
-        self.fontRoboto = Utils.WORK_DIR + "fonts/Roboto-Medium.ttf"
-        self.fontOrkney = Utils.WORK_DIR + "fonts/Orkney.ttf"
-        self.img_path = Utils.WORK_DIR + "images/"
+        self.fontRoboto = ut.WORK_DIR + "fonts/Roboto-Medium.ttf"
+        self.fontOrkney = ut.WORK_DIR + "fonts/Orkney.ttf"
+        self.img_path = ut.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
         loggerDEBUG("Display Class Initialized")
         self.fontClockTime = ImageFont.truetype(self.fontRoboto, 42)
+        self.fontClockTime_12hour = ImageFont.truetype(self.fontRoboto, 38)
         self.fontClockInfos = ImageFont.truetype(self.fontRoboto, 14)
         self.font3 = ImageFont.truetype(self.fontRoboto, 22)
         self.font4 = ImageFont.truetype(self.fontOrkney, 14)
         self.display_msg("connecting")
-        self.lockForTheClock = False                      
+        self.lockForTheClock = False
+        self.odooReachabilityMessage  = " "
 
-    def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
+    def removeFirstZero(self,hour):
+        if hour[0] == "0":
+            hour = hour[1:]
+        return hour
+
+    def display_hours_and_minutes(self,draw):
+        if "24" in ut.settings["time_format"]:
+            hour = time.strftime("%H:%M", time.localtime())
+            num_ones = hour.count("1")
+            if num_ones < 3:
+                draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+            else:
+                draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+        else:
+            t = time.localtime()
+            hour = time.strftime("%I:%M", t)
+            am_pm = time.strftime("%p", t)
+            hour = self.removeFirstZero(hour)
+            num_ones = hour.count("1")
+            if len(hour) > 4:
+                x_hour = 8
+                x_am_pm = 108
+            else:
+                x_hour = 24
+                x_am_pm = 102
+
+            if num_ones == 0:
+                draw.text((x_hour, 11), hour, font= self.fontClockTime_12hour, fill="white")
+            elif num_ones == 1:
+                draw.text((x_hour, 11), hour, font= self.fontClockTime_12hour, fill="white")
+            elif num_ones == 2:
+                draw.text((x_hour, 11), hour, font= self.fontClockTime_12hour, fill="white")
+            elif num_ones == 3:
+                draw.text((x_hour+2, 11), hour, font= self.fontClockTime_12hour, fill="white")
+            else:
+                draw.text((x_hour+2, 11), hour, font= self.fontClockTime_12hour, fill="white")
+
+            draw.text((x_am_pm, 34), am_pm, font= self.fontClockInfos, fill="white")
+
+    def getInternetQualityMessage(self):
+        internetQualityMessage = "No Internet"
+        if ut.internetReachable():
+            if ut.isTypeOfConnection_Connected("eth0"):
+                internetQualityMessage = "Ethernet"
+            elif ut.isTypeOfConnection_Connected("wlan0"):
+                internetQualityMessage = "WiFi"
+            else:
+                internetQualityMessage = "Internet"          
+        return internetQualityMessage
+
+    def _display_time(self):
         if not self.lockForTheClock:
+            internetQualityMessage = self.getInternetQualityMessage()
             with canvas(self.device) as draw:
-                hour = time.strftime("%H:%M", time.localtime())
-                num_ones = hour.count("1")
-                if num_ones == 0:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 1:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 2:
-                    draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-                elif num_ones == 3:
-                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-                else:
-                    draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-                if "\u2022" in wifiSignalQualityMessage:
-                    draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
-                    draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
-                else:
-                    draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*18, font=self.font4, fill="white", align="center")
-                draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
+                self.display_hours_and_minutes(draw)
+                draw.text((0, 0), internetQualityMessage +"\n"*7+"-"*26, font=self.fontClockInfos, fill="white", align="center")
+                draw.text((0, 51), self.odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
+
+    # def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
+    #     if not self.lockForTheClock:
+    #         with canvas(self.device) as draw:
+    #             hour = runShellCommand_and_returnOutput('date "+%H:%M"')
+    #             #hour = time.strftime("%H:%M", time.localtime())
+    #             num_ones = hour.count("1")
+    #             if num_ones == 0:
+    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+    #             elif num_ones == 1:
+    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+    #             elif num_ones == 2:
+    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
+    #             elif num_ones == 3:
+    #                 draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+    #             else:
+    #                 draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
+    #             if "\u2022" in wifiSignalQualityMessage:
+    #                 draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
+    #                 draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
+    #             else:
+    #                 draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*18, font=self.font4, fill="white", align="center")
+    #             draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
 
     def showCard(self,card):
         with canvas(self.device) as draw:
@@ -82,12 +144,12 @@ class Display:
         loggerINFO(f"Displaying message: {text}")
 
 
-    #@Utils.timer
+    #@ut.timer
     def display_msg(self, textKey, employee_name = None):
         #self.clear_display()
-        message = Utils.getMsgTranslated(textKey)
+        message = ut.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
-            if employee_name and Utils.settings["showEmployeeName"] == "yes":
+            if employee_name and ut.settings["showEmployeeName"] == "yes":
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
                 nameToDisplay = firstName
@@ -100,12 +162,12 @@ class Display:
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
         if '-SSIDresetPlaceholder-' in message[2]:
-            message[2] =  message[2].replace('-SSIDresetPlaceholder-',Utils.settings["SSIDreset"])
+            message[2] =  message[2].replace('-SSIDresetPlaceholder-',ut.settings["SSIDreset"])
         self.displayMsgRaw(message)
     
     def displayWithIP(self, textKey):
-        message = Utils.getMsgTranslated(textKey)
-        message[2] = message[2].replace("-IpPlaceholder-",Utils.getOwnIpAddress(),1)
+        message = ut.getMsgTranslated(textKey)
+        message[2] = message[2].replace("-IpPlaceholder-",ut.getOwnIpAddress(),1)
         self.displayMsgRaw(message)
 
     def clear_display(self):

@@ -29,9 +29,6 @@ def runShellCommand(command):
 
 def runShellCommand_and_returnOutput(command):
     try:
-        # completed = subprocess.run(command.split(),
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.STDOUT)
         completed = subprocess.check_output(command, shell=True)
         loggerDEBUG(f'shell command {command} - returncode: {completed}')
         return str(completed)
@@ -40,14 +37,29 @@ def runShellCommand_and_returnOutput(command):
         return False
 
 def setTimeZone():
-    try:
-        timezone = tz_dic.tz_dic[ut.settings["odooParameters"]["timezone"][0]]
-        os.environ["TZ"] = timezone
-        time.tzset()
-        return timezone
-    except Exception as e:
-        loggerERROR(f"exception in method setTimeZone: {e}")
-        return None
+    if ut.settings["howToDefineTime"]=="use +-xx:xx":
+        try:
+            timezone = tz_dic.tz_dic[ut.settings["odooParameters"]["timezone"][0]]
+            os.environ["TZ"] = timezone
+            time.tzset()
+            loggerDEBUG(f"Timezone: {timezone} - was set using +-xx:xx")
+            return True
+        except Exception as e:
+            loggerERROR(f"exception in method setTimeZone (using +-xx:xx): {e}")
+            return False
+    else:
+        try: 
+            tz_database_name = ut.settings["tz_database_name"]
+            commands = ["sudo rm /etc/timezone",
+                    "sudo rm /etc/localtime",
+                    "sudo ln -s /usr/share/zoneinfo/"+ tz_database_name + " /etc/localtime"]
+            for c in commands:
+                runShellCommand(c)
+            loggerDEBUG(f"Timezone: {tz_database_name} - was set using tz database")
+            return True
+        except Exception as e:
+            loggerERROR(f"exception in method setTimeZone (using tz database): {e}")
+            return False
 
 def getMachineID():
     try:

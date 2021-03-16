@@ -148,7 +148,6 @@ def isSuccesRunningSubprocess(command):
         loggerERROR(f"error - shell command: {command}")
         return False  
 
-
 def isPingable(address):
   command = "ping -c 1 " + address
   return isSuccesRunningSubprocess(command)
@@ -222,7 +221,7 @@ def getSettingsFromDeviceCustomization():
     "periodEvaluateReachability": 5.0,
     "periodDisplayClock": 10.0,
     "timeToDisplayResultAfterClocking": 1.2,
-    "terminalSetupManagement": "locally, on the terminal",
+    "terminalSetupManagement": "locally, on the terminal", # "remotely, on Odoo"
     "terminalIDinOdoo": None,
     "hashed_machine_id": None,
     "installedPythonModules": [],
@@ -231,7 +230,10 @@ def getSettingsFromDeviceCustomization():
     "manufacturingData": None,
     "location": "to be defined",
     "RoutefromOdooToDevice": None,
-    "RoutefromDeviceToOdoo": None
+    "RoutefromDeviceToOdoo": None,
+    "howToDefineTime": "use +-xx:xx", # "use tz database"
+    "tz_database_name": "Europe/Madrid",
+    "time_format": "24 hour" # 12 hour
   }
 
   for key, value in settingsList_And_DefaultValues.items():
@@ -352,19 +354,16 @@ def disableSSH():
   except Exception as e:
     print("Exception in method Utils.disableSSH: ", e)
 
-def runShellCommand_and_returnOutput(command):
-  try:
-    completed = subprocess.check_output(command, shell=True)
-    #loggerDEBUG(f'shell command {command} - returncode: {completed}')
-    return str(completed)
-  except:
-    #loggerERROR(f"error on shell command: {command}")
-    return False
-
 def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
-  answer = runShellCommand_and_returnOutput(
-    'nmcli dev | grep '+ typeConnection +' | grep -w "connected"')
-  if answer:
-    return True
-  else:
-    return False
+  try:
+    answer = cc.runShellCommand_and_returnOutput(
+      'nmcli dev | grep '+ typeConnection +' | grep -w "connected"')
+    if answer:
+      return True
+    else:
+      return False
+  except Exception as e:
+    loggerERROR(f'Exception while checking if type of connection {typeConnection} is connected: {e}')
+  return False
+
+

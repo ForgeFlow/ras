@@ -51,20 +51,28 @@ def registerTerminalInOdoo():
         print("Status code: ", response.status_code)
         print("Printing Entire Post Response")
         print(response.json())
-        answer = json.loads(response.json())
-        
-        # Download Messages and Settings from Odoo (?)
-        terminal_ID_in_Odoo = answer['terminal_ID_in_Odoo']
-        routefromDeviceToOdoo = answer["routefromDeviceToOdoo"]
-        routefromOdooToDevice = answer["routefromOdooToDevice"]
+        answer = response.json().get("result", None)
+        if answer:
+            error = answer.get("error", None)
+            if error:
+                loggerINFO(f"could not register the terminal in Odoo- error: {error}")
+            else:
+                terminal_ID_in_Odoo     = answer['id']
+                routefromDeviceToOdoo   = answer["routefromDeviceToOdoo"]
+                routefromOdooToDevice   = answer["routefromOdooToDevice"]
+                loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
+                ut.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
+                ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",routefromDeviceToOdoo)
+                ut.storeOptionInDeviceCustomization("routefromOdooToDevice",routefromOdooToDevice)
+        else:
+            loggerINFO(f"Answer from Odoo did not contain an answer")
+    except ConnectionRefusedError as e:
+        loggerINFO(f"Request Exception : {e}")
+        # TODO inform the user via Display and wait 1 second
     except Exception as e:
-        loggerERROR(f"Could not register Terminal in Odoo - Exception {e}")
+        loggerERROR(f"Could not register Terminal in Odoo - Exception: {e}")
+        # TODO inform the user via Display and wait 1 second
 
-    loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
-    ut.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
-    ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",routefromDeviceToOdoo)
-    ut.storeOptionInDeviceCustomization("routefromOdooToDevice",routefromOdooToDevice)
-    
     return terminal_ID_in_Odoo
 
 def getNewTerminalIDinOdoo():

@@ -24,8 +24,6 @@ class Tasks:
 
 		self.Clock = Clocking.Clocking(Odoo, Hardware)
 		self.ask_twice = ask_twice  # list of tasks to ask 'are you sure?' upon selection
-		
-		self.wifiStable = self.Clock.wifiStable
 
 		self.periodPollCardReader 				= 0.2  # second
 		self.periodCheckBothButtonsPressed     	= 1     # seconds
@@ -128,7 +126,7 @@ class Tasks:
 		loggerINFO('Thread Server Killer started')
 		while not exitFlag.isSet():		
 			exitFlag.wait(period)
-		print("Tasks ln 123 . srv shutdown: ", srv)
+		loggerINFO(f"Tasks ln 123 . srv shutdown: {srv}")
 		srv.shutdown()
 		loggerINFO('Thread Server Killer stopped')
 
@@ -138,7 +136,7 @@ class Tasks:
 			self.Reader.scan_card()
 			if self.Reader.card:
 				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
-					loggerINFO("ADMIN CARD was swipped\n")
+					loggerINFO("ADMIN CARD was swipped")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
 																			# to enter in the loop again (avoid closed loop)
@@ -170,9 +168,8 @@ class Tasks:
 			self.Clock.isOdooReachable() 
 			loggerINFO('Thread Display Clock started')
 			while not exitFlag.isSet():
-				#print("messages", self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage)
 				if not self.Disp.lockForTheClock:	
-					self.Disp._display_time(self.Clock.wifiSignalQualityMessage, self.Clock.odooReachabilityMessage) 
+					self.Disp._display_time()
 				exitFlag.wait(period)
 			loggerINFO('Thread Display Clock stopped')
  
@@ -271,7 +268,7 @@ class Tasks:
 			time.sleep(2)
 			self.Disp.lockForTheClock = False			
 
-		if self.wifiStable():
+		if internetReachable():
 			if Utils.isPingable("github.com"):
 				doFirmwareUpdate()
 				self.nextTask = "reboot"
@@ -293,7 +290,7 @@ class Tasks:
 	def getOdooUIDwithNewParameters(self):
 		loggerDEBUG("getOdooUIDwithNewParameters")
 		#self.ensureThatWifiWorks()
-		if self.wifiStable():
+		if internetReachable():
 			self.Disp.displayWithIP('browseForNewOdooParams')
 
 			self.Odoo.ensureNoDataJsonFile()
