@@ -10,6 +10,7 @@ import subprocess
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import odoo.odoo as od
 import common.common as cc
+import odoo.remoteManagement as odooRemote
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
@@ -233,7 +234,8 @@ def getSettingsFromDeviceCustomization():
     "RoutefromDeviceToOdoo": None,
     "howToDefineTime": "use +-xx:xx", # "use tz database"
     "tz_database_name": "Europe/Madrid",
-    "time_format": "24 hour" # 12 hour
+    "time_format": "24 hour", # 12 hour
+    "version_things_module_in_Odoo": None
   }
 
   for key, value in settingsList_And_DefaultValues.items():
@@ -242,6 +244,7 @@ def getSettingsFromDeviceCustomization():
   settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
+  settings["isRemoteOdooControlAvailable"] = odooRemote.isRemoteOdooControlAvailable() # True or False
   settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
   settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
 

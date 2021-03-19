@@ -31,3 +31,4 @@ def setOdooIpPort():
         loggerERROR(f"Could not set Odoo IP port - exception {e}")
 
     return odooIpPort
+

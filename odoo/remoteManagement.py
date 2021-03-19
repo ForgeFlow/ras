@@ -48,8 +48,8 @@ def registerTerminalInOdoo():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        print("Status code: ", response.status_code)
-        print("Printing Entire Post Response")
+        loggerDEBUG(f"Register Terminal in Odoo - Status code of response: {response.status_code} ")
+        loggerDEBUG("Printing Entire Post Response")
         print(response.json())
         answer = response.json().get("result", None)
         if answer:
@@ -87,3 +87,36 @@ def ensureFirstOdooConnection_RemoteManagement():
         # Display: Terminal has To be Accepted in Odoo To Continue
         # msg="Accept_In_Odoo_To_Continue"
         getNewTerminalIDinOdoo()
+
+def isRemoteOdooControlAvailable():
+    version_things_module_in_Odoo = None
+    try:
+        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ASK_VERSION_IN_ODOO
+        headers     = {'Content-Type': 'application/json'}
+
+        payload     = {'question': co.QUESTION_ASK_FOR_VERSION_IN_ODOO}
+
+        response    = requests.post(url=requestURL, json=payload, headers=headers)
+
+        print("Status code: ", response.status_code)
+        print("Printing Entire Post Response")
+        print(response.json())
+        answer = response.json().get("result", None)
+        if answer:
+            error = answer.get("error", None)
+            if error:
+                loggerINFO(f"Remote Odoo Control not Available - Could not get the Version of Odoo- error: {error}")
+            else:
+                version_things_module_in_Odoo     = answer['version']
+                loggerINFO(f"Version_things_module_in_Odoo: {version_things_module_in_Odoo}")
+                loggerINFO(f"Remote Odoo Control Available") 
+                ut.storeOptionInDeviceCustomization("version_things_module_in_Odoo",version_things_module_in_Odoo)
+                return True
+        else:
+            loggerINFO(f"Remote Odoo Control not Available - Answer from Odoo did not contain an answer")
+    except ConnectionRefusedError as e:
+        loggerERROR(f"Remote Odoo Control not Available - ConnectionRefusedError - Request Exception : {e}")
+    except Exception as e:
+        loggerERROR(f"Remote Odoo Control not Available - Exception: {e}")
+    
+    return False
