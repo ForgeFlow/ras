@@ -4,7 +4,8 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 def main():
     from dicts.ras_dic import PinsBuzzer, PinsDown, PinsOK
     from lib import Display, CardReader, PasBuz, Button
-    from lib import OdooXMLrpc, Tasks, Utils
+    from lib import OdooXMLrpc, Tasks
+    import lib.Utils as ut
 
     Buzz = PasBuz.PasBuz(PinsBuzzer)
     Disp = Display.Display()
@@ -20,7 +21,9 @@ def main():
 
         if ut.settings["shouldGetFirmwareUpdate"]:
             ut.settings["shouldGetFirmwareUpdate"] = False
-            Tasks.nextTask = "updateFirmware"
+            loggerINFO("Firmware to be updated now...")
+            #Tasks.nextTask = "updateFirmware"
+            Tasks.nextTask = "ensureInternetAndOdoo"
         else:
             Tasks.nextTask = "ensureInternetAndOdoo" # TODO should be only ensure Odoo
 

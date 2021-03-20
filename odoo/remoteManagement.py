@@ -18,8 +18,6 @@ def getPayload(settings_to_send):
 
 def acknowledgeTerminalInOdoo():
     terminal_ID_in_Odoo     = None
-    routefromDeviceToOdoo   = None
-    routefromOdooToDevice   = None
 
     try:
         requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
@@ -43,7 +41,8 @@ def acknowledgeTerminalInOdoo():
             "terminalSetupManagement",
             "timeToDisplayResultAfterClocking",
             "timeoutToCheckAttendance",
-            "timeoutToGetOdooUID"
+            "timeoutToGetOdooUID",
+            "shouldGetFirmwareUpdate"
         ]
         payload     = getPayload(settings_to_send)
 
@@ -59,12 +58,12 @@ def acknowledgeTerminalInOdoo():
                 loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
             else:
                 terminal_ID_in_Odoo     = answer['id']
-                routefromDeviceToOdoo   = answer["routefromDeviceToOdoo"]
-                routefromOdooToDevice   = answer["routefromOdooToDevice"]
-                loggerINFO(f"terminal ID in Odoo: {terminal_ID_in_Odoo}")
-                ut.storeOptionInDeviceCustomization("terminalIDinOdoo",terminal_ID_in_Odoo)
-                ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",routefromDeviceToOdoo)
-                ut.storeOptionInDeviceCustomization("routefromOdooToDevice",routefromOdooToDevice)
+                loggerINFO(f"terminal ID in Odoo: {answer['id']}")
+                ut.storeOptionInDeviceCustomization("terminalIDinOdoo",answer['id'])
+                ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",answer["routefromDeviceToOdoo"])
+                ut.storeOptionInDeviceCustomization("routefromOdooToDevice",answer["routefromOdooToDevice"])
+                ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",answer["shouldGetFirmwareUpdate"])
+                ut.storeOptionInDeviceCustomization("location",answer["location"])                
         else:
             loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:
