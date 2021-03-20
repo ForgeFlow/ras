@@ -293,6 +293,10 @@ class Tasks:
 			time.sleep(2)
 			self.Disp.lockForTheClock = False			
 
+####
+		loggerDEBUG("updateFirmware #################################")
+		return
+####
 		if ut.internetReachable():
 			if ut.isPingable("github.com"):
 				doFirmwareUpdate()
@@ -376,6 +380,13 @@ class Tasks:
 			self.Disp.lockForTheClock = False
 
 	def shutdownSafe(self):
+
+	####
+			loggerDEBUG("shutdownSafe #################################")
+			return
+	####
+
+
 			self.Disp.lockForTheClock = True
 			loggerDEBUG("Shutting down safe")
 			time.sleep(0.2)
@@ -388,6 +399,13 @@ class Tasks:
 			sys.exit(0)
 
 	def reboot(self):
+
+####
+		loggerDEBUG("reboot #################################")
+		return
+####
+
+
 		self.Disp.lockForTheClock = True
 		loggerDEBUG("Rebooting")
 		time.sleep(0.2)
