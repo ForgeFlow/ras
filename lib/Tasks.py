@@ -157,6 +157,24 @@ class Tasks:
 
 	def clocking(self):
 		loggerINFO('Entering Clocking Option')
+		def resetSettingsAndSynchronizeWithOdoo():
+			ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",False)
+			ut.storeOptionInDeviceCustomization("setRebootAt",None)
+			ut.storeOptionInDeviceCustomization('shutdownTerminal',False)
+			odooRemote.resetSettings()
+
+		def eventuallyUpdateAndReboot():
+			if ut.settings["setRebootAt"]< now:
+				resetSettingsAndSynchronizeWithOdoo()
+				if ut.settings["shouldGetFirmwareUpdate"]:
+					self.updateFirmware()
+				self.reboot()
+
+		def eventuallyUpdateAndShutdown():
+			resetSettingsAndSynchronizeWithOdoo()
+			if ut.settings["shouldGetFirmwareUpdate"]:
+				self.updateFirmware()
+			self.shutdownSafe()
 
 		def threadEvaluateReachability(period):
 				loggerINFO('Thread Get Messages started')
@@ -164,6 +182,10 @@ class Tasks:
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
 						if "remotely" in ut.settings["terminalSetupManagement"]:
 							odooRemote.routineCheck()
+							if ut.settings["setRebootAt"]:
+								eventuallyUpdateAndReboot()
+							elif ut.settings['shutdownTerminal']:
+								eventuallyUpdateAndShutdown()
 						exitFlag.wait(period)
 				loggerINFO('Thread Get Messages stopped')
 
@@ -271,7 +293,7 @@ class Tasks:
 			time.sleep(2)
 			self.Disp.lockForTheClock = False			
 
-		if internetReachable():
+		if ut.internetReachable():
 			if ut.isPingable("github.com"):
 				doFirmwareUpdate()
 				self.nextTask = "reboot"
@@ -293,7 +315,7 @@ class Tasks:
 	def getOdooUIDwithNewParameters(self):
 		loggerDEBUG("getOdooUIDwithNewParameters")
 		#self.ensureThatWifiWorks()
-		if internetReachable():
+		if ut.internetReachable():
 			self.Disp.displayWithIP('browseForNewOdooParams')
 
 			self.Odoo.ensureNoDataJsonFile()

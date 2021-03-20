@@ -230,14 +230,13 @@ def getSettingsFromDeviceCustomization():
     "routefromDeviceToOdoo": None,
     "manufacturingData": None,
     "location": "to be defined",
-    "RoutefromOdooToDevice": None,
-    "RoutefromDeviceToOdoo": None,
     "howToDefineTime": "use +-xx:xx", # "use tz database"
     "tz_database_name": "Europe/Madrid",
     "time_format": "24 hour", # 12 hour
     "version_things_module_in_Odoo": None,
     "shouldGetFirmwareUpdate": False, # True, False
     "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
+    'shutdownTerminal': False,
   }
 
   for key, value in settingsList_And_DefaultValues.items():
