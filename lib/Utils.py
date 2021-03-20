@@ -235,7 +235,7 @@ def getSettingsFromDeviceCustomization():
     "howToDefineTime": "use +-xx:xx", # "use tz database"
     "tz_database_name": "Europe/Madrid",
     "time_format": "24 hour", # 12 hour
-    "version_things_module_in_Odoo": None
+    "version_things_module_in_Odoo": None,
     "shouldGetFirmwareUpdate": False, # True, False
   }
 
