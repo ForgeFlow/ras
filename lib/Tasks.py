@@ -278,7 +278,7 @@ class Tasks:
 				self.nextTask = self.defaultNextTask
 		else:
 			warnNoWiFiSignal()
-			self.nextTask = self.defaultNextTask
+			self.nextTask = self.ensureInternetAndOdoo
 
 	def resetWifi(self):
 		loggerINFO("Reset WiFi - Define a new SSID using wifi-connect")
