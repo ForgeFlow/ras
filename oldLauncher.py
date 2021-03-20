@@ -18,7 +18,11 @@ def main():
     try:
         Disp.displayGreetings()
 
-        Tasks.nextTask = "ensureInternetAndOdoo" # TODO should be only ensure Odoo
+        if ut.settings["shouldGetFirmwareUpdate"]:
+            ut.settings["shouldGetFirmwareUpdate"] = False
+            Tasks.nextTask = "updateFirmware"
+        else:
+            Tasks.nextTask = "ensureInternetAndOdoo" # TODO should be only ensure Odoo
 
         while True:
             if Tasks.nextTask:

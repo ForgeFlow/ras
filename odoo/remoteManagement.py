@@ -16,13 +16,13 @@ def getPayload(settings_to_send):
             loggerERROR(f"Exception while trying to access setting {s}")
     return payload
 
-def registerTerminalInOdoo():
+def acknowledgeTerminalInOdoo():
     terminal_ID_in_Odoo     = None
     routefromDeviceToOdoo   = None
     routefromOdooToDevice   = None
 
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_REGISTER_GATE
+        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         settings_to_send = [
             "firmwareVersion",
@@ -31,6 +31,7 @@ def registerTerminalInOdoo():
             "location",
             "manufacturingData",
             "odooConnectedAtLeastOnce",
+            "ownIpAddress",
             "periodDisplayClock",
             "periodEvaluateReachability",
             "routefromDeviceToOdoo",
@@ -48,14 +49,14 @@ def registerTerminalInOdoo():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        loggerDEBUG(f"Register Terminal in Odoo - Status code of response: {response.status_code} ")
-        loggerDEBUG("Printing Entire Post Response")
-        print(response.json())
+        loggerDEBUG(f"Acknowledge Terminal in Odoo - Status code of response: {response.status_code} ")
+        # loggerDEBUG("Printing Entire Post Response")
+        # print(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)
             if error:
-                loggerINFO(f"could not register the terminal in Odoo- error: {error}")
+                loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
             else:
                 terminal_ID_in_Odoo     = answer['id']
                 routefromDeviceToOdoo   = answer["routefromDeviceToOdoo"]
@@ -70,23 +71,20 @@ def registerTerminalInOdoo():
         loggerINFO(f"Request Exception : {e}")
         # TODO inform the user via Display and wait 1 second
     except Exception as e:
-        loggerERROR(f"Could not register Terminal in Odoo - Exception: {e}")
+        loggerERROR(f"Could not acknowledge Terminal in Odoo - Exception: {e}")
         # TODO inform the user via Display and wait 1 second
 
     return terminal_ID_in_Odoo
 
-def getNewTerminalIDinOdoo():
+def getTerminalIDinOdoo():
     if not ut.settings["hashed_machine_id"]:
         hashed_machine_id = cc.getHashedMachineId()
         ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
-    registerTerminalInOdoo()
+    acknowledgeTerminalInOdoo()
 
 def ensureFirstOdooConnection_RemoteManagement():
     loggerINFO("Terminal REMOTELY managed: ensure get Terminal ID in Odoo - initiated")
-    while not ut.settings["terminalIDinOdoo"]:
-        # Display: Terminal has To be Accepted in Odoo To Continue
-        # msg="Accept_In_Odoo_To_Continue"
-        getNewTerminalIDinOdoo()
+    getTerminalIDinOdoo()
 
 def isRemoteOdooControlAvailable():
     version_things_module_in_Odoo = None
@@ -98,9 +96,9 @@ def isRemoteOdooControlAvailable():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        print("Status code: ", response.status_code)
-        print("Printing Entire Post Response")
-        print(response.json())
+        # print("Status code: ", response.status_code)
+        # print("Printing Entire Post Response")
+        # print(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)

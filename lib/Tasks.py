@@ -6,6 +6,7 @@ import threading
 from hashlib import blake2b
 
 from . import Clocking, Utils, routes
+import lib.Utils as ut
 from dicts.ras_dic import ask_twice
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
@@ -72,7 +73,7 @@ class Tasks:
 		self.listOfEnableDisable =['enable', 'disable']
 
 	 ########### LANGUAGES ####################
-		self.listOfLanguages = Utils.getListOfLanguages(["ENGLISH"])
+		self.listOfLanguages = ut.getListOfLanguages(["ENGLISH"])
 		self.maxLanguageOptions = len(self.listOfLanguages) - 1
 
 		self.currentLanguageOption = 0		
@@ -109,7 +110,7 @@ class Tasks:
 
 		self.Disp.display_msg("newAdmCardDefined")
 
-		data = Utils.settings["odooParameters"]
+		data = ut.settings["odooParameters"]
 		self.Odoo.adm = data["admin_id"][0]
 		self.Buzz.Play("back_to_menu")
 
@@ -135,7 +136,7 @@ class Tasks:
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
-				if self.Reader.card.lower() == Utils.settings["odooParameters"]["admin_id"][0].lower():
+				if self.Reader.card.lower() == ut.settings["odooParameters"]["admin_id"][0].lower():
 					loggerINFO("ADMIN CARD was swipped")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
@@ -149,7 +150,7 @@ class Tasks:
 	def threadCheckBothButtonsPressed(self, period, howLong, exitFlag):
 		loggerINFO('Thread CheckBothButtonsPressed started')
 		while not exitFlag.isSet():
-			if Utils.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
+			if ut.bothButtonsPressedLongEnough(self.B_Down, self.B_OK, period, howLong, exitFlag):
 				self.nextTask = "getNewAdminCard"
 				exitFlag.set()
 		loggerINFO('Thread CheckBothButtonsPressed stopped')        
@@ -176,8 +177,8 @@ class Tasks:
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		periodEvaluateReachability = Utils.settings["periodEvaluateReachability"]   # seconds		
-		periodDisplayClock         =  Utils.settings["periodDisplayClock"]  # seconds
+		periodEvaluateReachability = ut.settings["periodEvaluateReachability"]   # seconds		
+		periodDisplayClock         =  ut.settings["periodDisplayClock"]  # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
@@ -208,20 +209,20 @@ class Tasks:
 		loggerDEBUG("choose Language")
 
 		self.currentLanguageOption = 0
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			currentLanguageOption = self.listOfLanguages[self.currentLanguageOption]
 			self.Disp.display_msg(currentLanguageOption)
-			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			ut.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:
 				self.Buzz.Play("OK")
 				self.Disp.language = currentLanguageOption
-				Utils.storeOptionInDeviceCustomization("language",currentLanguageOption)
+				ut.storeOptionInDeviceCustomization("language",currentLanguageOption)
 			elif self.B_Down.pressed:
 				goOneLanguageDownInTheMenu()
 		
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask
 
 	def showRFID(self):
@@ -243,7 +244,7 @@ class Tasks:
 		def doFirmwareUpdate():
 			loggerDEBUG("Updating Firmware")
 			self.Disp.display_msg("update")
-			os.chdir(Utils.WORK_DIR)
+			os.chdir(ut.WORK_DIR)
 			os.system("sudo git fetch origin v1.4-release")
 			os.system("sudo git reset --hard origin/v1.4-release")
 			self.Buzz.Play("OK")
@@ -269,7 +270,7 @@ class Tasks:
 			self.Disp.lockForTheClock = False			
 
 		if internetReachable():
-			if Utils.isPingable("github.com"):
+			if ut.isPingable("github.com"):
 				doFirmwareUpdate()
 				self.nextTask = "reboot"
 			else:
@@ -283,7 +284,7 @@ class Tasks:
 		loggerINFO("Reset WiFi - Define a new SSID using wifi-connect")
 		self.Disp.display_msg("configure_wifi")
 		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
-		os.system("sudo wifi-connect --portal-ssid " + Utils.settings["SSIDreset"])
+		os.system("sudo wifi-connect --portal-ssid " + ut.settings["SSIDreset"])
 		self.Buzz.Play("back_to_menu")
 		self.nextTask = self.defaultNextTask
 
@@ -382,7 +383,7 @@ class Tasks:
 
 		def askTwice():
 			self.Disp.display_msg("sure?")
-			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			ut.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed: 
 				setNextTask()
 			else:
@@ -407,7 +408,7 @@ class Tasks:
 		self.currentMenuOption = 0
 		while not self.nextTask:
 			self.Disp.display_msg(self.listOfTasksInMenu[self.currentMenuOption])
-			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			ut.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 			if self.B_OK.pressed:		
 				loggerDEBUG(f"OK pressed - current Menu Option is: {self.listOfTasksInMenu[self.currentMenuOption]}", )
 				checkAskTwice_and_eventuallySetNextTask()
@@ -415,17 +416,18 @@ class Tasks:
 				goOneOptionDownInTheMenu()
 
 	def ensureThatInternetIsAvailable(self):
-		if not Utils.internetReachable(): # wether ethernet nor wifi available
+		if not ut.internetReachable(): # wether ethernet nor wifi available
 			self.resetWifi()
 
 	def ensureFirstOdooConnection_LocalManagement(self):
-		if not Utils.settings["odooConnectedAtLeastOnce"]:
+		if not ut.settings["odooConnectedAtLeastOnce"]:
 			loggerINFO("Terminal LOCALLY managed: ensureFirstOdooConnection Odoo UID initiated")
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		if "remotely" in Utils.settings["terminalSetupManagement"]:
+		if "remotely" in ut.settings["terminalSetupManagement"] and \
+			ut.settings["isRemoteOdooControlAvailable"]:
 			odooRemote.ensureFirstOdooConnection_RemoteManagement()
 		else:
 			self.ensureFirstOdooConnection_LocalManagement()
@@ -447,21 +449,21 @@ class Tasks:
 		loggerDEBUG("shouldEmployeeNameBeDisplayed")
 
 		currentOption = 0
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			textCurrentOption = self.listOfYesNo[currentOption]
 			self.Disp.display_msg(textCurrentOption)
-			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			ut.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 
 			if self.B_Down.pressed:
 				currentOption = goOneDownInTheMenu(currentOption)
 
 		self.Buzz.Play("OK")
 		self.Disp.showEmployeeName = textCurrentOption
-		Utils.storeOptionInDeviceCustomization("showEmployeeName",textCurrentOption)
+		ut.storeOptionInDeviceCustomization("showEmployeeName",textCurrentOption)
 		
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask
 
 	def shouldSshBeEnabled(self):
@@ -473,22 +475,22 @@ class Tasks:
 			return currentOption
 
 		currentOption = 0
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 
 		while not self.B_OK.pressed:
 			textCurrentOption = self.listOfEnableDisable[currentOption]
 			self.Disp.display_msg(textCurrentOption)
-			Utils.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
+			ut.waitUntilOneButtonIsPressed(self.B_OK, self.B_Down)
 
 			if self.B_Down.pressed:
 				currentOption = goOneDownInTheMenu(currentOption)
 
 		self.Buzz.Play("OK")
 		if textCurrentOption == "enable":
-			Utils.enableSSH()
+			ut.enableSSH()
 		else:
-			Utils.disableSSH()
-		Utils.storeOptionInDeviceCustomization("ssh",textCurrentOption)
+			ut.disableSSH()
+		ut.storeOptionInDeviceCustomization("ssh",textCurrentOption)
 		
-		Utils.setButtonsToNotPressed(self.B_OK,self.B_Down)
+		ut.setButtonsToNotPressed(self.B_OK,self.B_Down)
 		self.nextTask = self.defaultNextTask

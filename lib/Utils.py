@@ -236,6 +236,7 @@ def getSettingsFromDeviceCustomization():
     "tz_database_name": "Europe/Madrid",
     "time_format": "24 hour", # 12 hour
     "version_things_module_in_Odoo": None
+    "shouldGetFirmwareUpdate": False, # True, False
   }
 
   for key, value in settingsList_And_DefaultValues.items():
@@ -247,6 +248,9 @@ def getSettingsFromDeviceCustomization():
   settings["isRemoteOdooControlAvailable"] = odooRemote.isRemoteOdooControlAvailable() # True or False
   settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
   settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+  if "remotely" in settings["terminalSetupManagement"] and \
+    settings["isRemoteOdooControlAvailable"]:
+    odooRemote.ensureFirstOdooConnection_RemoteManagement()
 
   #loggerDEBUG(f"settings dic is: {settings}")
   storeJsonData(fileDeviceCustomization,settings)

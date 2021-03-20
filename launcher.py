@@ -16,6 +16,9 @@ modules_to_be_installed = [  \
 
 installModules(modules_to_be_installed)
 
+
+
+
 ###############################################
 
 import os, sys, time 
@@ -35,24 +38,29 @@ from common.launcher import launcher
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from messaging.messaging import SubscriberMultipart as Subscriber
 
+import lib.Utils as ut
+
 loggerINFO(f'running on python version: {sys.version}')
 
 managed_essential_processes = { # key(=process name) : (pythonmodule where the process is defined (= process name))
     #"internet_connectivity_d": "connectivity.manager",
     "thermal_d": "thermal.manager",
-    "RAS_Launcher_d":"oldLauncher"  
+    "RAS_d": "oldLauncher"
 }
 
 managed_NON_essential_processes = {}
+daemon_processes = {}
+running: Dict[str, Process] = {}
+
+# if "remotely" in ut.settings["terminalSetupManagement"]:
+#     managed_essential_processes["RAS_remote_d"] = "launcher_remote"
+# else:
+#     managed_essential_processes["RAS_local_d"] = "oldLauncher"
 
 managed_processes = {
     **managed_essential_processes,
     **managed_NON_essential_processes
     }
-
-daemon_processes = {}
-
-running: Dict[str, Process] = {}
 
 def start_managed_process(name):
     if name not in running and name in managed_processes:
