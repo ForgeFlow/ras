@@ -117,3 +117,35 @@ def isRemoteOdooControlAvailable():
         loggerERROR(f"Remote Odoo Control not Available - Exception: {e}")
     
     return False
+
+def routineCheck()
+    try:
+        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_OUTGOING_IN_ODOO
+        headers     = {'Content-Type': 'application/json'}
+
+        payload     = {'question': co.QUESTION_ASK_FOR_ROUTINE_CHECK}
+
+        response    = requests.post(url=requestURL, json=payload, headers=headers)
+
+        # print("Status code: ", response.status_code)
+        # print("Printing Entire Post Response")
+        # print(response.json())
+        answer = response.json().get("result", None)
+        if answer:
+            error = answer.get("error", None)
+            if error:
+                loggerINFO(f"Routine Check not Available - error in answer from Odoo: {error}")
+            else:
+                ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",answer["shouldGetFirmwareUpdate"])
+                ut.storeOptionInDeviceCustomization("location",answer["location"])
+                ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True)
+                return True
+        else:
+            loggerINFO(f"Routine Check not Available - Answer from Odoo did not contain an answer")        
+    except ConnectionRefusedError as e:
+        loggerERROR(f"Routine Check not Available - ConnectionRefusedError - Request Exception : {e}")
+    except Exception as e:
+        loggerERROR(f"Routine Check not Available - Exception: {e}")
+
+    ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", False)
+    return False     

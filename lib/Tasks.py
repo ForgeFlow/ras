@@ -162,6 +162,8 @@ class Tasks:
 				loggerINFO('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
+						if "remotely" in ut.settings["terminalSetupManagement"]:
+							odooRemote.routineCheck()
 						exitFlag.wait(period)
 				loggerINFO('Thread Get Messages stopped')
 
