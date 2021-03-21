@@ -5,6 +5,7 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 import common.constants as co
 import common.common as cc
 import lib.Utils as ut
+import common.logger as lo
 
 
 def getPayload(settings_to_send):
@@ -125,7 +126,8 @@ def routineCheck():
         headers     = {'Content-Type': 'application/json'}
 
         payload     = {'question': co.QUESTION_ASK_FOR_ROUTINE_CHECK,
-                    'productName': ut.settings["manufacturingData"].get('productName') }
+                    'productName': ut.settings["manufacturingData"].get('productName'),
+                    'incrementalLog': lo.incrementalLog}
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
@@ -143,6 +145,7 @@ def routineCheck():
                 ut.storeOptionInDeviceCustomization("setRebootAt",answer["setRebootAt"])
                 ut.storeOptionInDeviceCustomization('shutdownTerminal', answer["shutdownTerminal"])
                 ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True)
+                lo.incrementalLog = []
                 return True
         else:
             loggerINFO(f"Routine Check not Available - Answer from Odoo did not contain an answer")        
@@ -182,6 +185,6 @@ def resetSettings():
         loggerERROR(f"resetSettings not Available - ConnectionRefusedError - Request Exception : {e}")
     except Exception as e:
         loggerERROR(f"resetSettings not Available - Exception: {e}")
-        
+
     ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", False)
     return False     

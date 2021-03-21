@@ -163,17 +163,21 @@ class Tasks:
 			ut.storeOptionInDeviceCustomization('shutdownTerminal',False)
 			odooRemote.resetSettings()
 
-		def eventuallyUpdateAndReboot():
-			if ut.settings["setRebootAt"]< now:
+		def checkIfUpdate_and_resetSettings():
+				shouldUpdate = ut.settings["shouldGetFirmwareUpdate"]
 				resetSettingsAndSynchronizeWithOdoo()
-				if ut.settings["shouldGetFirmwareUpdate"]:
+				if shouldUpdate:
 					self.updateFirmware()
+
+		def eventuallyUpdateAndReboot():
+			rebootTime = time.strptime(ut.settings["setRebootAt"], '%Y-%m-%d %H:%M:%S')
+			loggerDEBUG(f'ut.settings["setRebootAt"] {rebootTime}; time.localtime() {time.localtime()}')
+			if rebootTime < time.localtime():
+				checkIfUpdate_and_resetSettings()				
 				self.reboot()
 
 		def eventuallyUpdateAndShutdown():
-			resetSettingsAndSynchronizeWithOdoo()
-			if ut.settings["shouldGetFirmwareUpdate"]:
-				self.updateFirmware()
+			checkIfUpdate_and_resetSettings()
 			self.shutdownSafe()
 
 		def threadEvaluateReachability(period):
