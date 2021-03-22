@@ -85,29 +85,6 @@ class Display:
                 draw.text((0, 0), internetQualityMessage +"\n"*7+"-"*26, font=self.fontClockInfos, fill="white", align="center")
                 draw.text((0, 51), self.odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
 
-    # def _display_time(self, wifiSignalQualityMessage, odooReachabilityMessage):
-    #     if not self.lockForTheClock:
-    #         with canvas(self.device) as draw:
-    #             hour = runShellCommand_and_returnOutput('date "+%H:%M"')
-    #             #hour = time.strftime("%H:%M", time.localtime())
-    #             num_ones = hour.count("1")
-    #             if num_ones == 0:
-    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-    #             elif num_ones == 1:
-    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-    #             elif num_ones == 2:
-    #                 draw.text((10, 9), hour, font=self.fontClockTime, fill="white")
-    #             elif num_ones == 3:
-    #                 draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-    #             else:
-    #                 draw.text((12, 9), hour, font=self.fontClockTime, fill="white")
-    #             if "\u2022" in wifiSignalQualityMessage:
-    #                 draw.text((0, 0), "WiFi " +"\n"*7+"-"*19, font=self.fontClockInfos, fill="white", align="center")
-    #                 draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*23, font=self.font4, fill="white", align="center")
-    #             else:
-    #                 draw.text((0, 0), wifiSignalQualityMessage +"\n"*7+"-"*18, font=self.font4, fill="white", align="center")
-    #             draw.text((0, 51), odooReachabilityMessage+"\n"*2+"-"*26, font=self.fontClockInfos, fill="white", align="center")   
-
     def showCard(self,card):
         with canvas(self.device) as draw:
             try:
@@ -141,7 +118,7 @@ class Display:
         font = ImageFont.truetype(self.fontRoboto, size)
         with canvas(self.device) as draw:
             draw.multiline_text(origin, text, fill="white", font=font, align="center")
-        loggerINFO(f"Displaying message: {text}")
+        loggerINFO(f"Displaying message: {message}")
 
 
     #@ut.timer
@@ -150,6 +127,7 @@ class Display:
         message = ut.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and ut.settings["showEmployeeName"] == "yes":
+                loggerINFO(f"Employee Name: {employee_name}")
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
                 nameToDisplay = firstName
@@ -157,11 +135,12 @@ class Display:
                     lastName = employeeName[1][0:14]
                     nameToDisplay = nameToDisplay + "\n"+lastName
                 except:
-                    loggerDEBUG("Name has no lastName to Display")         
+                    loggerINFO("Name has no lastName to Display")         
                 message[2] = message[2].replace('-EmployeePlaceholder-',nameToDisplay,1)
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
         if '-SSIDresetPlaceholder-' in message[2]:
+            loggerINFO(f"SSID: {ut.settings['SSIDreset']}")
             message[2] =  message[2].replace('-SSIDresetPlaceholder-',ut.settings["SSIDreset"])
         self.displayMsgRaw(message)
     
@@ -173,4 +152,4 @@ class Display:
     def clear_display(self):
         with canvas(self.device) as draw:
             draw.multiline_text((0, 0), " ")
-            loggerDEBUG("Clear display")
+            loggerINFO("Clear display")

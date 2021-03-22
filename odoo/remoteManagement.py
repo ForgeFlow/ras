@@ -64,7 +64,12 @@ def acknowledgeTerminalInOdoo():
                 ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",answer["routefromDeviceToOdoo"])
                 ut.storeOptionInDeviceCustomization("routefromOdooToDevice",answer["routefromOdooToDevice"])
                 ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",answer["shouldGetFirmwareUpdate"])
-                ut.storeOptionInDeviceCustomization("location",answer["location"])                
+                ut.storeOptionInDeviceCustomization("location",answer["location"])
+                if answer["tz"]:
+                    ut.storeOptionInDeviceCustomization("tz_database_name", answer["tz"])
+                    ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
+                    cc.setTimeZone()
+                ut.storeOptionInDeviceCustomization("time_format",answer["hour12or24"])
         else:
             loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:
@@ -146,6 +151,11 @@ def routineCheck():
                 ut.storeOptionInDeviceCustomization('shutdownTerminal', answer["shutdownTerminal"])
                 ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True)
                 lo.incrementalLog = []
+                if answer["tz"]!=ut.settings["tz_database_name"]:
+                    ut.storeOptionInDeviceCustomization("tz_database_name", answer["tz"])
+                    ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
+                    cc.setTimeZone()
+                ut.storeOptionInDeviceCustomization("time_format",answer["hour12or24"])                
                 return True
         else:
             loggerINFO(f"Routine Check not Available - Answer from Odoo did not contain an answer")        

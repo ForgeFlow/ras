@@ -1,10 +1,21 @@
 #! /usr/bin/python3.7
-from moduleInstaller import installModules
+try:
+    from common.logger import loggerINFO
+    loggerINFO("----------------------------------------------------------------------")
+    loggerINFO("######################################################################")
+    loggerINFO("launching RAS2 -------------------------------------------------------")
+    loggerINFO("######################################################################")    
+    loggerINFO("----------------------------------------------------------------------")
+    loggerINFO("...")
+except:
+    pass
 
 from lib.Utils import getSettingsFromDeviceCustomization, migrationToVersion1_4_2
 
 migrationToVersion1_4_2()
 getSettingsFromDeviceCustomization()
+
+from moduleInstaller import installModules
 
 modules_to_be_installed = [  \
     "systemd-python",
@@ -15,7 +26,6 @@ modules_to_be_installed = [  \
     "psutil" ]
 
 installModules(modules_to_be_installed)
-
 
 
 

@@ -42,20 +42,23 @@ def setTimeZone():
             timezone = tz_dic.tz_dic[ut.settings["odooParameters"]["timezone"][0]]
             os.environ["TZ"] = timezone
             time.tzset()
-            loggerDEBUG(f"Timezone: {timezone} - was set using +-xx:xx")
+            loggerINFO(f"Timezone: {timezone} - was set using +-xx:xx")
             return True
         except Exception as e:
             loggerERROR(f"exception in method setTimeZone (using +-xx:xx): {e}")
             return False
     else:
         try: 
-            tz_database_name = ut.settings["tz_database_name"]
-            commands = ["sudo rm /etc/timezone",
-                    "sudo rm /etc/localtime",
-                    "sudo ln -s /usr/share/zoneinfo/"+ tz_database_name + " /etc/localtime"]
-            for c in commands:
-                runShellCommand(c)
-            loggerDEBUG(f"Timezone: {tz_database_name} - was set using tz database")
+            # tz_database_name = ut.settings["tz_database_name"]
+            # commands = ["sudo rm /etc/timezone",
+            #         "sudo rm /etc/localtime",
+            #         "sudo ln -s /usr/share/zoneinfo/"+ tz_database_name + " /etc/localtime"]
+            # for c in commands:
+            #     runShellCommand(c)
+            timezone = ut.settings["tz_database_name"]
+            os.environ["TZ"] = timezone
+            time.tzset()
+            loggerINFO(f"Timezone: {timezone} - was set using tz database")
             return True
         except Exception as e:
             loggerERROR(f"exception in method setTimeZone (using tz database): {e}")

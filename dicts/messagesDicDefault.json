@@ -132,27 +132,27 @@
   "browseForNewOdooParams": {
     "ENGLISH": [
       [
-        2,
+        0,
         0
       ],
-      14,
-      "Browse to\n-IpPlaceholder-:3000\nto introduce new\nOdoo Parameters\n-------------------------\n"
+      12,
+      "Browse to\n-IpPlaceholder-:3000\nto introduce new\nOdoo Parameters\n-----------------------------\n"
     ],
     "ESPA\u00d1OL": [
       [
         0,
         0
       ],
-      14,
-      "Navege a\n-IpPlaceholder-:3000\npara definir nuevos\nPar\u00e1metros Odoo\n--------------------\n"
+      12,
+      "Navege a\n-IpPlaceholder-:3000\npara definir nuevos\nPar\u00e1metros Odoo\n------------------------\n"
     ],
     "FRAN\u00c7AIS": [
       [
         0,
         0
       ],
-      14,
-      "Ouvrez l\"URL\n-IpPlaceholder-:3000\npour definir les\nParam\u00e8tres Odoo\n-------------------------\n"
+      12,
+      "Ouvrez l\"URL\n-IpPlaceholder-:3000\npour definir les\nParam\u00e8tres Odoo\n-----------------------------\n"
     ]
   },
   "check_in": {

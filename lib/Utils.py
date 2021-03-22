@@ -99,13 +99,15 @@ def setButtonsToNotPressed(button1,button2):
 
 #@timer
 def getJsonData(filePath):
-  try:
-    with open(filePath) as f:
-      data = json.load(f)
-    return data  
-  except Exception as e:
-    loggerDEBUG(f"exception while accessing file: {filePath} -exception: {e}")
-    #_logger.exception(e):
+  if os.path.isfile(filePath):
+    try:
+      with open(filePath) as f:
+        data = json.load(f)
+      return data  
+    except Exception as e:
+      loggerDEBUG(f"exception while accessing file: {filePath} -exception: {e}")
+      return None
+  else:
     return None
 
 def storeJsonData(filePath,data):

@@ -298,17 +298,20 @@ class Tasks:
 			self.Disp.lockForTheClock = False			
 
 ####
-		loggerDEBUG("updateFirmware #################################")
+		loggerINFO("trying to updateFirmware #################################")
 		return
 ####
 		if ut.internetReachable():
 			if ut.isPingable("github.com"):
+				loggerINFO("internet is available and github is pingable - the firmware update will run now")
 				doFirmwareUpdate()
 				self.nextTask = "reboot"
 			else:
+				loggerERROR("github.com NOT pingable - Firmware Update NOT possible now")
 				warnGithubNotPingable()
 				self.nextTask = self.defaultNextTask
 		else:
+			loggerERROR("NO Internet - Firmware Update NOT possible now")
 			warnNoWiFiSignal()
 			self.nextTask = self.ensureInternetAndOdoo
 
@@ -321,7 +324,7 @@ class Tasks:
 		self.nextTask = self.defaultNextTask
 
 	def getOdooUIDwithNewParameters(self):
-		loggerDEBUG("getOdooUIDwithNewParameters")
+		loggerINFO("getOdooUIDwithNewParameters")
 		#self.ensureThatWifiWorks()
 		if ut.internetReachable():
 			self.Disp.displayWithIP('browseForNewOdooParams')
@@ -386,13 +389,13 @@ class Tasks:
 	def shutdownSafe(self):
 
 	####
-			loggerDEBUG("shutdownSafe #################################")
+			loggerINFO("shutdownSafe #################################")
 			return
 	####
 
 
 			self.Disp.lockForTheClock = True
-			loggerDEBUG("Shutting down safe")
+			loggerINFO("#################   Shutting down safe ###################")
 			time.sleep(0.2)
 			self.Disp.display_msg("shuttingDown")
 			time.sleep(3)
@@ -405,13 +408,13 @@ class Tasks:
 	def reboot(self):
 
 ####
-		loggerDEBUG("reboot #################################")
+		loggerINFO("reboot #################################")
 		return
 ####
 
 
 		self.Disp.lockForTheClock = True
-		loggerDEBUG("Rebooting")
+		loggerINFO("################  Rebooting  #######################")
 		time.sleep(0.2)
 		self.Disp.display_msg("rebooting")
 		time.sleep(3)
