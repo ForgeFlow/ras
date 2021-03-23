@@ -17,7 +17,7 @@ dicts/dataEtRH.json
 dicts/dataLuiS.json
 dicts/deviceCustomizationLuis.json
 *.code-workspace
-.env
+
 reallyOldLauncher.py
 data/ras3.log
 killme.txt
