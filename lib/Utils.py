@@ -239,7 +239,8 @@ def getSettingsFromDeviceCustomization():
     "shouldGetFirmwareUpdate": False, # True, False
     "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
     'shutdownTerminal': False,
-    'incrementalLog': []
+    'incrementalLog': [],
+    'RASxxx': '2  '
   }
 
   for key, value in settingsList_And_DefaultValues.items():

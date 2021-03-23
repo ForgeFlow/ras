@@ -17,6 +17,23 @@ def getPayload(settings_to_send):
             loggerERROR(f"Exception while trying to access setting {s}")
     return payload
 
+def getRASxxx():
+    RAS_id_str ="2  "
+    try:
+        RAS_id = ut.settings["terminalIDinOdoo"]
+        if RAS_id:
+            RAS_id_str = str(RAS_id)
+            if len(RAS_id_str)==1:
+                RAS_id_str = "00" + RAS_id_str
+            elif len(RAS_id_str)==2:
+                RAS_id_str = "0" + RAS_id_str
+            elif len(RAS_id_str)>3:
+                RAS_id_str = RAS_id_str[-3:]
+    except Exception as e:
+        loggerERROR(f"Exception in getRASxxx: {e}")
+        
+    return RAS_id_str
+
 def acknowledgeTerminalInOdoo():
     terminal_ID_in_Odoo     = None
 
@@ -61,6 +78,7 @@ def acknowledgeTerminalInOdoo():
                 terminal_ID_in_Odoo     = answer['id']
                 loggerINFO(f"terminal ID in Odoo: {answer['id']}")
                 ut.storeOptionInDeviceCustomization("terminalIDinOdoo",answer['id'])
+                ut.storeOptionInDeviceCustomization("RASxxx",getRASxxx())
                 ut.storeOptionInDeviceCustomization("routefromDeviceToOdoo",answer["routefromDeviceToOdoo"])
                 ut.storeOptionInDeviceCustomization("routefromOdooToDevice",answer["routefromOdooToDevice"])
                 ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",answer["shouldGetFirmwareUpdate"])

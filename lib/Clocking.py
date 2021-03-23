@@ -33,10 +33,14 @@ class Clocking:
             self.Odoo.getUIDfromOdoo()
 
         if ut.internetReachable() and ut.isIpPortOpen(self.Odoo.odooIpPort) and self.Odoo.uid:
-            self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseOK")[2]
+            self.Disp.odooReachabilityMessage="RAS" + ut.settings["RASxxx"] + \
+                " <---> Odoo\n-----------------\n"
+            #self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseOK")[2]
             self.odooReachable = True
         else:
-            self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseNotConnected")[2]
+            self.Disp.odooReachabilityMessage="RAS" + ut.settings["RASxxx"] + \
+                " < ! > Odoo\n-----------------\n"            
+            #self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseNotConnected")[2]
             self.odooReachable = False
 
         loggerDEBUG(f"self.Disp.odooReachabilityMessage: {self.Disp.odooReachabilityMessage}")        
