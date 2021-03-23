@@ -1,5 +1,6 @@
 #! /usr/bin/python3.7
 import subprocess
+import os
 
 try:
     first_module_install_flag = "/home/pi/ras/data/first_module_install_flag"
@@ -12,6 +13,8 @@ try:
         completed = subprocess.run(command.split(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT)
+        if not os.path.exists('/home/pi/ras/data'):
+            os.makedirs('/home/pi/ras/data')
         with open(first_module_install_flag, 'w'): pass
 except:
     pass

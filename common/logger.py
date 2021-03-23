@@ -11,6 +11,9 @@ logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s %(name)s %(processName)s %(levelname)s: %(message)s')
 
+if not os.path.exists('/home/pi/ras/data'):
+  os.makedirs('/home/pi/ras/data')
+
 if not os.path.isfile(co.LOG_FILE):
   with open(co.LOG_FILE, 'w'): pass
 
