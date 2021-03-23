@@ -6,6 +6,10 @@ try:
     completed = subprocess.run(command.split(),
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT)
+    command = "sudo pip3 install python-decouple"
+    completed = subprocess.run(command.split(),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT)
 except:
     pass
 
