@@ -11,6 +11,7 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 import odoo.odoo as od
 import common.common as cc
 import odoo.remoteManagement as odooRemote
+import common.constants as co
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
@@ -219,7 +220,6 @@ def getSettingsFromDeviceCustomization():
     "timeoutToGetOdooUID": 6.0,
     "ssh": "enable",
     "sshPassword": "raspberry",
-    "firmwareVersion": "v1.4.3+",
     "timeoutToCheckAttendance": 3.0,
     "periodEvaluateReachability": 5.0,
     "periodDisplayClock": 10.0,
@@ -245,7 +245,8 @@ def getSettingsFromDeviceCustomization():
 
   for key, value in settingsList_And_DefaultValues.items():
     settings[key] = getOptionFromDeviceCustomization(key, defaultValue = value)
-
+  
+  settings["firmwareVersion"] = co.RAS_VERSION
   settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
