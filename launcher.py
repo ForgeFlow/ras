@@ -2,14 +2,17 @@
 import subprocess
 
 try:
-    command = "sudo pip3 install systemd-python"
-    completed = subprocess.run(command.split(),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT)
-    command = "sudo pip3 install python-decouple"
-    completed = subprocess.run(command.split(),
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT)
+    first_module_install_flag = "/home/pi/ras/data/first_module_install_flag"
+    if not os.path.isfile(first_module_install_flag):
+        command = "sudo pip3 install systemd-python"
+        completed = subprocess.run(command.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT)
+        command = "sudo pip3 install python-decouple"
+        completed = subprocess.run(command.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT)
+        with open(first_module_install_flag, 'w'): pass
 except:
     pass
 

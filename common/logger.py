@@ -1,6 +1,7 @@
 import logging
 from systemd import journal
 import time
+import os
 
 import common.constants as co
 
@@ -10,10 +11,13 @@ logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(asctime)s %(name)s %(processName)s %(levelname)s: %(message)s')
 
-fileHandler = logging.FileHandler(co.LOG_FILE)
-fileHandler.setLevel(logging.INFO)
-logger.addHandler(fileHandler)
-fileHandler.setFormatter(formatter)
+if not os.path.isfile(co.LOG_FILE):
+  with open(co.LOG_FILE, 'w'): pass
+
+#fileHandler = logging.FileHandler(co.LOG_FILE)
+#fileHandler.setLevel(logging.INFO)
+#logger.addHandler(fileHandler)
+#fileHandler.setFormatter(formatter)
 
 consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
