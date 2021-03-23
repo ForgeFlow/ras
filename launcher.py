@@ -1,4 +1,14 @@
 #! /usr/bin/python3.7
+import subprocess
+
+try:
+    command = "sudo pip3 install systemd-python"
+    completed = subprocess.run(command.split(),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT)
+except:
+    pass
+
 try:
     from common.logger import loggerINFO
     loggerINFO("----------------------------------------------------------------------")
