@@ -177,7 +177,7 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
       #print("Utils - IP Port CLOSED ", ipPort)
       isOpen = False
   except Exception as e:
-    print("Utils - exception in method isIpPortOpen: ", e)
+    loggerERROR(f"Utils - exception in method isIpPortOpen: {e}")
     isOpen = False
   finally:
     s.close()
@@ -356,14 +356,14 @@ def enableSSH():
     os.system("sudo systemctl enable ssh")
     os.system("sudo service ssh start")
   except Exception as e:
-    print("Exception in method Utils.enableSSH: ", e)
+    loggerERROR(f"Exception in method Utils.enableSSH: {e}")
 
 def disableSSH():
   try:
     os.system("sudo systemctl disable ssh")
     os.system("sudo service ssh stop")
   except Exception as e:
-    print("Exception in method Utils.disableSSH: ", e)
+    loggerERROR(f"Exception in method Utils.disableSSH: {e}")
 
 def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
   try:

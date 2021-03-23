@@ -297,10 +297,8 @@ class Tasks:
 			time.sleep(2)
 			self.Disp.lockForTheClock = False			
 
-####
 		loggerINFO("trying to updateFirmware #################################")
-		return
-####
+
 		if ut.internetReachable():
 			if ut.isPingable("github.com"):
 				loggerINFO("internet is available and github is pingable - the firmware update will run now")
@@ -387,13 +385,6 @@ class Tasks:
 			self.Disp.lockForTheClock = False
 
 	def shutdownSafe(self):
-
-	####
-			loggerINFO("shutdownSafe #################################")
-			return
-	####
-
-
 			self.Disp.lockForTheClock = True
 			loggerINFO("#################   Shutting down safe ###################")
 			time.sleep(0.2)
@@ -406,13 +397,6 @@ class Tasks:
 			sys.exit(0)
 
 	def reboot(self):
-
-####
-		loggerINFO("reboot #################################")
-		return
-####
-
-
 		self.Disp.lockForTheClock = True
 		loggerINFO("################  Rebooting  #######################")
 		time.sleep(0.2)

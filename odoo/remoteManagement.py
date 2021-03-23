@@ -154,9 +154,9 @@ def routineCheck():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        print("routineCheck Status code: ", response.status_code)
-        print("routineCheck Printing Entire Post Response")
-        print(response.json())
+        # print("routineCheck Status code: ", response.status_code)
+        # print("routineCheck Printing Entire Post Response")
+        # print(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)
@@ -196,9 +196,9 @@ def resetSettings():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        print("resetSettings Status code: ", response.status_code)
-        print("resetSettings Printing Entire Post Response")
-        print(response.json())
+        # print("resetSettings Status code: ", response.status_code)
+        # print("resetSettings Printing Entire Post Response")
+        # print(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)

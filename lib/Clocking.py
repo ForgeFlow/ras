@@ -80,7 +80,7 @@ class Clocking:
         self.Disp.display_msg("connecting")
         # print("clocking ln142 - odoo uid ", self.Odoo.uid)
         if not self.Odoo.uid:
-            print("first if in card logging")
+            #print("first if in card logging")
             self.msg = "ContactAdm"  # There was no successful Odoo Connection (no uid) since turning the device on:
                                      # Contact Your Admin because Odoo is down , the message is changed eventually later
             self.Odoo.getUIDfromOdoo()  # be sure that always uid is set to the last Odoo status (if connected)
