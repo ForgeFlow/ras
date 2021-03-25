@@ -1,55 +1,7 @@
 #! /usr/bin/python3.7
-import subprocess
-import os
+import launcherHelper as lh
 
-try:
-    first_module_install_flag = "/home/pi/ras/data/first_module_install_flag"
-    if not os.path.isfile(first_module_install_flag):
-        command = "sudo pip3 install systemd-python"
-        completed = subprocess.run(command.split(),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
-        command = "sudo pip3 install python-decouple"
-        completed = subprocess.run(command.split(),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT)
-        if not os.path.exists('/home/pi/ras/data'):
-            os.makedirs('/home/pi/ras/data')
-        with open(first_module_install_flag, 'w'): pass
-except:
-    pass
-
-try:
-    from common.logger import loggerINFO
-    loggerINFO("----------------------------------------------------------------------")
-    loggerINFO("######################################################################")
-    loggerINFO("launching RAS2 -------------------------------------------------------")
-    loggerINFO("######################################################################")    
-    loggerINFO("----------------------------------------------------------------------")
-    loggerINFO("...")
-except:
-    pass
-
-from lib.Utils import getSettingsFromDeviceCustomization, migrationToVersion1_4_2
-
-migrationToVersion1_4_2()
-getSettingsFromDeviceCustomization()
-
-from moduleInstaller import installModules
-
-modules_to_be_installed = [  \
-    "systemd-python",
-    "python-decouple",
-    "pyzmq",
-    "colorama",
-    "setproctitle",
-    "psutil" ]
-
-installModules(modules_to_be_installed)
-
-
-
-###############################################
+lh.ensureMigrationsAndSettings()
 
 import os, sys, time 
 import importlib

@@ -6,6 +6,7 @@ import common.constants as co
 import common.common as cc
 import lib.Utils as ut
 import common.logger as lo
+from launcherHelper import copyDeviceCustomizationJson
 
 
 def getPayload(settings_to_send):
@@ -41,26 +42,15 @@ def acknowledgeTerminalInOdoo():
         requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         settings_to_send = [
-            "firmwareVersion",
-            "hashed_machine_id",
-            "language",
-            "location",
             "manufacturingData",
-            "odooConnectedAtLeastOnce",
+            "hashed_machine_id",            
+            "firmwareVersion",
+            "language",
             "ownIpAddress",
-            "periodDisplayClock",
-            "periodEvaluateReachability",
-            "routefromDeviceToOdoo",
-            "routefromOdooToDevice",
-            "showEmployeeName",
             "ssh",
             "sshPassword",
-            "terminalIDinOdoo",
-            "terminalSetupManagement",
-            "timeToDisplayResultAfterClocking",
-            "timeoutToCheckAttendance",
-            "timeoutToGetOdooUID",
-            "shouldGetFirmwareUpdate"
+            "showEmployeeName",
+            "timezone",                
         ]
         payload     = getPayload(settings_to_send)
 
@@ -88,6 +78,7 @@ def acknowledgeTerminalInOdoo():
                     ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
                     cc.setTimeZone()
                 ut.storeOptionInDeviceCustomization("time_format",answer["hour12or24"])
+                copyDeviceCustomizationJson()
         else:
             loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:

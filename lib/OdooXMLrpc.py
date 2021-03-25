@@ -14,6 +14,7 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 import odoo.odoo as od
 import lib.Utils as ut
 import common.common as cc
+from launcherHelper import copyDeviceCustomizationJson
 
 class OdooXMLrpc:
     def __init__(self, Display):
@@ -55,6 +56,7 @@ class OdooXMLrpc:
                 loggerINFO(f"got user id from Odoo ")
                 self.uid = user_id
                 ut.storeOptionInDeviceCustomization("odooConnectedAtLeastOnce", True)
+                copyDeviceCustomizationJson()
                 returnValue =  True
             else:
                 loggerINFO(f"NO user id from Odoo {user_id}")

@@ -378,4 +378,6 @@ def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
     loggerERROR(f'Exception while checking if type of connection {typeConnection} is connected: {e}')
   return False
 
+def migrate_to_store_settings_in_files_1_4_7():
 
+  pass
