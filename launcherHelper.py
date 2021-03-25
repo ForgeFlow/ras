@@ -2,6 +2,7 @@
 import subprocess
 import os
 
+
 def copyDeviceCustomizationJson():
     try:
         file1 = "/home/pi/ras/dicts/deviceCustomization.json "
@@ -31,17 +32,7 @@ def installSystemdAndDecouple():
     except:
         pass  
 
-def ensureMigrationsAndSettings():
-
-    copyDeviceCustomizationJson()
-       
-    installSystemdAndDecouple()
-
-    from lib.Utils import getSettingsFromDeviceCustomization, migrationToVersion1_4_2
-
-    migrationToVersion1_4_2()
-    getSettingsFromDeviceCustomization()
-
+def ensure_modules_are_installed():
     from moduleInstaller import installModules
 
     modules_to_be_installed = [  \
@@ -54,5 +45,21 @@ def ensureMigrationsAndSettings():
 
     installModules(modules_to_be_installed)
 
-    # from lib.Utils import migrate_to_store_settings_in_files_1_4_7
-    # migrate_to_store_settings_in_files_1_4_7()
+def ensureMigrationsAndSettings():
+
+    copyDeviceCustomizationJson()
+       
+    installSystemdAndDecouple()
+
+    from lib.Utils import getSettingsFromDeviceCustomization, migrationToVersion1_4_2
+
+    migrationToVersion1_4_2()
+
+    getSettingsFromDeviceCustomization()
+
+    ensure_modules_are_installed()
+
+    import lib.Utils as ut
+
+    ut.removeMessagesFromDeviceCustomizationJson() # stores it in json and makes a copy into the sample json too
+

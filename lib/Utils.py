@@ -20,7 +20,6 @@ fileDataJson                  = WORK_DIR + "dicts/data.json"
 fileCredentials               = WORK_DIR + "dicts/credentials.json"
 
 settings                      = {}
-defaultMessagesDic            = {}
 credentialsDic                = {}
 defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
 
@@ -251,38 +250,44 @@ def getSettingsFromDeviceCustomization():
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
   settings["isRemoteOdooControlAvailable"] = odooRemote.isRemoteOdooControlAvailable() # True or False
-  settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
   if "remotely" in settings["terminalSetupManagement"] and \
     settings["isRemoteOdooControlAvailable"]:
     odooRemote.ensureFirstOdooConnection_RemoteManagement()
-
-  #loggerDEBUG(f"settings dic is: {settings}")
   storeJsonData(fileDeviceCustomization,settings)
 
-def getMsg(textKey):
-  try:
-    return settings["messagesDic"][textKey] 
-  except KeyError:
-    return settings["defaultMessagesDic"][textKey]
-  except:
-    return None
+# # def getMsg(textKey):
+# #   try:
+# #     loggerDEBUG(f"#####################################################  :  {messagesDic}")
+# #     loggerDEBUG(f"textKey {textKey}; messagesDic[textKey] {messagesDic[textKey]}")
+# #     return messagesDic[textKey] 
+# #   except KeyError:
+# #     loggerDEBUG(f"Exception- getMsg: KeyError")
+# #     return defaultMessagesDic[textKey]
+# #   except Exception as e:
+# #     loggerDEBUG(f"Exception-getMsg: {e}")
+# #     return None
 
-def getMsgTranslated(textKey):
-  try:
-    msgTranslated = getMsg(textKey)[settings["language"]]       
-    return copy.deepcopy(msgTranslated)
-  except:
-    if textKey == "listOfLanguages":
-      return ["ENGLISH"]
-    else:
-      return [[0, 0], 20," "]
+# def getMsgTranslated(textKey):
+#   try:
+#     loggerDEBUG(f'settings["language"]: {settings["language"]}')
+#     # for key in messagesDic:
+#     #   loggerDEBUG(f"key in messagesDic: {key}")
+#     # msg1 = messagesDic[textKey]
+#     # loggerDEBUG(f"textKey {textKey}; msg1 {msg1}")
+#     msgTranslated = messagesDic[textKey][settings["language"]]       
+#     return copy.deepcopy(msgTranslated)
+#   except Exception as e:
+#     loggerDEBUG(f"Exception-getMsgTranslated: {e}")
+#     if textKey == "listOfLanguages":
+#       return ["ENGLISH"]
+#     else:
+#       return [[0, 0], 20," "]
 
-def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
-  try:
-    return getMsg("listOfLanguages")
-  except:
-    return defaultListOfLanguages
+# def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
+#   try:
+#     return getMsg("listOfLanguages")
+#   except:
+#     return defaultListOfLanguages
 
 def transferDataJsonToDeviceCustomization(deviceCustomizationDic):
   dataJsonOdooParameters = getJsonData(fileDataJson)
@@ -377,7 +382,14 @@ def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
   except Exception as e:
     loggerERROR(f'Exception while checking if type of connection {typeConnection} is connected: {e}')
   return False
+    
 
-def migrate_to_store_settings_in_files_1_4_7():
-
-  pass
+def removeMessagesFromDeviceCustomizationJson():
+    try:
+        m1 = settings.pop("messagesDic", None)
+        m2 = settings.pop("defaultMessagesDic", None)
+        if m1 or m2:
+            storeJsonData(fileDeviceCustomization,settings)
+            storeJsonData(fileDeviceCustomizationSample,settings)
+    except Exception as e:
+        loggerERROR(f'Exception in Utils.removeMessagesFromDeviceCustomizationJson: {e}')

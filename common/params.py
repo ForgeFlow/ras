@@ -50,6 +50,14 @@ class TxType(Enum):
 class UnknownKeyName(Exception):
   pass
 
+#### json files
+  "installedPythonModules",# make a database and the name of the 
+          # files are the name of the modules
+  'incrementalLog', # make a database and the entries are 
+  # 1,2,3 and so on and the file contain the logs
+  "messagesDic" # DEPRECATED ##################
+  "defaultMessagesDic" # DEPRECATED ##################
+
 keys = {
   #TxType.FACTORY_SETTINGS: will never change
   "firmwareAtShipment": [TxType.PERSISTENT],
@@ -62,6 +70,7 @@ keys = {
   "fileForMessages" # DEPRECATED ##################
 "terminalSetupManagement" # DEPRECATED ##################
 "howToDefineTime" # DEPRECATED ##################
+"hashed_machine_id"
 
   #TxType.DEFINED_ON_DEVICE_SETUP : defined when installing the device
   "https": [TxType.PERSISTENT],
@@ -73,15 +82,18 @@ keys = {
 "db"# DEPRECATED ##################
 "user_name"# DEPRECATED ##################
 "user_password"# DEPRECATED #################
+"odooUrlTemplate"
+"odooIpPort"
+"HasCompletedSetup"
 
-
-  #TxType.UPDATED_FROM_ODOO_ON_START: Updates come from Odoo - do not clear on start but
+  #TxType.UPDATED_FROM_ODOO_ONLY_ON_START: Updates come from Odoo - do not clear on start but
   #       can be changed when connecting with odoo (Acknowdledgement)
   "terminalIDinOdoo"cms,
   "RASxxx"cms,
   "routefromDeviceToOdoo"cms,
   "routefromOdooToDevice"cms,
   "version_things_module_in_Odoo"cms,
+  "ownIpAddress"
 
   #TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS:  Updates come from Odoo - do not clear on start,
   #       can be changed anytime when connected to Odoo through routine calls
@@ -93,31 +105,51 @@ keys = {
   "time_format",
   "timeoutToCheckAttendance",  
   "timeoutToGetOdooUID",  # DEPRECATED ##################
+  "periodEvaluateReachability",
+  "periodDisplayClock",
+  "timeToDisplayResultAfterClocking",
+  "location",
+  "shouldGetFirmwareUpdate": False, # True, False
+  "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
+  'shutdownTerminal': False,
+  "isRemoteOdooControlAvailable"
 
+  "GitBranch": [TxType.PERSISTENT],
+  "GitCommit": [TxType.PERSISTENT],
+  "GitRemote"
+
+
+**, "messages_on_display" #### ---> json file
+
+
+**, "UpdateAvailable" # to be proofed in Odoo every day @03:00 + random
+** define a way to reset the device to factory settings !!!
   #TxType.UPDATED_FROM_DEVICE: Updates are done through the Firmware
   "installedPythonModules"
   "firmwareVersion"
+  "LastUpdateTime"
+  "UpdateFailedCount"
 
-  #TO COPY FROM openpilot
-  "GitBranch": [TxType.PERSISTENT],
-  "GitCommit": [TxType.PERSISTENT],
-  "GitRemote": [TxType.PERSISTENT],
+### to proof if we need it:
+  "flask",
+
+
+***??? #TO COPY FROM openpilot
+
   "GithubSshKeys": [TxType.PERSISTENT],
-  "HasAcceptedTerms": [TxType.PERSISTENT],
-  "HasCompletedSetup": [TxType.PERSISTENT],
-  "DisablePowerDown": [TxType.PERSISTENT],
-  "DisableUpdates": [TxType.PERSISTENT],
-  "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
-  "ShouldDoUpdate": [TxType.CLEAR_ON_MANAGER_START],
-  "UpdateAvailable": [TxType.CLEAR_ON_MANAGER_START],
-  "UpdateFailedCount": [TxType.CLEAR_ON_MANAGER_START],
-  "Version": [TxType.PERSISTENT],
 
-  "IsUpdateAvailable": [TxType.CLEAR_ON_MANAGER_START],
-  "LastUpdateTime": [TxType.PERSISTENT],
+  "HasAcceptedTerms": [TxType.PERSISTENT],
+
+  "DisablePowerDown": [TxType.PERSISTENT],
+
+  "DisableUpdates": [TxType.PERSISTENT],
+
+  "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
+
+  : [TxType.CLEAR_ON_MANAGER_START],
+
   "AccessToken": [TxType.CLEAR_ON_MANAGER_START],
   
-
   "DongleId": [TxType.PERSISTENT],
 
 

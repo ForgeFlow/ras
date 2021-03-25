@@ -73,7 +73,7 @@ class Tasks:
 		self.listOfEnableDisable =['enable', 'disable']
 
 	 ########### LANGUAGES ####################
-		self.listOfLanguages = ut.getListOfLanguages(["ENGLISH"])
+		self.listOfLanguages = self.Disp.getListOfLanguages(["ENGLISH"])
 		self.maxLanguageOptions = len(self.listOfLanguages) - 1
 
 		self.currentLanguageOption = 0		

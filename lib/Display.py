@@ -1,5 +1,6 @@
 import time
 import logging
+import copy
 
 from PIL import Image, ImageFont
 from luma.core.render import canvas
@@ -10,6 +11,8 @@ import lib.Utils as ut
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common.common import runShellCommand_and_returnOutput
+
+
 
 class Display:
     def __init__(self):
@@ -26,6 +29,42 @@ class Display:
         self.display_msg("connecting")
         self.lockForTheClock = False
         self.odooReachabilityMessage  = " "
+        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + ut.settings["fileForMessages"])
+        self.defaultMessagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/messagesDicDefault.json")
+
+    # def getMsg(textKey):
+    #   try:
+    #     loggerDEBUG(f"#####################################################  :  {messagesDic}")
+    #     loggerDEBUG(f"textKey {textKey}; messagesDic[textKey] {messagesDic[textKey]}")
+    #     return messagesDic[textKey] 
+    #   except KeyError:
+    #     loggerDEBUG(f"Exception- getMsg: KeyError")
+    #     return defaultMessagesDic[textKey]
+    #   except Exception as e:
+    #     loggerDEBUG(f"Exception-getMsg: {e}")
+    #     return None
+
+    def getMsgTranslated(self, textKey):
+        try:
+            loggerDEBUG(f'settings["language"]: {ut.settings["language"]}')
+            # for key in messagesDic:
+            #   loggerDEBUG(f"key in messagesDic: {key}")
+            # msg1 = messagesDic[textKey]
+            # loggerDEBUG(f"textKey {textKey}; msg1 {msg1}")
+            msgTranslated = self.messagesDic[textKey][ut.settings["language"]]       
+            return copy.deepcopy(msgTranslated)
+        except Exception as e:
+            loggerDEBUG(f"Exception-getMsgTranslated: {e}")
+            if textKey == "listOfLanguages":
+                return ["ENGLISH"]
+            else:
+                return [[0, 0], 20," "]
+
+    def getListOfLanguages(self, defaultListOfLanguages = ["ENGLISH"]):
+        try:
+            return self.getMsg("listOfLanguages")
+        except:
+            return defaultListOfLanguages
 
     def removeFirstZero(self,hour):
         if hour[0] == "0":
@@ -124,7 +163,7 @@ class Display:
     #@ut.timer
     def display_msg(self, textKey, employee_name = None):
         #self.clear_display()
-        message = ut.getMsgTranslated(textKey)
+        message = self.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
             if employee_name and ut.settings["showEmployeeName"] == "yes":
                 loggerINFO(f"Employee Name: {employee_name}")
@@ -145,7 +184,7 @@ class Display:
         self.displayMsgRaw(message)
     
     def displayWithIP(self, textKey):
-        message = ut.getMsgTranslated(textKey)
+        message = self.getMsgTranslated(textKey)
         message[2] = message[2].replace("-IpPlaceholder-",ut.getOwnIpAddress(),1)
         self.displayMsgRaw(message)
 
