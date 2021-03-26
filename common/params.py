@@ -29,7 +29,7 @@ import shutil
 import fcntl
 import tempfile
 import threading
-from enum import Enum
+from enum import Enum, auto
 from common.constants import PARAMS
 
 
@@ -42,118 +42,122 @@ def mkdirs_exists_ok(path):
 
 
 class TxType(Enum):
-  PERSISTENT = 1
-  CLEAR_ON_MANAGER_START = 2
-  CLEAR_ON_PANDA_DISCONNECT = 3
+  DO_NOT_RESET_ON_MANAGER_START = auto() # do not reset to default values on manager start
+  RESET_ON_MANAGER_START = auto() 
+  FACTORY_SETTINGS = auto()  # will never change
+  TO_DEPRECATE = auto()   # will be deprecated when Odoo Module for Remote Control
+                # is installed and check attendance has worked at least once
+  DEFINED_ON_DEVICE_SETUP  = auto() # parameters are defined on device setup
+  UPDATED_FROM_ODOO_ONLY_ON_START = auto()  # parameters updated once 
+                # after rebooting the device
+                # and get their values from stored values in the odoo database
+                #  Updates come from Odoo - do not clear on start but
+                # can be changed when connecting with odoo (Acknowdledgement)
+  UPDATED_FROM_ODOO_ON_ROUTINE_CALLS = auto()  # Updates come from Odoo - do not clear on start,
+                # can be changed anytime when connected to Odoo through routine calls
+  UPDATED_FROM_DEVICE = auto()  # Updates are done through the Firmware
 
 
 class UnknownKeyName(Exception):
   pass
 
 #### json files
+json_keys = {
   "installedPythonModules",# make a database and the name of the 
           # files are the name of the modules
   'incrementalLog', # make a database and the entries are 
   # 1,2,3 and so on and the file contain the logs
-  "messagesDic" # DEPRECATED ##################
-  "defaultMessagesDic" # DEPRECATED ##################
+  "messagesDic", # TO_DEPRECATE ##################
+  "defaultMessagesDic", # TO_DEPRECATE ##################
+  "messages_on_display", #### NEW ---> json file
+  "flask", ### to proof if we need it:
+}
 
 keys = {
   #TxType.FACTORY_SETTINGS: will never change
-  "firmwareAtShipment": [TxType.PERSISTENT],
-  "productName": [TxType.PERSISTENT],
-  "productionDate": [TxType.PERSISTENT],
-  "productionLocation": [TxType.PERSISTENT],
-  "productionNumber": [TxType.PERSISTENT],
-  "qualityInspector": [TxType.PERSISTENT], 
-  "SSIDreset": [TxType.PERSISTENT],
-  "fileForMessages" # DEPRECATED ##################
-"terminalSetupManagement" # DEPRECATED ##################
-"howToDefineTime" # DEPRECATED ##################
-"hashed_machine_id"
-
+  "firmwareAtShipment":       [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "productName":              [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "productionDate":           [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "productionLocation":       [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "productionNumber":         [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "qualityInspector":         [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START], 
+  "SSIDreset":                [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "hashed_machine_id":        [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],  
+  "fileForMessages":          [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE], 
+  "terminalSetupManagement":  [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE], 
+  "howToDefineTime":          [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
   #TxType.DEFINED_ON_DEVICE_SETUP : defined when installing the device
-  "https": [TxType.PERSISTENT],
-  "odoo_host": [TxType.PERSISTENT],
-  "odoo_port":[TxType.PERSISTENT],
-  "timezone": [TxType.PERSISTENT], # DEPRECATED ################## to be substituted by "tz_database_name"
-  "odooConnectedAtLeastOnce"
-"admin_id"# DEPRECATED ##################
-"db"# DEPRECATED ##################
-"user_name"# DEPRECATED ##################
-"user_password"# DEPRECATED #################
-"odooUrlTemplate"
-"odooIpPort"
-"HasCompletedSetup"
-
+  "https":                    [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "odoo_host":                [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "odoo_port":                [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "odooConnectedAtLeastOnce": [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "odooUrlTemplate":          [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "odooIpPort":               [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "HasCompletedSetup":        [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "admin_id":                 [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
+  "db":                       [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
+  "user_name":                [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
+  "user_password":            [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
+  "timezone":                 [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE], # to be substituted by "tz_database_name"
   #TxType.UPDATED_FROM_ODOO_ONLY_ON_START: Updates come from Odoo - do not clear on start but
   #       can be changed when connecting with odoo (Acknowdledgement)
-  "terminalIDinOdoo"cms,
-  "RASxxx"cms,
-  "routefromDeviceToOdoo"cms,
-  "routefromOdooToDevice"cms,
-  "version_things_module_in_Odoo"cms,
-  "ownIpAddress"
-
+  "terminalIDinOdoo":               [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "RASxxx":                         [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "routefromDeviceToOdoo":          [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "routefromOdooToDevice":          [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "version_things_module_in_Odoo":  [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "ownIpAddress":                   [TxType.UPDATED_FROM_ODOO_ONLY_ON_START, TxType.DO_NOT_RESET_ON_MANAGER_START],
   #TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS:  Updates come from Odoo - do not clear on start,
   #       can be changed anytime when connected to Odoo through routine calls
-  "ssh": [TxType.PERSISTENT],
-  "showEmployeeName": [TxType.PERSISTENT],
-  "sshPassword": [TxType.PERSISTENT],
-  "language"
-  "tz_database_name",
-  "time_format",
-  "timeoutToCheckAttendance",  
-  "timeoutToGetOdooUID",  # DEPRECATED ##################
-  "periodEvaluateReachability",
-  "periodDisplayClock",
-  "timeToDisplayResultAfterClocking",
-  "location",
-  "shouldGetFirmwareUpdate": False, # True, False
-  "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
-  'shutdownTerminal': False,
-  "isRemoteOdooControlAvailable"
-
-  "GitBranch": [TxType.PERSISTENT],
-  "GitCommit": [TxType.PERSISTENT],
-  "GitRemote"
-
-
-**, "messages_on_display" #### ---> json file
-
-
-**, "UpdateAvailable" # to be proofed in Odoo every day @03:00 + random
-** define a way to reset the device to factory settings !!!
+  "ssh":                              [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "showEmployeeName":                 [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "sshPassword":                      [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "language":                         [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "tz_database_name":                 [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "time_format":                      [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "timeoutToCheckAttendance":         [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],  
+  "periodEvaluateReachability":       [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "periodDisplayClock":               [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "timeToDisplayResultAfterClocking": [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "location":                         [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "shouldGetFirmwareUpdate":          [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START], # True, False
+  "setRebootAt":                      [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START], # time for next reboot (not periodically - einzelfall nur)
+  'shutdownTerminal':                 [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "isRemoteOdooControlAvailable":     [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "GitBranch":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "GitCommit":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "GitRemote":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "DoFactoryReset":                   [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "UpdateAvailable":                  [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START], # to be proofed in Odoo every day @03:00 + random
+  "timeoutToGetOdooUID":              [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],  # TO_DEPRECATE ##################
   #TxType.UPDATED_FROM_DEVICE: Updates are done through the Firmware
-  "installedPythonModules"
-  "firmwareVersion"
-  "LastUpdateTime"
-  "UpdateFailedCount"
-
-### to proof if we need it:
-  "flask",
-
-
-***??? #TO COPY FROM openpilot
-
-  "GithubSshKeys": [TxType.PERSISTENT],
-
-  "HasAcceptedTerms": [TxType.PERSISTENT],
-
-  "DisablePowerDown": [TxType.PERSISTENT],
-
-  "DisableUpdates": [TxType.PERSISTENT],
-
-  "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
-
-  : [TxType.CLEAR_ON_MANAGER_START],
-
-  "AccessToken": [TxType.CLEAR_ON_MANAGER_START],
-  
-  "DongleId": [TxType.PERSISTENT],
-
-
+  "installedPythonModules": [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "firmwareVersion":        [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "LastFirmwareUpdateTime": [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "LastTimeDeviceStarted":  [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  "UpdateFailedCount":      [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
 }
+
+
+
+# ***??? #TO COPY FROM openpilot
+
+#   "GithubSshKeys": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+
+#   "HasAcceptedTerms": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+
+#   "DisablePowerDown": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+
+#   "DisableUpdates": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+
+#   "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
+
+#   "AccessToken": [TxType.CLEAR_ON_MANAGER_START],
+  
+#   "DongleId": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+
+
+
 
 
 def fsync_dir(path):
@@ -290,13 +294,13 @@ class DBWriter(DBAccessor):
       # new_data_path is a temporary symlink that will atomically overwrite data_path.
       #
       # The current situation is:
-      data_path -> old_data_path
+      #   data_path -> old_data_path
       # We're going to write params data to tempdir_path
-      tempdir_path -> params data
+      #   tempdir_path -> params data
       # Then point new_data_path to tempdir_path
-      new_data_path -> tempdir_path
+      #   new_data_path -> tempdir_path
       # Then atomically overwrite data_path with new_data_path
-      data_path -> tempdir_path
+      #   data_path -> tempdir_path
       old_data_path = None
       new_data_path = None
       tempdir_path = tempfile.mkdtemp(prefix=".tmp", dir=self._path)
@@ -316,7 +320,7 @@ class DBWriter(DBAccessor):
           old_data_path = os.path.join(self._path, os.readlink(data_path))
         except (OSError, IOError):
           # NOTE(mgraczyk): If other DB implementations have bugs, this could cause
-                        copies to be left behind, but we still want to overwrite.
+          #             copies to be left behind, but we still want to overwrite.
           pass
 
         new_data_path = "{}.link".format(tempdir_path)

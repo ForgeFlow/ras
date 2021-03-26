@@ -2,6 +2,8 @@
 import subprocess
 import os
 
+def ensureSettingsStoredInParametersDatabase():
+    pass
 
 def copyDeviceCustomizationJson():
     try:
@@ -62,4 +64,6 @@ def ensureMigrationsAndSettings():
     import lib.Utils as ut
 
     ut.removeMessagesFromDeviceCustomizationJson() # stores it in json and makes a copy into the sample json too
+
+    ensureSettingsStoredInParametersDatabase()
 
