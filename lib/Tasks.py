@@ -12,6 +12,9 @@ from dicts.ras_dic import ask_twice
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common import constants as co
 import odoo.remoteManagement as odooRemote
+from common.params import Params
+
+params = Params(db=PARAMS)
 
 class Tasks:
 	def __init__(self, Odoo, Hardware):
@@ -110,7 +113,7 @@ class Tasks:
 
 		self.Disp.display_msg("newAdmCardDefined")
 
-		data = ut.settings["odooParameters"]
+		data = params.get("odooParameters", encoding='utf-8')[]
 		self.Odoo.adm = data["admin_id"][0]
 		self.Buzz.Play("back_to_menu")
 
@@ -136,7 +139,7 @@ class Tasks:
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
-				if self.Reader.card.lower() == ut.settings["odooParameters"]["admin_id"][0].lower():
+				if self.Reader.card.lower() == params.get("admin_id", encoding='utf-8').lower():
 					loggerINFO("ADMIN CARD was swipped")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
@@ -164,14 +167,14 @@ class Tasks:
 			odooRemote.resetSettings()
 
 		def checkIfUpdate_and_resetSettings():
-				shouldUpdate = ut.settings["shouldGetFirmwareUpdate"]
+				shouldUpdate = params.get("shouldGetFirmwareUpdate", encoding='utf-8')
 				resetSettingsAndSynchronizeWithOdoo()
 				if shouldUpdate:
 					self.updateFirmware()
 
 		def eventuallyUpdateAndReboot():
-			rebootTime = time.strptime(ut.settings["setRebootAt"], '%Y-%m-%d %H:%M:%S')
-			loggerDEBUG(f'ut.settings["setRebootAt"] {rebootTime}; time.localtime() {time.localtime()}')
+			rebootTime = time.strptime(params.get("setRebootAt", encoding='utf-8'), '%Y-%m-%d %H:%M:%S')
+			loggerDEBUG(f'params.get("setRebootAt", encoding="utf-8") {rebootTime}; time.localtime() {time.localtime()}')
 			if rebootTime < time.localtime():
 				checkIfUpdate_and_resetSettings()				
 				self.reboot()
@@ -184,11 +187,11 @@ class Tasks:
 				loggerINFO('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
-						if "remotely" in ut.settings["terminalSetupManagement"]:
+						if "remotely" in params.get("", encoding='utf-8')["terminalSetupManagement"]:
 							odooRemote.routineCheck()
-							if ut.settings["setRebootAt"]:
+							if params.get("setRebootAt", encoding='utf-8'):
 								eventuallyUpdateAndReboot()
-							elif ut.settings['shutdownTerminal']:
+							elif params.get("shutdownTerminal", encoding='utf-8'):
 								eventuallyUpdateAndShutdown()
 						exitFlag.wait(period)
 				loggerINFO('Thread Get Messages stopped')
@@ -205,8 +208,8 @@ class Tasks:
 		exitFlag = threading.Event()
 		exitFlag.clear()
 
-		periodEvaluateReachability = ut.settings["periodEvaluateReachability"]   # seconds		
-		periodDisplayClock         =  ut.settings["periodDisplayClock"]  # seconds
+		periodEvaluateReachability = float(params.get("periodEvaluateReachability", encoding='utf-8'))   # seconds		
+		periodDisplayClock         = float(params.get("periodDisplayClock", encoding='utf-8'))  # seconds
 
 		evaluateReachability    = threading.Thread(target=threadEvaluateReachability, args=(periodEvaluateReachability,))
 		pollCardReader          = threading.Thread(target=self.threadPollCardReader, args=(self.periodPollCardReader,exitFlag,self.Clock.card_logging,))
@@ -317,7 +320,7 @@ class Tasks:
 		loggerINFO("Reset WiFi - Define a new SSID using wifi-connect")
 		self.Disp.display_msg("configure_wifi")
 		os.system("sudo rm -R /etc/NetworkManager/system-connections/*")
-		os.system("sudo wifi-connect --portal-ssid " + ut.settings["SSIDreset"])
+		os.system("sudo wifi-connect --portal-ssid " + params.get("SSIDreset", encoding='utf-8'))
 		self.Buzz.Play("back_to_menu")
 		self.nextTask = self.defaultNextTask
 
@@ -377,7 +380,7 @@ class Tasks:
 			self.Disp.lockForTheClock = True
 			origin = (34, 20)
 			size = 24
-			text = ut.settings["firmwareVersion"]
+			text = params.get("firmwareVersion", encoding='utf-8')
 			message = [origin,size,text]
 			self.Disp.displayMsgRaw(message)
 			time.sleep(2)
@@ -453,14 +456,14 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureFirstOdooConnection_LocalManagement(self):
-		if not ut.settings["odooConnectedAtLeastOnce"]:
+		if not params.get("odooConnectedAtLeastOnce", encoding='utf-8'):
 			loggerINFO("Terminal LOCALLY managed: ensureFirstOdooConnection Odoo UID initiated")
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		if "remotely" in ut.settings["terminalSetupManagement"] and \
-			ut.settings["isRemoteOdooControlAvailable"]:
+		if "remotely" in params.get("terminalSetupManagement", encoding='utf-8') and \
+			params.get("isRemoteOdooControlAvailable", encoding='utf-8'):
 			odooRemote.ensureFirstOdooConnection_RemoteManagement()
 		else:
 			self.ensureFirstOdooConnection_LocalManagement()

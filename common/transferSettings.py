@@ -4,10 +4,7 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 import lib.Utils as ut
 
 
-params = Params(db=PARAMS)
-
-def transferSettingsToParams_db():
-    #factory_settings_keys = params.get_list_of_keys_with_type(TxType.FACTORY_SETTINGS)
+ #factory_settings_keys = params.get_list_of_keys_with_type(TxType.FACTORY_SETTINGS)
     keys = params.get_list_of_all_keys()
     loggerDEBUG(f"keys; {keys}")
     for k in keys:

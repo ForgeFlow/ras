@@ -136,27 +136,21 @@ keys = {
   "UpdateFailedCount":      [TxType.UPDATED_FROM_DEVICE, TxType.DO_NOT_RESET_ON_MANAGER_START],
 }
 
-
-
 # ***??? #TO COPY FROM openpilot
 
-#   "GithubSshKeys": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+  #   "GithubSshKeys": [TxType.DO_NOT_RESET_ON_MANAGER_START],
 
-#   "HasAcceptedTerms": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+  #   "HasAcceptedTerms": [TxType.DO_NOT_RESET_ON_MANAGER_START],
 
-#   "DisablePowerDown": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+  #   "DisablePowerDown": [TxType.DO_NOT_RESET_ON_MANAGER_START],
 
-#   "DisableUpdates": [TxType.DO_NOT_RESET_ON_MANAGER_START],
+  #   "DisableUpdates": [TxType.DO_NOT_RESET_ON_MANAGER_START],
 
-#   "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
+  #   "DoUninstall": [TxType.CLEAR_ON_MANAGER_START],
 
-#   "AccessToken": [TxType.CLEAR_ON_MANAGER_START],
-  
-#   "DongleId": [TxType.DO_NOT_RESET_ON_MANAGER_START],
-
-
-
-
+  #   "AccessToken": [TxType.CLEAR_ON_MANAGER_START],
+    
+  #   "DongleId": [TxType.DO_NOT_RESET_ON_MANAGER_START],
 
 def fsync_dir(path):
   fd = os.open(path, os.O_RDONLY)
@@ -418,11 +412,11 @@ class Params():
       result.append(key)
     return result
 
-  def manager_start(self):
-    self._clear_keys_with_type(TxType.CLEAR_ON_MANAGER_START)
+  # def manager_start(self):
+  #   self._clear_keys_with_type(TxType.CLEAR_ON_MANAGER_START)
 
-  def panda_disconnect(self):
-    self._clear_keys_with_type(TxType.CLEAR_ON_PANDA_DISCONNECT)
+  # def panda_disconnect(self):
+  #   self._clear_keys_with_type(TxType.CLEAR_ON_PANDA_DISCONNECT)
 
   def delete(self, key):
     with self.transaction(write=True) as txn:

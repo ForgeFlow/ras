@@ -11,8 +11,9 @@ import lib.Utils as ut
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common.common import runShellCommand_and_returnOutput
+from common.params import Params
 
-
+params = Params(db=PARAMS)
 
 class Display:
     def __init__(self):
@@ -29,7 +30,7 @@ class Display:
         self.display_msg("connecting")
         self.lockForTheClock = False
         self.odooReachabilityMessage  = " "
-        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + ut.settings["fileForMessages"])
+        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + params.get("fileForMessages" ,encoding='utf-8'))
         self.defaultMessagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/messagesDicDefault.json")
 
     # def getMsg(textKey):
@@ -46,12 +47,12 @@ class Display:
 
     def getMsgTranslated(self, textKey):
         try:
-            loggerDEBUG(f'settings["language"]: {ut.settings["language"]}')
+            loggerDEBUG(f'settings["language"]: {params.get("language"  ,encoding='utf-8')}')
             # for key in messagesDic:
             #   loggerDEBUG(f"key in messagesDic: {key}")
             # msg1 = messagesDic[textKey]
             # loggerDEBUG(f"textKey {textKey}; msg1 {msg1}")
-            msgTranslated = self.messagesDic[textKey][ut.settings["language"]]       
+            msgTranslated = self.messagesDic[textKey][params.get("language"  ,encoding='utf-8')]       
             return copy.deepcopy(msgTranslated)
         except Exception as e:
             loggerDEBUG(f"Exception-getMsgTranslated: {e}")
@@ -72,7 +73,7 @@ class Display:
         return hour
 
     def display_hours_and_minutes(self,draw):
-        if "24" in ut.settings["time_format"]:
+        if "24" in params.get("time_format", encoding='utf-8'):
             hour = time.strftime("%H:%M", time.localtime())
             num_ones = hour.count("1")
             if num_ones < 3:
@@ -165,7 +166,7 @@ class Display:
         #self.clear_display()
         message = self.getMsgTranslated(textKey)
         if '-EmployeePlaceholder-' in message[2]:
-            if employee_name and ut.settings["showEmployeeName"] == "yes":
+            if employee_name and params.get("showEmployeeName"  ,encoding='utf-8') == "yes":
                 loggerINFO(f"Employee Name: {employee_name}")
                 employeeName = employee_name.split(" ",1)
                 firstName = employeeName[0][0:14]
@@ -179,8 +180,8 @@ class Display:
             else:
                 message[2] =  "\n"+ message[2].replace('-EmployeePlaceholder-',"")
         if '-SSIDresetPlaceholder-' in message[2]:
-            loggerINFO(f"SSID: {ut.settings['SSIDreset']}")
-            message[2] =  message[2].replace('-SSIDresetPlaceholder-',ut.settings["SSIDreset"])
+            loggerINFO(f"SSID: {params.get('SSIDreset'  ,encoding='utf-8')}")
+            message[2] =  message[2].replace('-SSIDresetPlaceholder-',params.get("SSIDreset"  ,encoding='utf-8'))
         self.displayMsgRaw(message)
     
     def displayWithIP(self, textKey):
