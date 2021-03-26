@@ -74,7 +74,6 @@ json_keys = {
 }
 
 keys = {
-  #TxType.FACTORY_SETTINGS: will never change
   "firmwareAtShipment":       [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "productName":              [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "productionDate":           [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START],
@@ -86,13 +85,12 @@ keys = {
   "fileForMessages":          [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE], 
   "terminalSetupManagement":  [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE], 
   "howToDefineTime":          [TxType.FACTORY_SETTINGS, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
-  #TxType.DEFINED_ON_DEVICE_SETUP : defined when installing the device
   "https":                    [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "odoo_host":                [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "odoo_port":                [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "odooConnectedAtLeastOnce": [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "odooUrlTemplate":          [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
-  "odooIpPort":               [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
+  #"odooIpPort":               [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "HasCompletedSetup":        [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START],
   "admin_id":                 [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
   "db":                       [TxType.DEFINED_ON_DEVICE_SETUP, TxType.DO_NOT_RESET_ON_MANAGER_START, TxType.TO_DEPRECATE],
@@ -385,7 +383,6 @@ def write_db(params_path, key, value):
 class Params():
   def __init__(self, db=PARAMS):
     self.db = db
-
     # create the database if it doesn't exist...
     if not os.path.exists(self.db + "/d"):
       with self.transaction(write=True):
@@ -407,6 +404,19 @@ class Params():
       for key in keys:
         if tx_type in keys[key]:
           txn.delete(key)
+  
+  def get_list_of_keys_with_type(self, tx_type):
+    result = []
+    for key in keys:
+      if tx_type in keys[key]:
+        result.append(key)
+    return result
+
+  def get_list_of_all_keys(self):
+    result=[]
+    for key in keys:
+      result.append(key)
+    return result
 
   def manager_start(self):
     self._clear_keys_with_type(TxType.CLEAR_ON_MANAGER_START)

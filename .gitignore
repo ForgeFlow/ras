@@ -19,9 +19,11 @@ dicts/deviceCustomizationLuis.json
 *.code-workspace
 
 reallyOldLauncher.py
-data/ras3.log
+
 killme.txt
-data/first_module_install_flag
+
 dicts/deviceCustomization.sample.json
 
 killme_settings.py
+
+data

@@ -3,7 +3,16 @@ import subprocess
 import os
 
 def ensureSettingsStoredInParametersDatabase():
-    pass
+    from common.transferSettings import transferSettingsToParams_db
+    try:
+        params_db_transferred_flag = "/home/pi/ras/data/params_db_transferred_flag"
+        if not os.path.isfile(params_db_transferred_flag):
+            transferSettingsToParams_db()
+            if not os.path.exists('/home/pi/ras/data'):
+                os.makedirs('/home/pi/ras/data')
+            with open(params_db_transferred_flag, 'w'): pass
+    except:
+        pass  
 
 def copyDeviceCustomizationJson():
     try:

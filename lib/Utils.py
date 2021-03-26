@@ -244,8 +244,8 @@ def getSettingsFromDeviceCustomization():
 
   for key, value in settingsList_And_DefaultValues.items():
     settings[key] = getOptionFromDeviceCustomization(key, defaultValue = value)
-  
-  settings["firmwareVersion"] = co.RAS_VERSION
+  settings["hashed_machine_id"]   = cc.getHashedMachineId()
+  settings["firmwareVersion"]     = co.RAS_VERSION
   settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
