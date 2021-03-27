@@ -446,6 +446,11 @@ class Params():
     Use the put_nonblocking helper function in time sensitive code, but
     in general try to avoid writing params as much as possible.
     """
+    if type(dat) == bool:
+      if dat:
+        dat="1"
+      else:
+        dat="0"
 
     if key not in keys:
       raise UnknownKeyName(key)

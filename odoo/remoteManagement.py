@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import common.constants as co
@@ -7,6 +8,10 @@ import common.common as cc
 import lib.Utils as ut
 import common.logger as lo
 from launcherHelper import copyDeviceCustomizationJson
+from common.constants import PARAMS
+from common.params import Params
+
+params = Params(db=PARAMS)
 
 
 def getPayload(settings_to_send):
@@ -20,8 +25,12 @@ def getPayload(settings_to_send):
 
 def getRASxxx():
     RAS_id_str ="2  "
+    params = Params(db=PARAMS)
     try:
-        RAS_id = ut.settings["terminalIDinOdoo"]
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            RAS_id = ut.settings["terminalIDinOdoo"]
+        else:
+            RAS_id = params.get("terminalIDinOdoo", encoding='utf-8')
         if RAS_id:
             RAS_id_str = str(RAS_id)
             if len(RAS_id_str)==1:
@@ -37,9 +46,13 @@ def getRASxxx():
 
 def acknowledgeTerminalInOdoo():
     terminal_ID_in_Odoo     = None
-
+    params = Params(db=PARAMS)
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            template = ut.settings["odooUrlTemplate"]
+        else:
+            template = params.get("odooUrlTemplate", encoding='utf-8')
+        requestURL  = template + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         settings_to_send = [
             "manufacturingData",
@@ -91,9 +104,17 @@ def acknowledgeTerminalInOdoo():
     return terminal_ID_in_Odoo
 
 def getTerminalIDinOdoo():
-    if not ut.settings["hashed_machine_id"]:
+    params = Params(db=PARAMS)
+    if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+        hashed_machine_id = ut.settings["hashed_machine_id"]
+    else:
+        hashed_machine_id = params.get("hashed_machine_id", encoding='utf-8')
+    if not hashed_machine_id:
         hashed_machine_id = cc.getHashedMachineId()
-        ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
+        else:
+            params.put("hashed_machine_id", hashed_machine_id)
     acknowledgeTerminalInOdoo()
 
 def ensureFirstOdooConnection_RemoteManagement():
@@ -102,8 +123,13 @@ def ensureFirstOdooConnection_RemoteManagement():
 
 def isRemoteOdooControlAvailable():
     version_things_module_in_Odoo = None
+    params = Params(db=PARAMS)
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ASK_VERSION_IN_ODOO
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            template = ut.settings["odooUrlTemplate"]
+        else:
+            template = params.get("odooUrlTemplate", encoding='utf-8')
+        requestURL  = template + co.ROUTE_ASK_VERSION_IN_ODOO
         headers     = {'Content-Type': 'application/json'}
 
         payload     = {'question': co.QUESTION_ASK_FOR_VERSION_IN_ODOO}

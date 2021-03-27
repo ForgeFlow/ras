@@ -8,6 +8,7 @@ import lib.Utils as ut
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common.params import Params
+from common.constants import PARAMS
 
 params = Params(db=PARAMS)
 

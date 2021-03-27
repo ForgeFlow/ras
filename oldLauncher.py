@@ -7,6 +7,7 @@ def main():
     from lib import OdooXMLrpc, Tasks
     import lib.Utils as ut
     from common.params import Params
+    from common.constants import PARAMS
 
     params = Params(db=PARAMS)
 
@@ -21,8 +22,8 @@ def main():
     Tasks = Tasks.Tasks(Odoo, Hardware)
     try:
         Disp.displayGreetings()
-
-        if params.get("shouldGetFirmwareUpdate", encoding='utf-8'):
+        loggerDEBUG(f"shouldGetFirmwareUpdate: {(params.get('shouldGetFirmwareUpdate', encoding='utf-8') == 1)}")
+        if params.get("shouldGetFirmwareUpdate", encoding='utf-8') == "1":
             params.put("shouldGetFirmwareUpdate", bytes("0"))
             loggerINFO("Firmware to be updated now...")
             #Tasks.nextTask = "updateFirmware"

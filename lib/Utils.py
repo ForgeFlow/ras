@@ -12,6 +12,9 @@ import odoo.odoo as od
 import common.common as cc
 import odoo.remoteManagement as odooRemote
 import common.constants as co
+from common.params import Params
+
+params = Params(db=co.PARAMS)
 
 WORK_DIR                      = "/home/pi/ras/"
 fileDeviceCustomization       = WORK_DIR + "dicts/deviceCustomization.json"
@@ -209,85 +212,65 @@ def storeOptionInDeviceCustomization(option,value):
 
 def getSettingsFromDeviceCustomization():
   settingsList_And_DefaultValues = {
-    'language': "ENGLISH",
-    "showEmployeeName":"yes",
-    "fileForMessages":"messagesDicDefault.json",
-    "SSIDreset": "__RAS__",
-    "odooParameters": None,
-    "odooConnectedAtLeastOnce": False,
-    "flask": defaultCredentialsDic,
-    "timeoutToGetOdooUID": 6.0,
-    "ssh": "enable",
-    "sshPassword": "raspberry",
-    "timeoutToCheckAttendance": 3.0,
-    "periodEvaluateReachability": 5.0,
-    "periodDisplayClock": 10.0,
-    "timeToDisplayResultAfterClocking": 1.2,
-    "terminalSetupManagement": "locally, on the terminal", # "remotely, on Odoo"
-    "terminalIDinOdoo": None,
-    "hashed_machine_id": None,
-    "installedPythonModules": [],
-    "routefromOdooToDevice": None,
-    "routefromDeviceToOdoo": None,
-    "manufacturingData": None,
-    "location": "to be defined",
-    "howToDefineTime": "use +-xx:xx", # "use tz database"
-    "tz_database_name": "Europe/Madrid",
-    "time_format": "24 hour", # 12 hour
-    "version_things_module_in_Odoo": None,
-    "shouldGetFirmwareUpdate": False, # True, False
-    "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
-    'shutdownTerminal': False,
-    'incrementalLog': [],
-    'RASxxx': '2  '
-  }
+      'language': "ENGLISH",
+      "showEmployeeName":"yes",
+      "fileForMessages":"messagesDicDefault.json",
+      "SSIDreset": "__RAS__",
+      "odooParameters": None,
+      "odooConnectedAtLeastOnce": False,
+      "flask": defaultCredentialsDic,
+      "timeoutToGetOdooUID": 6.0,
+      "ssh": "enable",
+      "sshPassword": "raspberry",
+      "timeoutToCheckAttendance": 3.0,
+      "periodEvaluateReachability": 5.0,
+      "periodDisplayClock": 10.0,
+      "timeToDisplayResultAfterClocking": 1.2,
+      "terminalSetupManagement": "locally, on the terminal", # "remotely, on Odoo"
+      "terminalIDinOdoo": None,
+      "hashed_machine_id": None,
+      "routefromOdooToDevice": None,
+      "routefromDeviceToOdoo": None,
+      "manufacturingData": None,
+      "location": "to be defined",
+      "howToDefineTime": "use +-xx:xx", # "use tz database"
+      "tz_database_name": "Europe/Madrid",
+      "time_format": "24 hour", # 12 hour
+      "version_things_module_in_Odoo": None,
+      "shouldGetFirmwareUpdate": False, # True, False
+      "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
+      'shutdownTerminal': False,
+      'incrementalLog': [],
+      'RASxxx': '2  ',
+      "installedPythonModules": []
+    }  
+  json_liste = ["installedPythonModules", "flask", 'incrementalLog',"odooParameters", "manufacturingData"]
 
-  for key, value in settingsList_And_DefaultValues.items():
-    settings[key] = getOptionFromDeviceCustomization(key, defaultValue = value)
+
+
+  params_available = os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG)
+
+  for key, default in settingsList_And_DefaultValues.items():
+    if not params_available or key in json_liste:
+      value = getOptionFromDeviceCustomization(key, defaultValue = default)
+    else:
+      value = params.get(key, encoding='utf-8')
+      
+    settings[key] = value
+  
   settings["hashed_machine_id"]   = cc.getHashedMachineId()
   settings["firmwareVersion"]     = co.RAS_VERSION
   settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
-  settings["isRemoteOdooControlAvailable"] = odooRemote.isRemoteOdooControlAvailable() # True or False
-  if "remotely" in settings["terminalSetupManagement"] and \
-    settings["isRemoteOdooControlAvailable"]:
+  odoo_remote_available = odooRemote.isRemoteOdooControlAvailable()
+  settings["isRemoteOdooControlAvailable"] = odoo_remote_available # True or False
+  if params_available:
+    params.put("isRemoteOdooControlAvailable", odoo_remote_available)
+  if "remotely" in settings["terminalSetupManagement"] and odoo_remote_available:
     odooRemote.ensureFirstOdooConnection_RemoteManagement()
-  storeJsonData(fileDeviceCustomization,settings)
-
-# # def getMsg(textKey):
-# #   try:
-# #     loggerDEBUG(f"#####################################################  :  {messagesDic}")
-# #     loggerDEBUG(f"textKey {textKey}; messagesDic[textKey] {messagesDic[textKey]}")
-# #     return messagesDic[textKey] 
-# #   except KeyError:
-# #     loggerDEBUG(f"Exception- getMsg: KeyError")
-# #     return defaultMessagesDic[textKey]
-# #   except Exception as e:
-# #     loggerDEBUG(f"Exception-getMsg: {e}")
-# #     return None
-
-# def getMsgTranslated(textKey):
-#   try:
-#     loggerDEBUG(f'settings["language"]: {settings["language"]}')
-#     # for key in messagesDic:
-#     #   loggerDEBUG(f"key in messagesDic: {key}")
-#     # msg1 = messagesDic[textKey]
-#     # loggerDEBUG(f"textKey {textKey}; msg1 {msg1}")
-#     msgTranslated = messagesDic[textKey][settings["language"]]       
-#     return copy.deepcopy(msgTranslated)
-#   except Exception as e:
-#     loggerDEBUG(f"Exception-getMsgTranslated: {e}")
-#     if textKey == "listOfLanguages":
-#       return ["ENGLISH"]
-#     else:
-#       return [[0, 0], 20," "]
-
-# def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
-#   try:
-#     return getMsg("listOfLanguages")
-#   except:
-#     return defaultListOfLanguages
+  if not params_available:
+    storeJsonData(fileDeviceCustomization,settings)
 
 def transferDataJsonToDeviceCustomization(deviceCustomizationDic):
   dataJsonOdooParameters = getJsonData(fileDataJson)
@@ -343,11 +326,17 @@ def migrationToVersion1_4_2():
     loggerDEBUG(f"Exception-transfer data.json to deviceCustomization file: {e}")
 
 def isOdooUsingHTTPS():
-  if  "https" in settings["odooParameters"].keys():
-    if settings["odooParameters"]["https"]== ["https"]:
-      return True
-  return False
-
+  if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+    if  "https" in settings["odooParameters"].keys():
+      if settings["odooParameters"]["https"]== ["https"]:
+        return True
+    return False
+  else:
+    try:
+      return bool(int(params.get("https", encoding='utf-8')))
+    except Exception as e:
+      loggerDEBUG(f"Exception- isOdooUsingHTTPS(): {e}")
+      return False
 
   #return credentialsDic
 

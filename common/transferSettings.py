@@ -3,10 +3,13 @@ from common.constants import PARAMS
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import lib.Utils as ut
 
+params = Params(db=PARAMS)
 
+def transferSettingsToParams_db():
  #factory_settings_keys = params.get_list_of_keys_with_type(TxType.FACTORY_SETTINGS)
     keys = params.get_list_of_all_keys()
     loggerDEBUG(f"keys; {keys}")
+    loggerDEBUG(f"settings; {ut.settings}")
     for k in keys:
         try:
             try:
@@ -16,11 +19,6 @@ import lib.Utils as ut
                 value = False
             if type(value) == list:
                 value = value[0]
-            if type(value) == bool:
-                if value:
-                    value = "1"
-                else:
-                    value = "0"
             value = str(value)
             params.put(k, value)
             loggerDEBUG(f"transferSettingsToParams_db - key:{k}; value:{value}")

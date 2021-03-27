@@ -12,6 +12,10 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 from . import constants as co
 import lib.Utils as ut
 from dicts import tz_dic
+from common.params import Params
+import common.constants as co
+
+params = Params(db=co.PARAMS)
 
 def prettyPrint(message):
     pPrint(message)
@@ -39,7 +43,7 @@ def runShellCommand_and_returnOutput(command):
 def setTimeZone():
     if ut.settings["howToDefineTime"]=="use +-xx:xx":
         try:
-            timezone = tz_dic.tz_dic[ut.settings["odooParameters"]["timezone"][0]]
+            timezone = tz_dic.tz_dic[params.get("timezone", encoding='utf-8')]
             os.environ["TZ"] = timezone
             time.tzset()
             loggerINFO(f"Timezone: {timezone} - was set using +-xx:xx")
@@ -55,7 +59,7 @@ def setTimeZone():
             #         "sudo ln -s /usr/share/zoneinfo/"+ tz_database_name + " /etc/localtime"]
             # for c in commands:
             #     runShellCommand(c)
-            timezone = ut.settings["tz_database_name"]
+            timezone = params.get("tz_database_name", encoding='utf-8')
             os.environ["TZ"] = timezone
             time.tzset()
             loggerINFO(f"Timezone: {timezone} - was set using tz database")

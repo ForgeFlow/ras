@@ -17,8 +17,9 @@ import common.common as cc
 from launcherHelper import copyDeviceCustomizationJson
 import odoo.odoo as od
 from common.params import Params
+import common.constants as co
 
-params = Params(db=PARAMS)
+params = Params(db=co.PARAMS)
 
 class OdooXMLrpc:
     def __init__(self, Display):

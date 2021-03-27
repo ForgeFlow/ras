@@ -1,16 +1,16 @@
 #! /usr/bin/python3.7
 import subprocess
 import os
+import common.constants as co
 
 def ensureSettingsStoredInParametersDatabase():
     from common.transferSettings import transferSettingsToParams_db
     try:
-        params_db_transferred_flag = "/home/pi/ras/data/params_db_transferred_flag"
-        if not os.path.isfile(params_db_transferred_flag):
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
             transferSettingsToParams_db()
             if not os.path.exists('/home/pi/ras/data'):
                 os.makedirs('/home/pi/ras/data')
-            with open(params_db_transferred_flag, 'w'): pass
+            with open(co.PARAMS_DB_TRANSFERRED_FLAG, 'w'): pass
     except:
         pass  
 

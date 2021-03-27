@@ -12,8 +12,9 @@ import lib.Utils as ut
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from common.common import runShellCommand_and_returnOutput
 from common.params import Params
+import common.constants as co
 
-params = Params(db=PARAMS)
+params = Params(db=co.PARAMS)
 
 class Display:
     def __init__(self):
@@ -21,18 +22,17 @@ class Display:
         self.fontOrkney = ut.WORK_DIR + "fonts/Orkney.ttf"
         self.img_path = ut.WORK_DIR + "images/"
         self.device = get_device(("-d", display_driver))
-        loggerDEBUG("Display Class Initialized")
         self.fontClockTime = ImageFont.truetype(self.fontRoboto, 42)
         self.fontClockTime_12hour = ImageFont.truetype(self.fontRoboto, 38)
         self.fontClockInfos = ImageFont.truetype(self.fontRoboto, 14)
         self.font3 = ImageFont.truetype(self.fontRoboto, 22)
         self.font4 = ImageFont.truetype(self.fontOrkney, 14)
-        self.display_msg("connecting")
         self.lockForTheClock = False
         self.odooReachabilityMessage  = " "
-        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + params.get("fileForMessages" ,encoding='utf-8'))
+        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + str(params.get("fileForMessages", encoding='utf-8')))
         self.defaultMessagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/messagesDicDefault.json")
-
+        loggerDEBUG("Display Class Initialized")
+        self.display_msg("connecting")
     # def getMsg(textKey):
     #   try:
     #     loggerDEBUG(f"#####################################################  :  {messagesDic}")
@@ -47,11 +47,7 @@ class Display:
 
     def getMsgTranslated(self, textKey):
         try:
-            loggerDEBUG(f'settings["language"]: {params.get("language"  ,encoding='utf-8')}')
-            # for key in messagesDic:
-            #   loggerDEBUG(f"key in messagesDic: {key}")
-            # msg1 = messagesDic[textKey]
-            # loggerDEBUG(f"textKey {textKey}; msg1 {msg1}")
+            loggerDEBUG(f'"language": {params.get("language", encoding="utf-8")}')
             msgTranslated = self.messagesDic[textKey][params.get("language"  ,encoding='utf-8')]       
             return copy.deepcopy(msgTranslated)
         except Exception as e:

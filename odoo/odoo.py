@@ -1,32 +1,48 @@
+import os
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
-
+import common.constants as co
 import lib.Utils as ut
+from common.params import Params
+
+params = Params(db=co.PARAMS)
 
 
 def setOdooUrlTemplate():
+    odooUrlTemplate    = None
     try:
-        if  ut.isOdooUsingHTTPS():
-            odooUrlTemplate = "https://%s" % ut.settings["odooParameters"]["odoo_host"][0]
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            if  ut.isOdooUsingHTTPS():
+                odooUrlTemplate = "https://%s" % ut.settings["odooParameters"]["odoo_host"][0]
+            else:
+                odooUrlTemplate = "http://%s" % ut.settings["odooParameters"]["odoo_host"][0]                
+            if ut.settings["odooParameters"]["odoo_port"][0]:
+                odooUrlTemplate += ":%s" % ut.settings["odooParameters"]["odoo_port"][0]
+            loggerINFO(f"odooUrlTemplate is {odooUrlTemplate}")
         else:
-            odooUrlTemplate = "http://%s" % ut.settings["odooParameters"]["odoo_host"][0]                
-        if ut.settings["odooParameters"]["odoo_port"][0]:
-            odooUrlTemplate += ":%s" % ut.settings["odooParameters"]["odoo_port"][0]
-        loggerINFO(f"odooUrlTemplate is {odooUrlTemplate}")
+            odooUrlTemplate = params.get("odooUrlTemplate", encoding='utf-8')
     except Exception as e:
-        odooUrlTemplate    = None
         loggerERROR(f"Could not set Odoo URL Template - exception: {e}")
-        
+   
     return odooUrlTemplate
 
 def setOdooIpPort():
     odooIpPort = None
     try:
-        if ut.settings["odooParameters"]["odoo_port"]!=[""]: 
-            portNumber =  int(ut.settings["odooParameters"]["odoo_port"][0])                          
-        elif ut.isOdooUsingHTTPS():
-            portNumber =   443
-        odooIpPort = (ut.settings["odooParameters"]["odoo_host"][0], portNumber)
-        loggerINFO(f"Odoo IP port is {odooIpPort}")
+        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
+            if ut.settings["odooParameters"]["odoo_port"]!=[""]: 
+                portNumber =  int(ut.settings["odooParameters"]["odoo_port"][0])                          
+            elif ut.isOdooUsingHTTPS():
+                portNumber =   443
+            odooIpPort = (ut.settings["odooParameters"]["odoo_host"][0], portNumber)
+            loggerINFO(f"Odoo IP port is {odooIpPort}")
+        else:
+            if params.get("odoo_port", encoding='utf-8')!="": 
+                portNumber =  int(params.get("odoo_port", encoding='utf-8'))                          
+            elif ut.isOdooUsingHTTPS():
+                portNumber =   443
+            odooIpPort = (params.get("odoo_host", encoding='utf-8'), portNumber)
+            loggerINFO(f"Odoo IP port is {odooIpPort}")
+            
     except Exception as e:
         loggerERROR(f"Could not set Odoo IP port - exception {e}")
 

@@ -13,6 +13,7 @@ from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, l
 from common import constants as co
 import odoo.remoteManagement as odooRemote
 from common.params import Params
+from common.constants import PARAMS
 
 params = Params(db=PARAMS)
 
@@ -113,8 +114,7 @@ class Tasks:
 
 		self.Disp.display_msg("newAdmCardDefined")
 
-		data = params.get("odooParameters", encoding='utf-8')[]
-		self.Odoo.adm = data["admin_id"][0]
+		self.Odoo.adm = params.get("admin_id", encoding='utf-8')
 		self.Buzz.Play("back_to_menu")
 
 		self.card = False  # avoid closed loop
@@ -187,11 +187,11 @@ class Tasks:
 				loggerINFO('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
-						if "remotely" in params.get("", encoding='utf-8')["terminalSetupManagement"]:
+						if "remotely" in params.get("terminalSetupManagement", encoding='utf-8'):
 							odooRemote.routineCheck()
-							if params.get("setRebootAt", encoding='utf-8'):
+							if params.get("setRebootAt", encoding='utf-8') != "0":
 								eventuallyUpdateAndReboot()
-							elif params.get("shutdownTerminal", encoding='utf-8'):
+							elif params.get("shutdownTerminal", encoding='utf-8') == "1":
 								eventuallyUpdateAndShutdown()
 						exitFlag.wait(period)
 				loggerINFO('Thread Get Messages stopped')
