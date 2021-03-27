@@ -6,6 +6,9 @@ def main():
     from lib import Display, CardReader, PasBuz, Button
     from lib import OdooXMLrpc, Tasks
     import lib.Utils as ut
+    from common.params import Params
+
+    params = Params(db=PARAMS)
 
     Buzz = PasBuz.PasBuz(PinsBuzzer)
     Disp = Display.Display()
@@ -19,8 +22,8 @@ def main():
     try:
         Disp.displayGreetings()
 
-        if ut.settings["shouldGetFirmwareUpdate"]:
-            ut.settings["shouldGetFirmwareUpdate"] = False
+        if params.get("shouldGetFirmwareUpdate", encoding='utf-8'):
+            params.put("shouldGetFirmwareUpdate", bytes("0"))
             loggerINFO("Firmware to be updated now...")
             #Tasks.nextTask = "updateFirmware"
             Tasks.nextTask = "ensureInternetAndOdoo"

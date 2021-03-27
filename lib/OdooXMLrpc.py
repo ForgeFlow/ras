@@ -15,6 +15,10 @@ import odoo.odoo as od
 import lib.Utils as ut
 import common.common as cc
 from launcherHelper import copyDeviceCustomizationJson
+import odoo.odoo as od
+from common.params import Params
+
+params = Params(db=PARAMS)
 
 class OdooXMLrpc:
     def __init__(self, Display):
@@ -26,16 +30,15 @@ class OdooXMLrpc:
     #@ut.timer
     def getUIDfromOdoo(self):
         loggerINFO("in method getUIDfromOdoo")
-        loggerDEBUG(f"Odoo Params are: {ut.settings['odooParameters']}")
         cc.setTimeZone()
-        self.odooUrlTemplate    = ut.settings["odooUrlTemplate"] # can be deleted?
-        self.odooIpPort         = ut.settings["odooIpPort"] # can be deleted?
+        self.odooUrlTemplate    = params.get("odooUrlTemplate", encoding='utf-8') # can be deleted?
+        self.odooIpPort         = od.setOdooIpPort() # can be deleted?
         self.setUserID()
         loggerINFO(f"Got user id from Odoo {self.uid}")             
     
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(ut.settings["odooUrlTemplate"] + str(url))
+            serverProxy = xmlrpclib.ServerProxy(params.get("odooUrlTemplate", encoding='utf-8') + str(url))
             return serverProxy
         except Exception as e:
             loggerWARNING(f"getServerProxy exception {e}")
@@ -47,11 +50,11 @@ class OdooXMLrpc:
         returnValue = False
         try:
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            setTimeout(float(ut.settings["timeoutToGetOdooUID"]) or None)
+            setTimeout(float(params.get("timeoutToGetOdooUID", encoding='utf-8')) or None)
             user_id = loginServerProxy.login(
-                ut.settings["odooParameters"]["db"][0],
-                ut.settings["odooParameters"]["user_name"][0],
-                ut.settings["odooParameters"]["user_password"][0])
+                params.get("db", encoding='utf-8'),
+                params.get("user_name", encoding='utf-8'),
+                params.get("user_password", encoding='utf-8'))
             if user_id:
                 loggerINFO(f"got user id from Odoo ")
                 self.uid = user_id
@@ -86,11 +89,11 @@ class OdooXMLrpc:
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                setTimeout(float(ut.settings["timeoutToCheckAttendance"]) or None)
+                setTimeout(float(params.get("timeoutToCheckAttendance", encoding='utf-8')) or None)
                 res = serverProxy.execute(
-                    ut.settings["odooParameters"]["db"][0],
+                    params.get("db", encoding='utf-8'),
                     self.uid,
-                    ut.settings["odooParameters"]["user_password"][0],
+                    params.get("user_password", encoding='utf-8'),
                     "hr.employee",
                     "register_attendance",
                     card,
