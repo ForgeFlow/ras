@@ -9,7 +9,7 @@ import lib.Utils as ut
 import common.logger as lo
 from launcherHelper import copyDeviceCustomizationJson
 from common.constants import PARAMS
-from common.params import Params
+from common.params import Params, TxType
 
 params = Params(db=PARAMS)
 
@@ -104,18 +104,10 @@ def acknowledgeTerminalInOdoo():
     return terminal_ID_in_Odoo
 
 def getTerminalIDinOdoo():
-    # params = Params(db=PARAMS)
-    # if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
-    #     hashed_machine_id = ut.settings["hashed_machine_id"]
-    # else:
-    #     hashed_machine_id = params.get("hashed_machine_id", encoding='utf-8')
     hashed_machine_id = ut.settings["hashed_machine_id"]
     if not hashed_machine_id:
         hashed_machine_id = cc.getHashedMachineId()
-        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
-            ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
-        else:
-            params.put("hashed_machine_id", hashed_machine_id)
+        ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
     acknowledgeTerminalInOdoo()
 
 def ensureFirstOdooConnection_RemoteManagement():
@@ -130,7 +122,7 @@ def isRemoteOdooControlAvailable():
         #     template = ut.settings["odooUrlTemplate"]
         # else:
         #     template = params.get("odooUrlTemplate", encoding='utf-8')
-        template = ut.settings["odooUrlTemplate"]
+        template    = ut.settings["odooUrlTemplate"]
         requestURL  = template + co.ROUTE_ASK_VERSION_IN_ODOO
         headers     = {'Content-Type': 'application/json'}
 
@@ -187,18 +179,21 @@ def routineCheck():
             else:
                 changes = answer.get("changes", False)
                 if changes:
-                    ut.storeOptionInDeviceCustomization("shouldGetFirmwareUpdate",answer["shouldGetFirmwareUpdate"])
-                    ut.storeOptionInDeviceCustomization("location",answer["location"])
-                    ut.storeOptionInDeviceCustomization("setRebootAt",answer["setRebootAt"])
-                    ut.storeOptionInDeviceCustomization('shutdownTerminal', answer["shutdownTerminal"])
-                    ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True)
-                    lo.incrementalLog = []
-                    if answer["tz"]!=ut.settings["tz_database_name"]:
+                    routine_options_list = params.get_list_of_keys_with_type(TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS)
+                    routine_options_list.pop("tz_database_name")
+                    routine_options_list.pop("time_format")
+                    routine_options_list.pop("isRemoteOdooControlAvailable") 
+                    routine_options_list.pop("howToDefineTime")                  
+                    for o in routine_options_list:
+                        ut.storeOptionInDeviceCustomization(o,answer.get(o, False))
+                    if answer.get("tz", False) != ut.settings["tz_database_name"]:
                         ut.storeOptionInDeviceCustomization("tz_database_name", answer["tz"])
                         ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
                         cc.setTimeZone()
-                    ut.storeOptionInDeviceCustomization("time_format",answer["hour12or24"])                
-                    return True
+                    ut.storeOptionInDeviceCustomization("time_format",answer.get("hour12or24", False))
+                    ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True) 
+                    lo.incrementalLog = []                   
+                return True
         else:
             loggerINFO(f"Routine Check not Available - No Answer from Odoo")        
     except ConnectionRefusedError as e:
