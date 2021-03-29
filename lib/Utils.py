@@ -25,6 +25,41 @@ fileCredentials               = WORK_DIR + "dicts/credentials.json"
 settings                      = {}
 credentialsDic                = {}
 defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
+settingsList_And_DefaultValues = {
+      'language': "ENGLISH",
+      "showEmployeeName":"yes",
+      "fileForMessages":"messagesDicDefault.json",
+      "SSIDreset": "__RAS__",
+      "odooParameters": None,
+      "odooConnectedAtLeastOnce": False,
+      "flask": defaultCredentialsDic,
+      "timeoutToGetOdooUID": 6.0,
+      "ssh": "enable",
+      "sshPassword": "raspberry",
+      "timeoutToCheckAttendance": 3.0,
+      "periodEvaluateReachability": 5.0,
+      "periodDisplayClock": 10.0,
+      "timeToDisplayResultAfterClocking": 1.2,
+      "terminalSetupManagement": "locally, on the terminal", # "remotely, on Odoo"
+      "terminalIDinOdoo": None,
+      "hashed_machine_id": None,
+      "routefromOdooToDevice": None,
+      "routefromDeviceToOdoo": None,
+      "manufacturingData": None,
+      "location": "to be defined",
+      "howToDefineTime": "use +-xx:xx", # "use tz database"
+      "tz_database_name": "Europe/Madrid",
+      "time_format": "24 hour", # 12 hour
+      "version_things_module_in_Odoo": None,
+      "shouldGetFirmwareUpdate": False, # True, False
+      "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
+      'shutdownTerminal': False,
+      'incrementalLog': [],
+      'RASxxx': '2  ',
+      "installedPythonModules": []
+    }
+json_liste = ["installedPythonModules", "flask", 'incrementalLog',"odooParameters", "manufacturingData"]
+
 
 def timer(func):
     @functools.wraps(func)
@@ -203,51 +238,18 @@ def getOptionFromDeviceCustomization(option, defaultValue):
     return None
 
 def storeOptionInDeviceCustomization(option,value):
+  params_available = os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG)
   try:
-    storeOptionInJsonFile(fileDeviceCustomization,option,value) # stores in file
+    if not params_available or option in json_liste:
+      storeOptionInJsonFile(fileDeviceCustomization,option,value) # stores in file
+    else:
+      value = params.put(option, value)
     settings[option]= value # stores on the running program
     return True
   except:
     return False
 
 def getSettingsFromDeviceCustomization():
-  settingsList_And_DefaultValues = {
-      'language': "ENGLISH",
-      "showEmployeeName":"yes",
-      "fileForMessages":"messagesDicDefault.json",
-      "SSIDreset": "__RAS__",
-      "odooParameters": None,
-      "odooConnectedAtLeastOnce": False,
-      "flask": defaultCredentialsDic,
-      "timeoutToGetOdooUID": 6.0,
-      "ssh": "enable",
-      "sshPassword": "raspberry",
-      "timeoutToCheckAttendance": 3.0,
-      "periodEvaluateReachability": 5.0,
-      "periodDisplayClock": 10.0,
-      "timeToDisplayResultAfterClocking": 1.2,
-      "terminalSetupManagement": "locally, on the terminal", # "remotely, on Odoo"
-      "terminalIDinOdoo": None,
-      "hashed_machine_id": None,
-      "routefromOdooToDevice": None,
-      "routefromDeviceToOdoo": None,
-      "manufacturingData": None,
-      "location": "to be defined",
-      "howToDefineTime": "use +-xx:xx", # "use tz database"
-      "tz_database_name": "Europe/Madrid",
-      "time_format": "24 hour", # 12 hour
-      "version_things_module_in_Odoo": None,
-      "shouldGetFirmwareUpdate": False, # True, False
-      "setRebootAt": None, # time for next reboot (not periodically - einzelfall nur)
-      'shutdownTerminal': False,
-      'incrementalLog': [],
-      'RASxxx': '2  ',
-      "installedPythonModules": []
-    }  
-  json_liste = ["installedPythonModules", "flask", 'incrementalLog',"odooParameters", "manufacturingData"]
-
-
-
   params_available = os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG)
 
   for key, default in settingsList_And_DefaultValues.items():

@@ -19,6 +19,7 @@
     "setproctitle",
     "psutil"
   ],
+  "isRemoteOdooControlAvailable": false,
   "manufacturingData": null,
   "odooConnectedAtLeastOnce": true,
   "odooParameters": null
