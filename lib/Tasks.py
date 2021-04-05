@@ -458,7 +458,7 @@ class Tasks:
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 
-	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+	def ensureThatOdooHasBeenReachedAtLeastOnce(self):		
 		if "remotely" in ut.settings["terminalSetupManagement"] and \
 			ut.settings["isRemoteOdooControlAvailable"]:
 			odooRemote.ensureFirstOdooConnection_RemoteManagement()

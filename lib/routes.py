@@ -17,7 +17,7 @@ from multiprocessing import Process
 import threading
 from . import Utils
 
-_logger = logging.getLogger(__name__)
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 tz_sorted = OrderedDict(sorted(tz_dic.items()))
 
@@ -97,10 +97,10 @@ def startServerAdminCard(exitFlag):
 	return srv
 
 def startServerOdooParams(exitFlag):
+	loggerINFO("begin startServerOdooParams")
 	app = Flask("odoo_config_params")
 	app.secret_key = os.urandom(12)
-	Utils.getOwnIpAddress()
-	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	srv = make_server(str(Utils.getOwnIpAddress()), 3000, app)
 	ctx = app.app_context()
 	ctx.push()
 	server = ServerThread(srv)

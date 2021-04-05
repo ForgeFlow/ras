@@ -20,6 +20,7 @@ fileDataJson                  = WORK_DIR + "dicts/data.json"
 fileCredentials               = WORK_DIR + "dicts/credentials.json"
 
 settings                      = {}
+settings_msg                  = {}
 defaultMessagesDic            = {}
 credentialsDic                = {}
 defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
@@ -251,8 +252,8 @@ def getSettingsFromDeviceCustomization():
   settings["odooIpPort"]          = od.setOdooIpPort()
   settings["ownIpAddress"]        = getOwnIpAddress()
   settings["isRemoteOdooControlAvailable"] = odooRemote.isRemoteOdooControlAvailable() # True or False
-  settings["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
-  settings["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
+  settings_msg["messagesDic"]         = getJsonData(WORK_DIR + "dicts/" + settings["fileForMessages"])
+  settings_msg["defaultMessagesDic"]  = getJsonData(WORK_DIR + "dicts/messagesDicDefault.json")
   if "remotely" in settings["terminalSetupManagement"] and \
     settings["isRemoteOdooControlAvailable"]:
     odooRemote.ensureFirstOdooConnection_RemoteManagement()
@@ -262,9 +263,9 @@ def getSettingsFromDeviceCustomization():
 
 def getMsg(textKey):
   try:
-    return settings["messagesDic"][textKey] 
+    return settings_msg["messagesDic"][textKey] 
   except KeyError:
-    return settings["defaultMessagesDic"][textKey]
+    return settings_msg["defaultMessagesDic"][textKey]
   except:
     return None
 
@@ -349,7 +350,7 @@ def isOdooUsingHTTPS():
 def getOwnIpAddress():
   command = "hostname -I | awk '{ print $1}' "
   ipAddress = (subprocess.check_output(command, shell=True).decode("utf-8").strip("\n"))
-  #storeOptionInDeviceCustomization("ownIpAddress",ipAddress)
+  storeOptionInDeviceCustomization("ownIpAddress",ipAddress)
   return ipAddress
 
 def enableSSH():

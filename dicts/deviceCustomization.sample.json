@@ -1,34 +1,55 @@
 {
-  "ssh":"enable",
-  "sshPassword":"raspberry",
-  "timeoutToGetOdooUID": 6.0,
-  "timeoutToCheckAttendance": 3.0,
-  "periodEvaluateReachability": 5.0,
-  "periodDisplayClock":10.0,
-  "timeToDisplayResultAfterClocking": 1.2,
+  "RASxxx": "2  ",
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
-  "firmwareVersion": "v1.4.3",
-  "language": "ENGLISH",
+  "firmwareVersion": "v1.4.7",
+  "flask": {
+    "new password": [
+      "admin"
+    ],
+    "old password": [
+      "password"
+    ],
+    "username": [
+      "admin"
+    ]
+  },
+  "hashed_machine_id": null,
+  "howToDefineTime": "use tz database",
+  "incrementalLog": [],
+  "installedPythonModules": [
+    "systemd-python",
+    "python-decouple",
+    "pyzmq",
+    "colorama",
+    "setproctitle",
+    "psutil"
+  ],
+  "isRemoteOdooControlAvailable": false,
+  "language": "ESPA\u00d1OL",
+  "location": "to be defined",
   "manufacturingData": {
-    "firmwareAtShipment": "prior to v1.4.2",
+    "firmwareAtShipment": "v1.4.7",
     "productName": "RAS2",
-    "productionDate": "before October 2020",
+    "productionDate": "21-04-06",
     "productionLocation": "Frankfurt",
-    "productionNumber": "before October 2020",
+    "productionNumber": "21-04-06-001",
     "qualityInspector": "Luis"
   },
   "odooConnectedAtLeastOnce": false,
+  "odooIpPort": [
+    "192.168.178.xx",
+    8069
+  ],
   "odooParameters": {
     "admin_id": [
-      "ffffffff"
+      "ff"
     ],
     "db": [
-      "1"
+      "2"
     ],
-    "https": false,
     "odoo_host": [
-      "192.168.0.xx"
+      "192.168.178.xx"
     ],
     "odoo_port": [
       "8069"
@@ -37,15 +58,30 @@
       "+01:00"
     ],
     "user_name": [
-      "user"
+      "admin"
     ],
     "user_password": [
-      "psswd"
+      "admin"
     ]
   },
+  "odooUrlTemplate": "http://192.168.178.xx:8069",
+  "ownIpAddress": "192.168.178.21",
+  "periodDisplayClock": 10.0,
+  "periodEvaluateReachability": 5.0,
+  "routefromDeviceToOdoo": null,
+  "routefromOdooToDevice": null,
+  "setRebootAt": null,
+  "shouldGetFirmwareUpdate": false,
   "showEmployeeName": "yes",
-  "wifi": {
-    "Password": "SSID PSSWD",
-    "SSID": "SSID NAME"
-  }
+  "shutdownTerminal": false,
+  "ssh": "enable",
+  "sshPassword": "psswd",
+  "terminalIDinOdoo": null,
+  "terminalSetupManagement": "remotely, on Odoo",
+  "timeToDisplayResultAfterClocking": 1.2,
+  "time_format": "12 hour",
+  "timeoutToCheckAttendance": 3.0,
+  "timeoutToGetOdooUID": 6.0,
+  "tz_database_name": "Europe/Madrid",
+  "version_things_module_in_Odoo": null
 }
