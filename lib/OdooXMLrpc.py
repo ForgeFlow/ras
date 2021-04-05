@@ -27,8 +27,8 @@ class OdooXMLrpc:
         loggerINFO("in method getUIDfromOdoo")
         loggerDEBUG(f"Odoo Params are: {ut.settings['odooParameters']}")
         cc.setTimeZone()
-        self.odooUrlTemplate    = ut.settings["odooUrlTemplate"] # can be deleted?
-        self.odooIpPort         = ut.settings["odooIpPort"] # can be deleted?
+        self.odooUrlTemplate    = od.setOdooUrlTemplate() # can be deleted?
+        self.odooIpPort         = od.setOdooIpPort() # can be deleted?
         self.setUserID()
         loggerINFO(f"Got user id from Odoo {self.uid}")             
     
