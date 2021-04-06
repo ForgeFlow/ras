@@ -23,6 +23,7 @@ fileDataJson                  = WORK_DIR + "dicts/data.json"
 fileCredentials               = WORK_DIR + "dicts/credentials.json"
 
 settings                      = {}
+settings_msg                  = {}
 credentialsDic                = {}
 defaultCredentialsDic         = {"username": ["admin"], "new password": ["admin"], "old password": ["password"]}
 settingsList_And_DefaultValues = {

@@ -51,17 +51,6 @@ def acknowledgeTerminalInOdoo():
         requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         list_of_all_keys = params.get_list_of_all_keys()
-        # settings_to_send = [
-            #     "manufacturingData",
-            #     "hashed_machine_id",            
-            #     "firmwareVersion",
-            #     "language",
-            #     "ownIpAddress",
-            #     "ssh",
-            #     "sshPassword",
-            #     "showEmployeeName",
-            #     "timezone",                
-            # ]
         payload     = getPayload(list_of_all_keys)
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
@@ -75,23 +64,15 @@ def acknowledgeTerminalInOdoo():
             if error:
                 loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
             else:
-                keys_to_pop_out = ["terminalIDinOdoo", "RASxxx", "tz_database_name", "howToDefineTime", "time_format"]
-                for k in keys_to_pop_out:
-                    list_of_all_keys.pop(k)
-
                 for o in list_of_all_keys:
                     ut.storeOptionInDeviceCustomization(o,answer.get(o, False))
-
                 terminal_ID_in_Odoo     = answer.get('id', False)
                 loggerINFO(f"terminal ID in Odoo: {answer.get('id', False)}")
-                ut.storeOptionInDeviceCustomization("terminalIDinOdoo",answer.get('id', False))
-                ut.storeOptionInDeviceCustomization("RASxxx",getRASxxx()) # TODO getRASxxx should be made in odoo
                 if answer["tz"]:
-                    ut.storeOptionInDeviceCustomization("tz_database_name", answer.get('tz', False))
-                    ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
+                    # ut.storeOptionInDeviceCustomization("tz_database_name", answer.get('tz', False))
+                    # ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
                     cc.setTimeZone()
-                ut.storeOptionInDeviceCustomization("time_format",answer.get('hour12or24', False))
-                copyDeviceCustomizationJson()
+                copyDeviceCustomizationJson() # Is it necessary?
         else:
             loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:

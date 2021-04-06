@@ -99,8 +99,7 @@ def startServerAdminCard(exitFlag):
 def startServerOdooParams(exitFlag):
 	app = Flask("odoo_config_params")
 	app.secret_key = os.urandom(12)
-	Utils.getOwnIpAddress()
-	srv = make_server(str(Utils.settings["ownIpAddress"][0]), 3000, app)
+	srv = make_server(str(Utils.getOwnIpAddress()), 3000, app)
 	ctx = app.app_context()
 	ctx.push()
 	server = ServerThread(srv)

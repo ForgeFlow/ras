@@ -32,14 +32,14 @@ class OdooXMLrpc:
     def getUIDfromOdoo(self):
         loggerINFO("in method getUIDfromOdoo")
         cc.setTimeZone()
-        self.odooUrlTemplate    = params.get("odooUrlTemplate", encoding='utf-8') # can be deleted?
+        self.odooUrlTemplate    = od.setOdooUrlTemplate() # can be deleted?
         self.odooIpPort         = od.setOdooIpPort() # can be deleted?
         self.setUserID()
         loggerINFO(f"Got user id from Odoo {self.uid}")             
     
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(params.get("odooUrlTemplate", encoding='utf-8') + str(url))
+            serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
             return serverProxy
         except Exception as e:
             loggerWARNING(f"getServerProxy exception {e}")
