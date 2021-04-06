@@ -34,7 +34,7 @@ class OdooXMLrpc:
     
     def getServerProxy(self, url):
         try:
-            serverProxy = xmlrpclib.ServerProxy(ut.settings["odooUrlTemplate"] + str(url))
+            serverProxy = xmlrpclib.ServerProxy(self.odooUrlTemplate + str(url))
             return serverProxy
         except Exception as e:
             loggerWARNING(f"getServerProxy exception {e}")
