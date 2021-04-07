@@ -21,3 +21,7 @@ dicts/deviceCustomizationLuis.json
 reallyOldLauncher.py
 data/ras3.log
 killme.txt
+killme_settings.py
+params
+data/first_module_install_flag
+data/params_db_transferred_flag
