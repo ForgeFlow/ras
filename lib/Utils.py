@@ -59,7 +59,19 @@ settingsList_And_DefaultValues = {
       'RASxxx': '2  ',
       "installedPythonModules": []
     }
-json_liste = ["installedPythonModules", "flask", 'incrementalLog',"odooParameters", "manufacturingData"]
+json_liste = [
+  "installedPythonModules", 
+  "flask", 
+  'incrementalLog',
+  "odooParameters", 
+  "manufacturingData", 
+  "fileForMessages",
+  "timeoutToGetOdooUID",
+  "terminalSetupManagement",
+  "terminalIDinOdoo",
+  "howToDefineTime",
+  "tz_database_name"
+  ]
 
 
 def timer(func):

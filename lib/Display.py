@@ -29,7 +29,9 @@ class Display:
         self.font4 = ImageFont.truetype(self.fontOrkney, 14)
         self.lockForTheClock = False
         self.odooReachabilityMessage  = " "
-        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + str(params.get("fileForMessages", encoding='utf-8')))
+        #loggerDEBUG(f'ut.settings("fileForMessages"): {ut.settings("fileForMessages")}')
+        #loggerDEBUG(f'ut.WORK_DIR + "dicts/" + str(ut.settings("fileForMessages")): {ut.WORK_DIR + "dicts/" + str(ut.settings("fileForMessages"))}')
+        self.messagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/" + str(ut.settings["fileForMessages"]))
         self.defaultMessagesDic = ut.getJsonData(ut.WORK_DIR + "dicts/messagesDicDefault.json")
         loggerDEBUG("Display Class Initialized")
         self.display_msg("connecting")

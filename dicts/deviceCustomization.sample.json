@@ -1,4 +1,8 @@
 {
+  "RASxxx": "2  ",
+  "SSIDreset": "__RAS__",
+  "fileForMessages": "messagesDicDefault.json",
+  "firmwareVersion": "v1.4.6",
   "flask": {
     "new password": [
       "admin"
@@ -10,6 +14,8 @@
       "admin"
     ]
   },
+  "hashed_machine_id": null,
+  "howToDefineTime": "use +-xx:xx",
   "incrementalLog": [],
   "installedPythonModules": [
     "systemd-python",
@@ -20,7 +26,30 @@
     "psutil"
   ],
   "isRemoteOdooControlAvailable": false,
+  "language": "ENGLISH",
+  "location": "to be defined",
   "manufacturingData": null,
   "odooConnectedAtLeastOnce": true,
-  "odooParameters": null
+  "odooIpPort": null,
+  "odooParameters": null,
+  "odooUrlTemplate": null,
+  "ownIpAddress": "192.168.178.21",
+  "periodDisplayClock": 10.0,
+  "periodEvaluateReachability": 5.0,
+  "routefromDeviceToOdoo": null,
+  "routefromOdooToDevice": null,
+  "setRebootAt": null,
+  "shouldGetFirmwareUpdate": false,
+  "showEmployeeName": "yes",
+  "shutdownTerminal": false,
+  "ssh": "enable",
+  "sshPassword": "raspberry",
+  "terminalIDinOdoo": null,
+  "terminalSetupManagement": "remotely, on Odoo",
+  "timeToDisplayResultAfterClocking": 1.2,
+  "time_format": "24 hour",
+  "timeoutToCheckAttendance": 3.0,
+  "timeoutToGetOdooUID": 6.0,
+  "tz_database_name": "Europe/Madrid",
+  "version_things_module_in_Odoo": null
 }
