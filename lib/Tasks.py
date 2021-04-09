@@ -114,7 +114,7 @@ class Tasks:
 
 		self.Disp.display_msg("newAdmCardDefined")
 
-		self.Odoo.adm = params.get("admin_id", encoding='utf-8')
+		self.Odoo.adm = ut.settings["admin_id"]
 		self.Buzz.Play("back_to_menu")
 
 		self.card = False  # avoid closed loop
@@ -139,7 +139,7 @@ class Tasks:
 		while not exitFlag.isSet():
 			self.Reader.scan_card()
 			if self.Reader.card:
-				if self.Reader.card.lower() == params.get("admin_id", encoding='utf-8').lower():
+				if self.Reader.card.lower() == ut.settings["admin_id"].lower():
 					loggerINFO("ADMIN CARD was swipped")
 					self.nextTask = None
 					self.Reader.card = False    # Reset the value of the card, in order to allow
@@ -187,7 +187,7 @@ class Tasks:
 				loggerINFO('Thread Get Messages started')
 				while not exitFlag.isSet():
 						self.Clock.isOdooReachable()   # Odoo and Wifi Status Messages are updated
-						if "remotely" in params.get("terminalSetupManagement", encoding='utf-8'):
+						if "remotely" in ut.settings["terminalSetupManagement"]:
 							odooRemote.routineCheck()
 							if params.get("setRebootAt", encoding='utf-8') != "0":
 								eventuallyUpdateAndReboot()
@@ -456,14 +456,14 @@ class Tasks:
 			self.resetWifi()
 
 	def ensureFirstOdooConnection_LocalManagement(self):
-		if not params.get("odooConnectedAtLeastOnce", encoding='utf-8'):
+		if not ut.settings["odooConnectedAtLeastOnce"]:
 			loggerINFO("Terminal LOCALLY managed: ensureFirstOdooConnection Odoo UID initiated")
 			while not self.Odoo.uid:
 				self.getOdooUIDwithNewParameters()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
-		if "remotely" in params.get("terminalSetupManagement", encoding='utf-8') and \
-			params.get("isRemoteOdooControlAvailable", encoding='utf-8'):
+		if "remotely" in ut.settings["terminalSetupManagement"] and \
+			ut.settings["isRemoteOdooControlAvailable"]:
 			odooRemote.ensureFirstOdooConnection_RemoteManagement()
 		else:
 			self.ensureFirstOdooConnection_LocalManagement()

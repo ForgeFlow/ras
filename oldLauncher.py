@@ -32,6 +32,7 @@ def main():
             Tasks.nextTask = "ensureInternetAndOdoo" # TODO should be only ensure Odoo
 
         while True:
+            loggerDEBUG(f"On OldLauncher Tasks.nextTask: {Tasks.nextTask}")          
             if Tasks.nextTask:
                 Disp.display_msg("connecting")
                 Tasks.executeNextTask()

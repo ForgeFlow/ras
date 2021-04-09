@@ -57,7 +57,11 @@ settingsList_And_DefaultValues = {
       'shutdownTerminal': False,
       'incrementalLog': [],
       'RASxxx': '2  ',
-      "installedPythonModules": []
+      "installedPythonModules": [],
+      "timezone": "+01:00",
+      "db": None,
+      "user_name": None,
+      "user_password": None,
     }
 json_liste = [
   "installedPythonModules", 
@@ -70,7 +74,11 @@ json_liste = [
   "terminalSetupManagement",
   "terminalIDinOdoo",
   "howToDefineTime",
-  "tz_database_name"
+  "tz_database_name",
+  "timezone",
+  "db",
+  "user_name",
+  "user_password",
   ]
 
 
@@ -272,7 +280,14 @@ def getSettingsFromDeviceCustomization():
       value = params.get(key, encoding='utf-8')
       
     settings[key] = value
-  
+
+  try:
+    settings["db"] = settings["odooParameters"]["db"][0]
+    settings["user_name"] = settings["odooParameters"]["user_name"][0]  
+    settings["user_password"] = settings["odooParameters"]["user_password"][0]
+  except Exception as e:
+    loggerDEBUG(f"got error setting odooParameters setting (to deprecate) {e}")
+
   settings["hashed_machine_id"]   = cc.getHashedMachineId()
   settings["firmwareVersion"]     = co.RAS_VERSION
   settings["odooUrlTemplate"]     = od.setOdooUrlTemplate()

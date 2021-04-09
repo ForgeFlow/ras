@@ -1,8 +1,9 @@
 {
   "RASxxx": "2  ",
   "SSIDreset": "__RAS__",
+  "db": null,
   "fileForMessages": "messagesDicDefault.json",
-  "firmwareVersion": "v1.4.6",
+  "firmwareVersion": "v1.4.8",
   "flask": {
     "new password": [
       "admin"
@@ -31,7 +32,29 @@
   "manufacturingData": null,
   "odooConnectedAtLeastOnce": true,
   "odooIpPort": null,
-  "odooParameters": null,
+  "odooParameters": {
+    "admin_id": [
+      "7bdd55d3"
+    ],
+    "db": [
+      "210323b"
+    ],
+    "odoo_host": [
+      "192.168.178.28"
+    ],
+    "odoo_port": [
+      "8069"
+    ],
+    "timezone": [
+      "+01:00"
+    ],
+    "user_name": [
+      "admin"
+    ],
+    "user_password": [
+      "admin"
+    ]
+  },
   "odooUrlTemplate": null,
   "ownIpAddress": "192.168.178.21",
   "periodDisplayClock": 10.0,
@@ -50,6 +73,9 @@
   "time_format": "24 hour",
   "timeoutToCheckAttendance": 3.0,
   "timeoutToGetOdooUID": 6.0,
+  "timezone": "+01:00",
   "tz_database_name": "Europe/Madrid",
+  "user_name": null,
+  "user_password": null,
   "version_things_module_in_Odoo": null
 }

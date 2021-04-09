@@ -50,12 +50,13 @@ class OdooXMLrpc:
         self.uid = False
         returnValue = False
         try:
+            loggerINFO(f"db {ut.settings['db']}")
             loginServerProxy = self.getServerProxy("/xmlrpc/common")
-            setTimeout(float(params.get("timeoutToGetOdooUID", encoding='utf-8')) or None)
+            setTimeout(float(ut.settings['timeoutToGetOdooUID']) or None)
             user_id = loginServerProxy.login(
-                params.get("db", encoding='utf-8'),
-                params.get("user_name", encoding='utf-8'),
-                params.get("user_password", encoding='utf-8'))
+                ut.settings["db"],
+                ut.settings["user_name"],
+                ut.settings["user_password"])
             if user_id:
                 loggerINFO(f"got user id from Odoo ")
                 self.uid = user_id
@@ -90,11 +91,11 @@ class OdooXMLrpc:
         try:
             serverProxy = self.getServerProxy("/xmlrpc/object")
             if serverProxy:
-                setTimeout(float(params.get("timeoutToCheckAttendance", encoding='utf-8')) or None)
+                setTimeout(float(ut.settings["timeoutToCheckAttendance"]) or None)
                 res = serverProxy.execute(
-                    params.get("db", encoding='utf-8'),
+                    ut.settings["db"],
                     self.uid,
-                    params.get("user_password", encoding='utf-8'),
+                    ut.settings["user_password"],
                     "hr.employee",
                     "register_attendance",
                     card,
