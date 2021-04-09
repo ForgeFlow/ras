@@ -468,5 +468,8 @@ class CardReader:
           uid[0], uid[1], uid[2], uid[3])
 
     self.card = card
+
+    loggerDEBUG(f"in scan card ######## -  card: {card}")
+
     if card:
-      loggerDEBUG(f"from MFRC CardReader - card: {self.card} read @ {time.localtime()}")
+      loggerDEBUG(f"from MFRC CardReader - card: {self.card}")

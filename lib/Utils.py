@@ -285,6 +285,14 @@ def getSettingsFromDeviceCustomization():
     settings["db"] = settings["odooParameters"]["db"][0]
     settings["user_name"] = settings["odooParameters"]["user_name"][0]  
     settings["user_password"] = settings["odooParameters"]["user_password"][0]
+    settings["admin_id"] = settings["odooParameters"]["admin_id"][0]
+    settings["timezone"] = settings["odooParameters"]["timezone"][0]
+    settings["odoo_host"] = settings["odooParameters"]["odoo_host"][0]
+    settings["odoo_port"] = settings["odooParameters"]["odoo_port"][0]
+    if "https" in settings["odooParameters"]:
+      settings["https"] = settings["odooParameters"]["https"][0]
+    else:
+      settings["https"] = ""
   except Exception as e:
     loggerDEBUG(f"got error setting odooParameters setting (to deprecate) {e}")
 

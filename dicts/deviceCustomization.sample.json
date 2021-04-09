@@ -31,7 +31,10 @@
   "location": "to be defined",
   "manufacturingData": null,
   "odooConnectedAtLeastOnce": true,
-  "odooIpPort": null,
+  "odooIpPort": [
+    "192.168.178.28",
+    8069
+  ],
   "odooParameters": {
     "admin_id": [
       "7bdd55d3"
@@ -55,8 +58,8 @@
       "admin"
     ]
   },
-  "odooUrlTemplate": null,
-  "ownIpAddress": "192.168.178.21",
+  "odooUrlTemplate": "http://192.168.178.28:8069",
+  "ownIpAddress": "192.168.178.38",
   "periodDisplayClock": 10.0,
   "periodEvaluateReachability": 5.0,
   "routefromDeviceToOdoo": null,
