@@ -22,7 +22,7 @@ class Clocking:
         self.B_Down = hardware[3]  # Button Down
         self.B_OK = hardware[4]  # Button OK
 
-        self.timeToDisplayResult = float(params.get("timeToDisplayResultAfterClocking", encoding='utf-8')) #1.4 # in seconds
+        self.timeToDisplayResult = float(params.get("timeToDisplayResultAfterClocking")) #1.4 # in seconds
 
         self.msg = False    # determines Melody to play and/or Text to display depending on Event happened: for example check in,
                             # check out, communication with odoo not possible ...
@@ -37,12 +37,12 @@ class Clocking:
             self.Odoo.getUIDfromOdoo()
 
         if ut.internetReachable() and ut.isIpPortOpen(self.Odoo.odooIpPort) and self.Odoo.uid:
-            self.Disp.odooReachabilityMessage="RAS" + params.get("RASxxx", encoding='utf-8') + \
+            self.Disp.odooReachabilityMessage="RAS" + params.get("RASxxx") + \
                 " <---> Odoo\n-----------------\n"
             #self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseOK")[2]
             self.odooReachable = True
         else:
-            self.Disp.odooReachabilityMessage="RAS" + params.get("RASxxx", encoding='utf-8') + \
+            self.Disp.odooReachabilityMessage="RAS" + params.get("RASxxx") + \
                 " < ! > Odoo\n-----------------\n"            
             #self.Disp.odooReachabilityMessage = ut.getMsgTranslated("clockScreen_databaseNotConnected")[2]
             self.odooReachable = False

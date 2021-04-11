@@ -132,7 +132,7 @@ keys = {
   #"timeoutToGetOdooUID":              [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.TO_DEPRECATE],  # TO_DEPRECATE ##################
 
   #TxType.UPDATED_FROM_DEVICE: Updates are done through the Firmware
-  "installedPythonModules": [TxType.UPDATED_FROM_DEVICE],
+  #"installedPythonModules": [TxType.UPDATED_FROM_DEVICE],
   "firmwareVersion":        [TxType.UPDATED_FROM_DEVICE],
   "lastFirmwareUpdateTime": [TxType.UPDATED_FROM_DEVICE],
   "lastTimeTerminalStarted":  [TxType.UPDATED_FROM_DEVICE],
@@ -425,7 +425,7 @@ class Params():
     with self.transaction(write=True) as txn:
       txn.delete(key)
 
-  def get(self, key, block=False, encoding=None):
+  def get(self, key, block=False, encoding='utf-8'):
     if key not in keys:
       raise UnknownKeyName(key)
 

@@ -18,7 +18,7 @@ def getPayload(settings_to_send):
     payload = {}
     for s in settings_to_send:
         try:
-            payload[s] = ut.settings[s]
+            payload[s] = params.get(s)
         except Exception as e:
             loggerERROR(f"Exception while trying to access setting {s}")
     return payload
@@ -48,7 +48,7 @@ def acknowledgeTerminalInOdoo():
     terminal_ID_in_Odoo     = None
     params = Params(db=PARAMS)
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + co.ROUTE_ACK_GATE
+        requestURL  = params.get("odooUrlTemplate") + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         list_of_all_keys = params.get_list_of_all_keys()
         payload     = getPayload(list_of_all_keys)
@@ -56,8 +56,8 @@ def acknowledgeTerminalInOdoo():
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
         loggerDEBUG(f"Acknowledge Terminal in Odoo - Status code of response: {response.status_code} ")
-        # loggerDEBUG("Printing Entire Post Response")
-        # print(response.json())
+        loggerDEBUG("Printing Entire Post Response")
+        print(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)
@@ -85,7 +85,7 @@ def acknowledgeTerminalInOdoo():
     return terminal_ID_in_Odoo
 
 def getTerminalIDinOdoo():
-    hashed_machine_id = ut.settings["hashed_machine_id"]
+    hashed_machine_id = params.get("hashed_machine_id")
     if not hashed_machine_id:
         hashed_machine_id = cc.getHashedMachineId()
         ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
@@ -97,13 +97,8 @@ def ensureFirstOdooConnection_RemoteManagement():
 
 def isRemoteOdooControlAvailable():
     version_things_module_in_Odoo = None
-    # params = Params(db=PARAMS)
     try:
-        # if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
-        #     template = ut.settings["odooUrlTemplate"]
-        # else:
-        #     template = params.get("odooUrlTemplate", encoding='utf-8')
-        template    = ut.settings["odooUrlTemplate"]
+        template    = params.get("odooUrlTemplate")
         requestURL  = template + co.ROUTE_ASK_VERSION_IN_ODOO
         headers     = {'Content-Type': 'application/json'}
 
@@ -136,13 +131,10 @@ def isRemoteOdooControlAvailable():
 
 def routineCheck():
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + \
-            co.ROUTE_OUTGOING_IN_ODOO + "/" + ut.settings["routefromOdooToDevice"]
+        requestURL  = params.get("odooUrlTemplate") + \
+            co.ROUTE_OUTGOING_IN_ODOO + "/" + params.get("routefromOdooToDevice")
         headers     = {'Content-Type': 'application/json'}
-        if ut.settings.get("manufacturingData", False):
-            productName = ut.settings.get("manufacturingData").get('productName', False)
-        else:
-            productName = ut.settings.get('productName', False)
+        productName = params.get('productName')
         payload     = {'question': co.QUESTION_ASK_FOR_ROUTINE_CHECK,
                     'productName': productName,
                     'incrementalLog': lo.incrementalLog}
@@ -187,13 +179,10 @@ def routineCheck():
 
 def resetSettings():
     try:
-        requestURL  = ut.settings["odooUrlTemplate"] + \
-            co.ROUTE_INCOMING_IN_ODOO + "/" + ut.settings["routefromDeviceToOdoo"]
+        requestURL  = params.get("odooUrlTemplate") + \
+            co.ROUTE_INCOMING_IN_ODOO + "/" + params.get("routefromDeviceToOdoo")
         headers     = {'Content-Type': 'application/json'}
-        if ut.settings.get("manufacturingData", False):
-            productName = ut.settings.get("manufacturingData").get('productName', False)
-        else:
-            productName = ut.settings.get('productName', False)
+        productName = params.get('productName')
         payload     = {'question': co.QUESTION_ASK_FOR_RESET_SETTINGS,
                     'productName': productName}
 

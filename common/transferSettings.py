@@ -13,7 +13,7 @@ def transferSettingsToParams_db():
     for k in keys:
         try:
             try:
-                value = ut.settings["manufacturingData"].pop(k, False) or ut.settings.pop(k, False) or ut.settings["odooParameters"].pop(k, False)
+                value = ut.settings.pop(k, False)
             except Exception as e:
                 loggerERROR(f"Transfer settings(json) to params key:{k}- error {e}")
                 value = False

@@ -173,11 +173,13 @@ class Tasks:
 					self.updateFirmware()
 
 		def eventuallyUpdateAndReboot():
-			rebootTime = time.strptime(params.get("setRebootAt", encoding='utf-8'), '%Y-%m-%d %H:%M:%S')
-			loggerDEBUG(f'params.get("setRebootAt", encoding="utf-8") {rebootTime}; time.localtime() {time.localtime()}')
-			if rebootTime < time.localtime():
-				checkIfUpdate_and_resetSettings()				
-				self.reboot()
+			setRebootAt = params.get("setRebootAt")
+			if setRebootAt != "None":
+				rebootTime = time.strptime(setRebootAt, '%Y-%m-%d %H:%M:%S')
+				loggerDEBUG(f'params.get("setRebootAt", encoding="utf-8") {rebootTime}; time.localtime() {time.localtime()}')
+				if rebootTime < time.localtime():
+					checkIfUpdate_and_resetSettings()				
+					self.reboot()
 
 		def eventuallyUpdateAndShutdown():
 			checkIfUpdate_and_resetSettings()
@@ -462,8 +464,9 @@ class Tasks:
 				self.getOdooUIDwithNewParameters()
 
 	def ensureThatOdooHasBeenReachedAtLeastOnce(self):
+		loggerINFO(f"isRemoteOdooControlAvailable : {params.get('isRemoteOdooControlAvailable')}")
 		if "remotely" in ut.settings["terminalSetupManagement"] and \
-			ut.settings["isRemoteOdooControlAvailable"]:
+			params.get("isRemoteOdooControlAvailable"):
 			odooRemote.ensureFirstOdooConnection_RemoteManagement()
 		else:
 			self.ensureFirstOdooConnection_LocalManagement()

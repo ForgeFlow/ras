@@ -6,6 +6,7 @@ import socket
 import copy
 import functools
 import subprocess
+from datetime import datetime
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import odoo.odoo as od
@@ -62,6 +63,9 @@ settingsList_And_DefaultValues = {
       "db": None,
       "user_name": None,
       "user_password": None,
+      "updateFailedCount": 0,
+      "lastFirmwareUpdateTime": False,
+      "lastTimeTerminalStarted": False
     }
 json_liste = [
   "installedPythonModules", 
@@ -79,6 +83,12 @@ json_liste = [
   "db",
   "user_name",
   "user_password",
+  "firmwareAtShipment" ,
+  "productName"        ,
+  "productionDate"     ,
+  "productionLocation" ,
+  "productionNumber"   ,
+  "qualityInspector"   , 
   ]
 
 
@@ -278,7 +288,7 @@ def getSettingsFromDeviceCustomization():
       value = getOptionFromDeviceCustomization(key, defaultValue = default)
     else:
       value = params.get(key, encoding='utf-8')
-      
+    loggerDEBUG(f"in getSettings... key {key} - value {value}")
     settings[key] = value
 
   try:
@@ -293,8 +303,23 @@ def getSettingsFromDeviceCustomization():
       settings["https"] = settings["odooParameters"]["https"][0]
     else:
       settings["https"] = ""
+    factory_settings = [
+    "firmwareAtShipment",
+    "productName",
+    "productionDate",
+    "productionLocation",
+    "productionNumber",
+    "qualityInspector",
+    "SSIDreset"]
+    for s in factory_settings:
+      settings[s] = settings["manufacturingData"][s]
   except Exception as e:
     loggerDEBUG(f"got error setting odooParameters setting (to deprecate) {e}")
+
+  if not settings["lastFirmwareUpdateTime"]:
+    settings["lastFirmwareUpdateTime"] = datetime.now().replace(microsecond=0)
+  
+  settings["lastTimeTerminalStarted"] = datetime.now().replace(microsecond=0)
 
   settings["hashed_machine_id"]   = cc.getHashedMachineId()
   settings["firmwareVersion"]     = co.RAS_VERSION
@@ -304,9 +329,9 @@ def getSettingsFromDeviceCustomization():
   odoo_remote_available = odooRemote.isRemoteOdooControlAvailable()
   settings["isRemoteOdooControlAvailable"] = odoo_remote_available # True or False
   if params_available:
-    params.put("isRemoteOdooControlAvailable", odoo_remote_available)
-  if "remotely" in settings["terminalSetupManagement"] and odoo_remote_available:
-    odooRemote.ensureFirstOdooConnection_RemoteManagement()
+    params.put("isRemoteOdooControlAvailable", settings["isRemoteOdooControlAvailable"])
+    params.put("lastTimeTerminalStarted", str(settings["lastTimeTerminalStarted"]) )
+
   if not params_available:
     storeJsonData(fileDeviceCustomization,settings)
 
