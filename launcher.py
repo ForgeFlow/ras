@@ -1,7 +1,7 @@
 #! /usr/bin/python3.7
-import launcherHelper as lh
+# import launcherHelper as lh
 
-lh.ensureMigrationsAndSettings()
+# lh.ensureMigrationsAndSettings()
 
 import os, sys, time 
 import importlib
@@ -27,7 +27,8 @@ loggerINFO(f'running on python version: {sys.version}')
 managed_essential_processes = { # key(=process name) : (pythonmodule where the process is defined (= process name))
     #"internet_connectivity_d": "connectivity.manager",
     "thermal_d": "thermal.manager",
-    "RAS_d": "oldLauncher"
+    "display_d": "display.manager",
+    #"RAS_d": "oldLauncher"
 }
 
 managed_NON_essential_processes = {}
