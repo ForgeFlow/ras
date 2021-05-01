@@ -151,6 +151,7 @@ def routineCheck():
                 loggerINFO(f"Routine Check not Available - error in answer from Odoo: {error}")
             else:
                 changes = answer.get("changes", False)
+                lo.incrementalLog = []
                 if changes:
                     routine_options_list = params.get_list_of_keys_with_type(TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS)
                     routine_options_list.pop("tz_database_name")
@@ -164,8 +165,7 @@ def routineCheck():
                         ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
                         cc.setTimeZone()
                     ut.storeOptionInDeviceCustomization("time_format",answer.get("hour12or24", False))
-                    ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True) 
-                    lo.incrementalLog = []                   
+                    ut.storeOptionInDeviceCustomization("isRemoteOdooControlAvailable", True)                   
                 return True
         else:
             loggerINFO(f"Routine Check not Available - No Answer from Odoo")        
