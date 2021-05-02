@@ -56,6 +56,7 @@ class TxType(Enum):
   UPDATED_FROM_ODOO_ON_ROUTINE_CALLS = auto()  # Updates come from Odoo - do not clear on start,
                 # can be changed anytime when connected to Odoo through routine calls
   UPDATED_FROM_DEVICE = auto()  # Updates are done through the Firmware
+  FLAG = auto() # used as flag in the firmware
 
 
 class UnknownKeyName(Exception):
@@ -74,6 +75,7 @@ json_keys = {
 }
 
 keys = {
+  "displayClock":             [TxType.FLAG],
   "firmwareAtShipment":       [TxType.FACTORY_SETTINGS],
   "productName":              [TxType.FACTORY_SETTINGS],
   "productionDate":           [TxType.FACTORY_SETTINGS],

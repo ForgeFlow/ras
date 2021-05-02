@@ -28,6 +28,7 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
     #"internet_connectivity_d": "connectivity.manager",
     "thermal_d": "thermal.manager",
     "display_d": "display.manager",
+    "clock_d": "clock.manager",
     #"RAS_d": "oldLauncher"
 }
 

@@ -11,6 +11,21 @@ from PIL import Image, ImageFont, ImageDraw
 
 import types
 
+from common.params import Params
+import common.constants as co
+
+import lib.Utils as ut
+
+params = Params(db=co.PARAMS)
+
+fontRoboto = "/home/pi/ras/fonts/Roboto-Medium.ttf"
+fontClockTime = ImageFont.truetype(fontRoboto, 42)
+fontClockTime_12hour = ImageFont.truetype(fontRoboto, 38)
+fontClockInfos = ImageFont.truetype(fontRoboto, 14)
+font_three_lines = ImageFont.truetype(fontRoboto, 16)
+
+
+
 class ssh1106_const():
     DISPLAYOFF = 0xAE
     DISPLAYON = 0xAF
@@ -368,23 +383,125 @@ def multiline_text_lu(
         left = xy[0]
 
 
+def getInternetQualityMessage():
+    internetQualityMessage = "No Internet"
+    if ut.internetReachable():
+        if ut.isTypeOfConnection_Connected("eth0"):
+            internetQualityMessage = "Ethernet"
+        elif ut.isTypeOfConnection_Connected("wlan0"):
+            internetQualityMessage = "WiFi"
+        else:
+            internetQualityMessage = "Internet"          
+    return internetQualityMessage
+
+
 class Oled():
 
     def __init__(self):
+        self.hour ="12:00"
+        self.am_pm ="AM"
+        self.x =10
+        self.x_am_pm = 108
+        self.internetQualityMessage = "No Internet"
+        self.odooReachabilityMessage = "..searching.."
+        self.displayClock = "yes"
+        self.store_status_of_now()
         try:
             self.device_display = sh1106(
                 serial_interface = i2c(port=1, address='0x3C'),
                 rotate = 2)
         except Exception as e:
-            loggerERROR(f"exception while getting device {e}")      
-        self.fontRoboto = "/home/pi/ras/fonts/Roboto-Medium.ttf"
-        self.font_three_lines = ImageFont.truetype(self.fontRoboto, 16)
+            loggerERROR(f"exception while getting device {e}")
 
+    def draw_text_centered(self, draw, origin, font, text):
+        # available methods in :
+        # /usr/local/lib/python3.7/dist-packages/PIL/ImageDraw.py 
+        draw.multiline_text = types.MethodType(multiline_text_lu, draw) # substitute with own method
+        draw.multiline_text(origin, text, fill="white", font=font, align="center")
+
+    def draw_text_not_centered(self, draw, origin, font, text):
+        # available methods in :
+        # /usr/local/lib/python3.7/dist-packages/PIL/ImageDraw.py 
+        draw.multiline_text = types.MethodType(multiline_text_lu, draw) # substitute with own method
+        draw.multiline_text(origin, text, fill="white", font=font, align="left")
 
     def three_lines_text(self, text="\n...connecting..."):
         origin = [0,0]
         with canvas(self.device_display) as draw:
-            # available methods in :
-            # /usr/local/lib/python3.7/dist-packages/PIL/ImageDraw.py 
-            draw.multiline_text = types.MethodType(multiline_text_lu, draw) # substitute with own method
-            draw.multiline_text(origin, text, fill="white", font=self.font_three_lines, align="center")
+            self.draw_text_centered(draw, origin, font_three_lines, text)
+
+
+    def store_status_of_now(self):
+        self.stored_hour = self.hour
+        self.stored_am_pm = self.am_pm
+        self.stored_x = self.x
+        self.stored_x_am_pm = self.x_am_pm
+        self.stored_internetQualityMessage = self.internetQualityMessage
+        self.stored_odooReachabilityMessage = self.odooReachabilityMessage
+        self.stored_displayClock = self.displayClock      
+
+    def somethingChanged(self):
+        if self.stored_displayClock != self.displayClock or \
+        self.stored_hour != self.hour or \
+        self.stored_am_pm != self.am_pm or \
+        self.stored_x != self.x or \
+        self.stored_x_am_pm != self.x_am_pm or \
+        self.stored_internetQualityMessage != self.internetQualityMessage or \
+        self.stored_odooReachabilityMessage != self.odooReachabilityMessage:
+            self.store_status_of_now()
+            return True
+        else:
+            return False
+
+    def display_time(self):
+
+        def removeFirstZero():
+            if self.hour[0] == "0":
+                self.hour = self.hour[1:]
+
+        def update_time_related_variables():
+            if "24" in params.get("time_format"):
+                self.hour = time.strftime("%H:%M", time.localtime())
+                num_ones = self.hour.count("1")
+                if num_ones < 3:
+                    self.x= 10
+                else:
+                    self.x= 12
+            else:
+                t = time.localtime()
+                self.hour = time.strftime("%I:%M", t)
+                self.am_pm = time.strftime("%p", t)
+                removeFirstZero()
+                num_ones = self.hour.count("1")
+                if len(self.hour) > 4:
+                    x_hour = 8
+                    self.x_am_pm = 108
+                else:
+                    x_hour = 24
+                    self.x_am_pm = 102
+
+                if num_ones <= 2:
+                    self.x= x_hour
+                else:
+                    self.x= x_hour+2
+
+        def display_hours_and_minutes(draw):
+            if "24" in params.get("time_format"):
+                self.draw_text_not_centered(draw, [self.x, 9], fontClockTime, self.hour)
+            else:
+                self.draw_text_not_centered(draw, [self.x, 11], fontClockTime_12hour, self.hour)
+                self.draw_text_not_centered(draw, [self.x_am_pm, 34], fontClockInfos,self.am_pm)
+
+        self.displayClock = params.get("displayClock")
+        if self.displayClock == "yes":
+            self.internetQualityMessage = getInternetQualityMessage()
+            # self.odooReachabilityMessage = get....
+            update_time_related_variables()
+            if self.somethingChanged():
+                with canvas(self.device_display) as draw:
+                    display_hours_and_minutes(draw)
+                    self.draw_text_centered(draw, [0, 0], fontClockInfos, self.internetQualityMessage)
+                    self.draw_text_centered(draw, [0, 51], fontClockInfos, self.odooReachabilityMessage)
+        else:
+           self.stored_displayClock = "no" 
+
