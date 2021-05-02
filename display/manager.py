@@ -26,9 +26,9 @@ def main():
         #loggerDEBUG(f"received {topic} {message}")
         if topic == "display":
             params.put("displayClock", "no")
-            counter, temperature = \
+            counter, load = \
                 message.split()
-            text = f"Display Manager\nUpdate nr.{counter}:\nT {temperature}°C"
+            text = f"Display Manager\nUpdate nr.{counter}:\n5min: {load}%"
             loggerINFO(text)           
             oled.three_lines_text(text)
 

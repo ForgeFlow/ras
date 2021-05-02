@@ -427,6 +427,7 @@ class Oled():
 
     def three_lines_text(self, text="\n...connecting..."):
         origin = [0,0]
+        self.device_display.command(self.device_display._const.NORMALDISPLAY)
         with canvas(self.device_display) as draw:
             self.draw_text_centered(draw, origin, font_three_lines, text)
 
@@ -498,6 +499,7 @@ class Oled():
             # self.odooReachabilityMessage = get....
             update_time_related_variables()
             if self.somethingChanged():
+                self.device_display.command(self.device_display._const.INVERTDISPLAY)
                 with canvas(self.device_display) as draw:
                     display_hours_and_minutes(draw)
                     self.draw_text_centered(draw, [0, 0], fontClockInfos, self.internetQualityMessage)
