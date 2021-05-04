@@ -26,7 +26,7 @@ import logging
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
-class CardReader:
+class MFRC522:
     #  NRSTPD = 22
 
     MAX_LEN = 16
@@ -467,7 +467,7 @@ class CardReader:
 
         self.card = card
 
-        loggerDEBUG(f"in scan card ######## -  card: {card}")
+        #loggerDEBUG(f"in scan card ######## -  card: {card}")
 
         if card:
             loggerDEBUG(f"from MFRC CardReader - card: {self.card}")

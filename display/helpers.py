@@ -213,7 +213,7 @@ class sh1106(device):
     to properly configure it. Further control commands can then be called to
     affect the brightness and other settings.
     """
-    def __init__(self, serial_interface=None, width=128, height=64, rotate=2):
+    def __init__(self, serial_interface=None, width=128, height=64, rotate=0):
         super(sh1106, self).__init__(ssh1106_const, serial_interface)
         self.capabilities(width, height, rotate)
         self._pages = self._h // 8
@@ -409,7 +409,7 @@ class Oled():
         try:
             self.device_display = sh1106(
                 serial_interface = i2c(port=1, address='0x3C'),
-                rotate = 2)
+                rotate = 0)
         except Exception as e:
             loggerERROR(f"exception while getting device {e}")
 

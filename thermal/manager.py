@@ -42,7 +42,7 @@ def main():
         message = f"{counter} {temperatureCurrent} {loadAvgPerc[1]} {memUsedPercent}"
 
         pub_thermal.publish("thermal", message)
-        pub_thermal.publish("display", f"{counter} {loadAvgPerc[1]}")
+        # pub_thermal.publish("display", f"{counter} {loadAvgPerc[1]}")
         # temperature max CPU RPi 85°C - Yellow > 80°C - Red > 84°C (self defined limits)
         counter += 1
 

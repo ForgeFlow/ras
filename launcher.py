@@ -29,6 +29,7 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
     "thermal_d": "thermal.manager",
     "display_d": "display.manager",
     "clock_d": "clock.manager",
+    "reader_d": "reader.manager"
     #"RAS_d": "oldLauncher"
 }
 

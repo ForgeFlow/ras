@@ -211,13 +211,13 @@ def isSuccesRunningSubprocess(command):
         completed = subprocess.run(command.split(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT)
-        loggerDEBUG(f'shell command {command} - returncode: {completed.returncode}')
+        #loggerDEBUG(f'shell command {command} - returncode: {completed.returncode}')
         if completed.returncode == 0:
             return True
         else:
             return False
     except:
-        loggerERROR(f"error - shell command: {command}")
+        #loggerERROR(f"error - shell command: {command}")
         return False  
 
 def isPingable(address):
@@ -432,8 +432,8 @@ def isTypeOfConnection_Connected(typeConnection): # ethernet/wifi
     else:
       return False
   except Exception as e:
-    loggerERROR(f'Exception while checking if type of connection {typeConnection} is connected: {e}')
-  return False
+    #loggerERROR(f'Exception while checking if type of connection {typeConnection} is connected: {e}')
+    return False
     
 
 def removeMessagesFromDeviceCustomizationJson():

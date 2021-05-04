@@ -34,10 +34,10 @@ def runShellCommand(command):
 def runShellCommand_and_returnOutput(command):
     try:
         completed = subprocess.check_output(command, shell=True)
-        loggerDEBUG(f'shell command {command} - returncode: {completed}')
+        #loggerDEBUG(f'shell command {command} - returncode: {completed}')
         return str(completed)
     except:
-        loggerERROR(f"error on shell command: {command}")
+        #loggerERROR(f"error on shell command: {command}")
         return False
 
 def setTimeZone():
