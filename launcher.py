@@ -29,7 +29,8 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
     "thermal_d": "thermal.manager",
     "display_d": "display.manager",
     "clock_d": "clock.manager",
-    "reader_d": "reader.manager"
+    "reader_d": "reader.manager",
+    "odoo_routine_check_d": "odooRoutineCheck.manager",
     #"RAS_d": "oldLauncher"
 }
 
@@ -89,8 +90,8 @@ def log_begin_manager_thread():
 def log_running_processes_list():
     running_alive = [p for p in running if running[p].is_alive()]
     running_dead = [p for p in running if p not in running_alive]
-    loggerINFO("alive: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
-    loggerINFO("dead: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
+    loggerINFO("alive processes: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
+    loggerINFO("dead processes: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
 
 def manager_thread():
     ras_subscriber = Subscriber("5556")
@@ -107,7 +108,7 @@ def manager_thread():
             counter, temperature, load_5min, memUsed = \
                 message.split()     
             loggerINFO(f"thermal update nr.{counter}: T {temperature}°C," + \
-                f" CPU load 5 min avg {load_5min}%, mem used {memUsed}%")
+                f" CPU load 5 minutes avg {load_5min}%, mem used {memUsed}%")
 
         if False: #thermal.isCritical()
             terminate_non_essential_managed_processes()

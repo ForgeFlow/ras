@@ -1,20 +1,16 @@
 import time
-import psutil
-import zmq
 
 from common import constants as co
-# from connectivity import helpers as ch   # connectivity helpers
 from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
 from messaging.messaging import PublisherMultipart as Publisher
-#from reader.MFRC522 import MFRC522
-from reader.CardReader import CardReader
+from reader.MFRC522 import MFRC522
 
 def main():
 
     pub_reader = Publisher("5557")
 
-    #reader = MFRC522()
-    reader = CardReader()
+    reader = MFRC522()
+
     while True:
         card = reader.scan_card()
 

@@ -211,26 +211,26 @@ class MFRC522:
             if (self.Read_MFRC522(self.ErrorReg) & 0x1B)==0x00:
                 status = self.MI_OK
 
-            if n & irqEn & 0x01:
-                status = self.MI_NOTAGERR
+                if n & irqEn & 0x01:
+                    status = self.MI_NOTAGERR
 
-            if command == self.PCD_TRANSCEIVE:
-                n = self.Read_MFRC522(self.FIFOLevelReg)
-                lastBits = self.Read_MFRC522(self.ControlReg) & 0x07
-                if lastBits != 0:
-                    backLen = (n-1)*8 + lastBits
-                else:
-                    backLen = n*8
+                if command == self.PCD_TRANSCEIVE:
+                    n = self.Read_MFRC522(self.FIFOLevelReg)
+                    lastBits = self.Read_MFRC522(self.ControlReg) & 0x07
+                    if lastBits != 0:
+                        backLen = (n-1)*8 + lastBits
+                    else:
+                        backLen = n*8
 
-                if n == 0:
-                    n = 1
-                if n > self.MAX_LEN:
-                    n = self.MAX_LEN
+                    if n == 0:
+                        n = 1
+                    if n > self.MAX_LEN:
+                        n = self.MAX_LEN
 
-                i = 0
-                while i<n:
-                    backData.append(self.Read_MFRC522(self.FIFODataReg))
-                    i = i + 1
+                    i = 0
+                    while i<n:
+                        backData.append(self.Read_MFRC522(self.FIFODataReg))
+                        i = i + 1
             else:
                 status = self.MI_ERR
 
@@ -279,10 +279,10 @@ class MFRC522:
                 while i<4:
                     serNumCheck = serNumCheck ^ backData[i]
                     i = i + 1
-                    if serNumCheck != backData[i]:
-                        status = self.MI_ERR
-                    else:
-                        status = self.MI_ERR
+                if serNumCheck != backData[i]:
+                    status = self.MI_ERR
+            else:
+                status = self.MI_ERR
 
         return (status,backData)
 
@@ -472,4 +472,4 @@ class MFRC522:
         if card:
             loggerDEBUG(f"from MFRC CardReader - card: {self.card}")
         
-        return self.card
+        return card

@@ -123,7 +123,7 @@ keys = {
   "shouldGetFirmwareUpdate":          [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS], # True, False
   "setRebootAt":                      [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS], # time for next reboot (not periodically - einzelfall nur)
   'shutdownTerminal':                 [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS],
-  "isRemoteOdooControlAvailable":     [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS],
+  "isRemoteOdooControlAvailable":     [TxType.UPDATED_FROM_DEVICE],
   "gitBranch":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS],
   "gitCommit":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS],
   "gitRemote":                        [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS],
@@ -135,6 +135,7 @@ keys = {
 
   #TxType.UPDATED_FROM_DEVICE: Updates are done through the Firmware
   #"installedPythonModules": [TxType.UPDATED_FROM_DEVICE],
+  "incrementalLog":         [TxType.UPDATED_FROM_DEVICE],
   "firmwareVersion":        [TxType.UPDATED_FROM_DEVICE],
   "lastFirmwareUpdateTime": [TxType.UPDATED_FROM_DEVICE],
   "lastTimeTerminalStarted":  [TxType.UPDATED_FROM_DEVICE],
@@ -440,7 +441,7 @@ class Params():
 
     if ret is not None and encoding is not None:
       ret = ret.decode(encoding)
-
+    #print(f"key: {key} -- ret: {ret}")
     return ret
 
   def put(self, key, dat):
