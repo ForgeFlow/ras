@@ -41,32 +41,15 @@ def runShellCommand_and_returnOutput(command):
         return False
 
 def setTimeZone():
-    if ut.settings["howToDefineTime"]=="use +-xx:xx":
-        try:
-            timezone = tz_dic.tz_dic[ut.settings['timezone']]
-            os.environ["TZ"] = timezone
-            time.tzset()
-            loggerINFO(f"Timezone: {timezone} - was set using +-xx:xx")
-            return True
-        except Exception as e:
-            loggerERROR(f"exception in method setTimeZone (using +-xx:xx): {e}")
-            return False
-    else:
-        try: 
-            # tz_database_name = ut.settings["tz_database_name"]
-            # commands = ["sudo rm /etc/timezone",
-            #         "sudo rm /etc/localtime",
-            #         "sudo ln -s /usr/share/zoneinfo/"+ tz_database_name + " /etc/localtime"]
-            # for c in commands:
-            #     runShellCommand(c)
-            timezone = params.get("tz_database_name", encoding='utf-8')
-            os.environ["TZ"] = timezone
-            time.tzset()
-            loggerINFO(f"Timezone: {timezone} - was set using tz database")
-            return True
-        except Exception as e:
-            loggerERROR(f"exception in method setTimeZone (using tz database): {e}")
-            return False
+    try: 
+        timezone = params.get("tz", encoding='utf-8')
+        os.environ["TZ"] = timezone
+        time.tzset()
+        loggerINFO(f"Timezone: {timezone} - was set using tz database")
+        return True
+    except Exception as e:
+        loggerERROR(f"exception in method setTimeZone (using tz database): {e}")
+        return False
 
 def getMachineID():
     try:

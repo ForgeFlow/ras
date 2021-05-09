@@ -1,4 +1,5 @@
 import time
+import datetime
 
 import atexit
 
@@ -470,16 +471,17 @@ class Oled():
                     self.x= 12
             else:
                 t = time.localtime()
+                print(f"time.tzname: {time.tzname}")
                 self.hour = time.strftime("%I:%M", t)
                 self.am_pm = time.strftime("%p", t)
                 removeFirstZero()
                 num_ones = self.hour.count("1")
                 if len(self.hour) > 4:
-                    x_hour = 8
-                    self.x_am_pm = 108
+                    x_hour = 6
+                    self.x_am_pm = 106
                 else:
-                    x_hour = 24
-                    self.x_am_pm = 102
+                    x_hour = 22
+                    self.x_am_pm = 100
 
                 if num_ones <= 2:
                     self.x= x_hour
