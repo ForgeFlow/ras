@@ -2,7 +2,7 @@
   "RASxxx": "2  ",
   "SSIDreset": "__RAS__",
   "fileForMessages": "messagesDicDefault.json",
-  "firmwareVersion": "v1.4.9",
+  "firmwareVersion": "v1.4.10",
   "flask": {
     "new password": [
       "admin"
@@ -29,7 +29,7 @@
   "language": "ESPA\u00d1OL",
   "location": "to be defined",
   "manufacturingData": {
-    "firmwareAtShipment": "v1.4.9",
+    "firmwareAtShipment": "v1.4.10",
     "productName": "RAS2",
     "productionDate": "21-05-09",
     "productionLocation": "Frankfurt",
