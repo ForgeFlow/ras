@@ -1,14 +1,17 @@
-import time
+from time import sleep
 
-from common import constants as co
-from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
+from common.constants import PERIOD_ODOO_ROUTINE_CHECK_MANAGER, PARAMS
+#from common.logger import loggerINFO, loggerCRITICAL, loggerDEBUG
 from odoo.helpers import routineCheck
+from common.params import Params
+
+params = Params(db=PARAMS)
 
 def main():
-
+    params.put("acknowledged",False)
     while True:
         routineCheck()
-        time.sleep(co.PERIOD_ODOO_ROUTINE_CHECK_MANAGER)
+        sleep(PERIOD_ODOO_ROUTINE_CHECK_MANAGER)
 
 
 if __name__ == "__main__":

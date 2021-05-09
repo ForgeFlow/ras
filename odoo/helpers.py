@@ -4,10 +4,8 @@ import os
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import common.constants as co
-import common.common as cc
-#import lib.Utils as ut
-#import common.logger as lo
-#from launcherHelper import copyDeviceCustomizationJson
+#import common.common as cc
+
 from common.constants import PARAMS
 from common.params import Params, TxType
 
@@ -40,9 +38,8 @@ def saveChangesToParams(answer):
         if k in routine_options_list:
             if answer.get(k,False)!=params.get(k):
                 params.put(k,answer.get(k, False))
-                if k=="tz": cc.setTimeZone()
 
-def routineCheck():
+def doRoutineCheck():
     answer = getAnswerFromOdooRoutineCheck()
 
     if answer:
@@ -59,3 +56,15 @@ def routineCheck():
 
     params.put("isRemoteOdooControlAvailable", False)
     return False
+
+def doAcknowledgementCheck():
+    print("##############################################################")
+    print("in Acknowledgement - in Acknowledgement - in Acknowledgement - in Acknowledgement - ")
+    params.put("acknowledged",True)
+    return
+
+def routineCheck():
+    if int(params.get("acknowledged")):
+        doRoutineCheck()
+    else:
+        doAcknowledgementCheck()

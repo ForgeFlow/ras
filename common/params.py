@@ -76,6 +76,7 @@ json_keys = {
 
 keys = {
   "displayClock":             [TxType.FLAG],
+  "acknowledged":             [TxType.FLAG],
   "firmwareAtShipment":       [TxType.FACTORY_SETTINGS],
   "productName":              [TxType.FACTORY_SETTINGS],
   "productionDate":           [TxType.FACTORY_SETTINGS],

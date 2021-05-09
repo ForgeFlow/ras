@@ -17,6 +17,8 @@ import common.constants as co
 
 import lib.Utils as ut
 
+import common.common as cc
+
 params = Params(db=co.PARAMS)
 
 fontRoboto = "/home/pi/ras/fonts/Roboto-Medium.ttf"
@@ -407,6 +409,8 @@ class Oled():
         self.odooReachabilityMessage = "..searching.."
         self.displayClock = "yes"
         self.store_status_of_now()
+        self.tz = params.get("tz")
+        cc.setTimeZone()
         try:
             self.device_display = sh1106(
                 serial_interface = i2c(port=1, address='0x3C'),
@@ -461,7 +465,13 @@ class Oled():
             if self.hour[0] == "0":
                 self.hour = self.hour[1:]
 
+        def updateTZifNecessary():
+            if params.get("tz")!=self.tz:
+                cc.setTimeZone()
+                self.tz = params.get("tz")
+
         def update_time_related_variables():
+            updateTZifNecessary()
             if "24" in params.get("time_format"):
                 self.hour = time.strftime("%H:%M", time.localtime())
                 num_ones = self.hour.count("1")
@@ -490,10 +500,10 @@ class Oled():
 
         def display_hours_and_minutes(draw):
             if "24" in params.get("time_format"):
-                self.draw_text_not_centered(draw, [self.x, 9], fontClockTime, self.hour)
+                self.draw_text_not_centered(draw, [self.x, 10], fontClockTime_12hour, self.hour)
             else:
-                self.draw_text_not_centered(draw, [self.x, 11], fontClockTime_12hour, self.hour)
-                self.draw_text_not_centered(draw, [self.x_am_pm, 34], fontClockInfos,self.am_pm)
+                self.draw_text_not_centered(draw, [self.x, 10], fontClockTime_12hour, self.hour)
+                self.draw_text_not_centered(draw, [self.x_am_pm, 33], fontClockInfos,self.am_pm)
 
         self.displayClock = params.get("displayClock")
         if self.displayClock == "yes":
@@ -505,7 +515,7 @@ class Oled():
                 with canvas(self.device_display) as draw:
                     display_hours_and_minutes(draw)
                     self.draw_text_centered(draw, [0, 0], fontClockInfos, self.internetQualityMessage)
-                    self.draw_text_centered(draw, [0, 51], fontClockInfos, self.odooReachabilityMessage)
+                    self.draw_text_centered(draw, [0, 49], fontClockInfos, self.odooReachabilityMessage)
         else:
            self.stored_displayClock = "no" 
 
