@@ -270,13 +270,16 @@ def getMsg(textKey):
     return None
 
 def getMsgTranslated(textKey):
+  if textKey == "listOfLanguages":
+    return ["ENGLISH"]
   try:
     msgTranslated = getMsg(textKey)[settings["language"]]       
     return copy.deepcopy(msgTranslated)
-  except:
-    if textKey == "listOfLanguages":
-      return ["ENGLISH"]
-    else:
+  except KeyError:
+    try:
+      msgTranslated = getMsg(textKey)["ENGLISH"]
+      return copy.deepcopy(msgTranslated)
+    except:
       return [[0, 0], 20," "]
 
 def getListOfLanguages(defaultListOfLanguages = ["ENGLISH"]):
