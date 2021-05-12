@@ -122,9 +122,11 @@ keys_routine_calls = [  #[TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS]
   "lastConnectionOdooTerminal" ]
 
 keys = {
-  "displayClock":             [TxType.FLAG],
-  "acknowledged":             [TxType.FLAG],
-  "isRemoteOdooControlAvailable":     [TxType.FLAG],
+  "displayClock":                 [TxType.FLAG],
+  "acknowledged":                 [TxType.FLAG],
+  "isRemoteOdooControlAvailable": [TxType.FLAG],
+  
+  "incrementalLog":         [TxType.LOG],
   # "firmwareAtShipment":       [TxType.FACTORY_SETTINGS],
     # "productName":              [TxType.FACTORY_SETTINGS],
     # "productionDate":           [TxType.FACTORY_SETTINGS],
@@ -171,7 +173,7 @@ keys = {
     #"timeoutToGetOdooUID":              [TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS, TxType.TO_DEPRECATE],  # TO_DEPRECATE ##################
     #TxType.UPDATED_FROM_DEVICE: Updates are done through the Firmware
     #"installedPythonModules": [TxType.UPDATED_FROM_DEVICE],
-  "incrementalLog":         [TxType.UPDATED_FROM_DEVICE],
+  
   # "ownIpAddress":                   [TxType.UPDATED_FROM_DEVICE],
     # "firmwareVersion":        [TxType.UPDATED_FROM_DEVICE],
     # "lastFirmwareUpdateTime": [TxType.UPDATED_FROM_DEVICE],

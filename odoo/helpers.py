@@ -7,12 +7,11 @@ import common.constants as co
 #import common.common as cc
 
 from common.constants import PARAMS
-from common.params import Params, TxType
+from common.params import Params, TxType, keys_routine_calls
 
 params = Params(db=PARAMS)
 
 productName = params.get('productName')
-routine_options_list = params.get_list_of_keys_with_type(TxType.UPDATED_FROM_ODOO_ON_ROUTINE_CALLS)
 
 def getAnswerFromOdooRoutineCheck():
     try:
@@ -35,7 +34,7 @@ def getAnswerFromOdooRoutineCheck():
 
 def saveChangesToParams(answer):
     for k in answer:
-        if k in routine_options_list:
+        if k in keys_routine_calls:
             if answer.get(k,False)!=params.get(k):
                 params.put(k,answer.get(k, False))
 
