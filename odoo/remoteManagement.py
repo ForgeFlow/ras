@@ -9,7 +9,8 @@ import lib.Utils as ut
 import common.logger as lo
 from launcherHelper import copyDeviceCustomizationJson
 from common.constants import PARAMS
-from common.params import Params, TxType
+from common.params import Params
+from common.keys import TxType
 
 params = Params(db=PARAMS)
 

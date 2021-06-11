@@ -7,8 +7,8 @@ import common.constants as co
 #import common.common as cc
 
 from common.constants import PARAMS
-from common.params import Params, TxType, keys_routine_calls
-
+from common.params import Params
+from common.keys import TxType, keys_by_Type
 params = Params(db=PARAMS)
 
 productName = params.get('productName')
@@ -34,7 +34,7 @@ def getAnswerFromOdooRoutineCheck():
 
 def saveChangesToParams(answer):
     for k in answer:
-        if k in keys_routine_calls:
+        if k in keys_by_Type[TxType.ON_ROUTINE_CALLS]:
             if answer.get(k,False)!=params.get(k):
                 params.put(k,answer.get(k, False))
 
