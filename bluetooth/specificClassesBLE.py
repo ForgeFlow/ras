@@ -30,6 +30,7 @@ UUID_GATESETUP_SERVICE      = '5468696e-6773-496e-546f-756368000100'
 # UUID_DEVICE_TYPE_CHARACTERISTIC         = '5468696e-6773-496e-546f-756368100003'
 UUID_INTERNET_CONNECTED_CHARACTERISTIC  = '5468696e-6773-496e-546f-756368100004'
 UUID_SSIDS_CHARACTERISTIC               = '5468696e-6773-496e-546f-756368100005'
+UUID_CONNECT_TO_SSID_CHARACTERISTIC     = '5468696e-6773-496e-546f-756368100006'
 
 DEVICE_NAME = 'RAS: please connect with me'
 
@@ -85,6 +86,41 @@ class SSIDsCharacteristic(Characteristic):
         print(f"SSID Char. {self.SSID_index} was read: {self.value}")
         return self.value
 
+class ConnectToSSIDCharacteristic(Characteristic):
+    """
+    connects to the SSID specified by
+    (write) SSID name + "\n" + SSID password + "\n"
+
+    (read) returns "connected" and the name of the last SSID
+    or simply "not connected"
+    """
+
+    def __init__(self, service):
+        self.bus = dbus.SystemBus()
+        self.uuid = UUID_CONNECT_TO_SSID_CHARACTERISTIC
+        self.index = self.uuid[-6:]
+        Characteristic.__init__(self, self.bus, self.index,self.uuid,        
+                ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
+                service)
+        self.value = "not connected"
+        self.notifying = False
+
+    def ReadValue(self, options):
+        print(f"TestCharacteristic Read: {self.value}")
+        self.answer = self.value.encode()
+        return self.answer
+
+    def WriteValue(self, value, options):
+        valueString =""
+        for i in range(0,len(value)):
+            valueString+= str(value[i])
+        print(f'TestCharacteristic was written : {valueString}')
+        print("#"*100)
+        print("#"*100)
+        print("#"*100)
+        self.value= valueString
+
+
 class GateSetupService(Service):
     """
     Service that exposes Gate Device Information and allows for the Setup
@@ -93,6 +129,7 @@ class GateSetupService(Service):
         Service.__init__(self, bus, UUID_GATESETUP_SERVICE)
         self.add_characteristic(InternetConnectedCharacteristic(self))
         self.add_characteristic(SSIDsCharacteristic(self))
+        self.add_characteristic(ConnectToSSIDCharacteristic(self))
 
 class GateSetupApplication(Application):
     def __init__(self):
