@@ -35,7 +35,7 @@ def runShellCommand_and_returnOutput(command):
     try:
         completed = subprocess.check_output(command, shell=True)
         #loggerDEBUG(f'shell command {command} - returncode: {completed}')
-        return str(completed)
+        return str(completed, 'utf-8', 'ignore')
     except:
         #loggerERROR(f"error on shell command: {command}")
         return False

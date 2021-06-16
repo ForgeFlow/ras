@@ -39,7 +39,7 @@ def changeDeviceHostname(): # the bluetooth device listening reads the DeviceHos
     os.system("invoke-rc.d hostname.sh start")
     os.system("invoke-rc.d networking force-reload")
     os.system("invoke-rc.d dhcpcd force-reload")
-    # systemctl daemon-reload
+    os.system("systemctl daemon-reload")
 
 
 def server():
