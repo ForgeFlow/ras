@@ -1,13 +1,14 @@
 import sys
-import dbus 
+import dbus
+import subprocess
 from gi.repository import GLib, GObject
 from bluetooth.genericClassesBLE import Application, Advertisement, Service, Characteristic
 from pprint import PrettyPrinter
 import time
 from dbus.mainloop.glib import DBusGMainLoop
 from common.common import runShellCommand_and_returnOutput as rs
-
-# answer = (rs("nmcli --get-values SSID d wifi list --rescan yes")) # it is a bytes literal
+from common.launcher import launcher
+from multiprocessing import Process, Manager
 
 prettyPrint = PrettyPrinter(indent=1).pprint
 
@@ -31,8 +32,10 @@ UUID_GATESETUP_SERVICE      = '5468696e-6773-496e-546f-756368000100'
 UUID_INTERNET_CONNECTED_CHARACTERISTIC  = '5468696e-6773-496e-546f-756368100004'
 UUID_SSIDS_CHARACTERISTIC               = '5468696e-6773-496e-546f-756368100005'
 UUID_CONNECT_TO_SSID_CHARACTERISTIC     = '5468696e-6773-496e-546f-756368100006'
+UUID_COMMAND_CHARACTERISTIC             = '5468696e-6773-496e-546f-756368100007'
+UUID_NOTIFY_STATUS_CHARACTERISTIC       = '5468696e-6773-496e-546f-756368100008'
 
-DEVICE_NAME = 'RAS: please connect with me'
+DEVICE_NAME = 'ThingsInTouch: please pair'
 
 class InternetConnectedCharacteristic(Characteristic):
     """
@@ -75,7 +78,7 @@ class SSIDsCharacteristic(Characteristic):
     def ReadValue(self, options):
         try:
             #print("before trying #####################################################")
-            answer = (rs("nmcli --get-values SSID d wifi list --rescan yes")) # it is a bytes literal
+            answer = (rs("nmcli --get-values SSID d wifi list --rescan yes")) 
             #print(f"answer: {answer}")
             self.value = answer.encode()
             print(f"SSID Char. was read: {self.value}")
@@ -115,10 +118,77 @@ class ConnectToSSIDCharacteristic(Characteristic):
         for i in range(0,len(value)):
             valueString+= str(value[i])
         print(f'TestCharacteristic was written : {valueString}')
+        splittedString = valueString.split("\n")
+        self.ssidName = splittedString[0]
+        self.ssidPassword = splittedString[1]
+        print(f'ssidName : {self.ssidName}; ssidPassword : {self.ssidPassword};')
+        #answer = (rs('nmcli dev wifi con '+self.ssidName+' password '+self.ssidPassword))
+        #name ='"'+self.ssidName+'"'
+        subprocess.Popen(["nmcli","dev","wifi", 'con', self.ssidName, 'password', self.ssidPassword])
+        #print(f'answer after nmcli connecting {answer}') 
         print("#"*100)
         print("#"*100)
         print("#"*100)
-        self.value= valueString
+        self.value= "waiting for subprocess to answer"
+
+class CommandCharacteristic(Characteristic):
+    """
+    makes RAS to do certain things...
+
+    (write) command code ---- codes can go from 32 to 126 in base 10 (94 different commands)
+    command 32: read SSIDs-----> "32"+"\n"
+    command 33: connect to SSID ---->"33"+"\n"+"nameof SSID"+"\n""password of SSID"+"\n"
+
+    (read) is not implemented
+    
+    """
+
+    def __init__(self, service):
+        self.bus = dbus.SystemBus()
+        self.uuid = UUID_CONNECT_TO_SSID_CHARACTERISTIC
+        self.index = self.uuid[-6:]
+        Characteristic.__init__(self, self.bus, self.index, self.uuid,        
+                ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
+                service)
+        value = "read method not implemented"
+        self.answer = value.encode()
+        self.notifying = False
+        ####################################
+        self.name = {}
+        self.process = {}
+        self.running = {}
+        self.defined_commands = ["32"]
+        #####################################
+        self.name["32"] = "read_SSIDs"
+        self.process["32"] = "bluetooth.read_SSIDs"
+        self.running["32"] = False
+
+    def ReadValue(self, options):
+        print(f"TestCharacteristic Read: {self.answer}")
+        return self.answer
+
+    def WriteValue(self, value, options):
+        valueString =""
+        for i in range(0,len(value)):
+            valueString+= str(value[i])
+        print(f'TestCharacteristic was written : {valueString}')
+        splittedString = valueString.split("\n")
+        for i in range(0,3):
+            splittedString.append('0') # append three 0s at the end of the list
+        self.command = splittedString[0]
+        self.arg1 = splittedString[1]
+        self.arg2 = splittedString[2]
+        if self.command in self.defined_commands:
+            self.running[self.command] = Process(
+                name=self.name[self.command],
+                target=launcher,
+                args=(self.process[self.command],))
+            send the process to the notify to start a join and then notify
+        print("#"*100)
+        print("#"*100)
+        print("#"*100)
+
+
 
 
 class GateSetupService(Service):
