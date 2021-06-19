@@ -81,6 +81,9 @@ keys_by_Type.update({
       "displayClock",
       "acknowledged",
       "isRemoteOdooControlAvailable",
+      "internetReachable",
+      "statusProcessReadSSIDs",
+      "statusProcessConnectToSSID"
     ]
   })
 
