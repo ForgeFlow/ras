@@ -481,7 +481,7 @@ class Oled():
                     self.x= 12
             else:
                 t = time.localtime()
-                print(f"time.tzname: {time.tzname}")
+                #print(f"time.tzname: {time.tzname}")
                 self.hour = time.strftime("%I:%M", t)
                 self.am_pm = time.strftime("%p", t)
                 removeFirstZero()

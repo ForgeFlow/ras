@@ -43,12 +43,12 @@ UUID_NOTIFY_CHARACTERISTIC  = '5468696e-6773-496e-546f-756368100007'
 
 DEVICE_NAME = 'ThingsInTouch: please pair'
 
-N_A             = str(bytes.fromhex('20'))
-TRUE            = str(bytes.fromhex('21'))
-FALSE           = str(bytes.fromhex('22'))
-SEPARATOR       = str(bytes.fromhex('A0')) # this is "\n"
-READ_SSIDS      = str(bytes.fromhex('20'))
-CONNECT_TO_SSID = str(bytes.fromhex('21'))
+N_A             = (32).to_bytes(1, byteorder="big")
+TRUE            = (33).to_bytes(1, byteorder="big")
+FALSE           = (34).to_bytes(1, byteorder="big")
+SEPARATOR       = (160).to_bytes(1, byteorder="big") # this is "\n"
+READ_SSIDS      = (32).to_bytes(1, byteorder="big")
+CONNECT_TO_SSID = (33).to_bytes(1, byteorder="big")
 
 def codifyAnswer(*args):
     answer = ''
@@ -92,6 +92,7 @@ class SSIDsCharacteristic(Characteristic):
                 service)
         self.message = "---"      
         self.value = self.message.encode()
+        params.put("statusProcessReadSSIDs", N_A)
         self.notifying = False
 
     def ReadValue(self, options):
@@ -124,6 +125,7 @@ class ConnectToSSIDCharacteristic(Characteristic):
                 ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
                 service)
         self.value = N_A
+        params.put("statusProcessConnectToSSID", N_A)
         self.notifying = False
 
     def ReadValue(self, options):
@@ -165,13 +167,12 @@ class NotifyCharacteristic(Characteristic):
     N/A : value 32 in decimal (32d=0x20)
     true: value 33 in decimal  (33d=0x21) (process terminated)
     false: value 34 in decimal (34d=0x22) (process terminated)
-    separator is "\n" or 0xA0
 
     example of message:
     B0 is false (no internet);
     B1 process "read SSIDs" has begun and has terminated (true)
     B2 there is no process "connect to SSID"
-    message to be notifyed 0x22, 0xA0, 0x21, 0xA0
+    message to be notifyed 0x22, 0x21, 0x20
     
     """
 
@@ -182,10 +183,10 @@ class NotifyCharacteristic(Characteristic):
         Characteristic.__init__( self, self.bus, self.index, self.uuid, ['read', 'notify'], service)
         #self.value = codifyAnswer(N_A, N_A, N_A)
         self.notifying = False
-        #params.put("statusProcessReadSSIDs", N_A)
-        #params.put("statusProcessConnectToSSID", N_A)
+        params.put("statusProcessReadSSIDs", N_A)
+        params.put("statusProcessConnectToSSID", N_A)
         self.notification = 0
-        self.battery_lvl = 100
+        self.valueToNotify = [N_A,N_A,N_A]
         self.period = 1000 # in ms
         GObject.timeout_add(self.period, self.periodical_tasks)
 
@@ -193,16 +194,41 @@ class NotifyCharacteristic(Characteristic):
         print(f"TestCharacteristic Read: {self.value}")
         return self.value.encode()
 
-    def notify_battery_level(self):
-        if not self.notifying: return
-        self.PropertiesChanged( GATT_CHRC_IFACE, { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
+    def notify_value(self):
+        try:
+            if not self.notifying: return
+            for i, b in enumerate(self.valueToNotify):
+                # if isinstance(b, bytes):
+                #      self.valueTo
+                print(f'value {b} - type {type(b)}')
+            arrayOfBytes = [dbus.Byte(ord(b)) for b in self.valueToNotify]
+            print(f"sending notification: {self.notification} -  {arrayOfBytes}")
+            self.notification += 1
+            self.PropertiesChanged( GATT_CHRC_IFACE, {'Value': arrayOfBytes}, [])
+        except Exception as e:
+            print(f'exception in notify value: {e}')
 
     def periodical_tasks(self):
-        if self.battery_lvl > 0:    self.battery_lvl -= 2
-        else:                       self.battery_lvl = 100
-        print('Battery Level drained: ' + repr(self.battery_lvl))
-        if self.notifying:          self.notify_battery_level()
-        return True
+        try:
+            statusProcessReadSSIDs = params.get("statusProcessReadSSIDs")
+            statusProcessConnectToSSID = params.get("statusProcessConnectToSSID")
+
+            if internetReachable():
+                internetByte = TRUE.decode()
+            else:
+                internetByte = FALSE.decode()
+
+            self.valueToNotify = [internetByte,
+                statusProcessReadSSIDs,
+                statusProcessConnectToSSID]
+            
+            print(f'new value to notify: {self.valueToNotify}')
+            if self.notifying:
+                self.notify_value()
+            return True
+        except Exception as e:
+            print(f'exception in NOTIFY PERIODICAL: {e}')
+        
 
         # if not self.notifying: return
 
