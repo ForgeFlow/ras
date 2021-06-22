@@ -83,7 +83,8 @@ keys_by_Type.update({
       "isRemoteOdooControlAvailable",
       "internetReachable",
       "statusProcessReadSSIDs",
-      "statusProcessConnectToSSID"
+      "statusProcessConnectToSSID",
+      "statusProcessConnectToOdoo"
     ]
   })
 
