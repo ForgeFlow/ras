@@ -2,6 +2,10 @@
 import subprocess
 import os
 import common.constants as co
+from common.params import Params
+from common.keys import keys_by_Type, TxType
+from factory_settings.params import factory_settings
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 def ensureSettingsStoredInParametersDatabase():
     from common.transferSettings import transferSettingsToParams_db
@@ -76,3 +80,10 @@ def ensureMigrationsAndSettings():
 
     ensureSettingsStoredInParametersDatabase()
 
+def store_factory_settings_in_database():
+    params = Params(db=co.PARAMS)
+    for k in keys_by_Type[TxType.FACTORY_SETTINGS]:
+        try:
+            params.put(k, factory_settings[k])
+        except Exception as e:
+            loggerERROR(f"exception while storing factory setting {k}: {e}")

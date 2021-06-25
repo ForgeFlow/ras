@@ -107,9 +107,6 @@ def isRemoteOdooControlAvailable():
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
-        # print("Status code: ", response.status_code)
-        # print("Printing Entire Post Response")
-        # print(response.json())
         answer = response.json().get("result", False)
         if answer:
             error = answer.get("error", False)

@@ -16,11 +16,17 @@ from colorama import Fore as cf
 # Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 from common import constants as co
+from common.params import Params
 from common.launcher import launcher
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from messaging.messaging import SubscriberMultipart as Subscriber
 
+from launcherHelper import store_factory_settings_in_database
+
 import lib.Utils as ut
+
+
+store_factory_settings_in_database() 
 
 loggerINFO(f'running on python version: {sys.version}')
 
@@ -38,11 +44,6 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
 managed_NON_essential_processes = {}
 daemon_processes = {}
 running: Dict[str, Process] = {}
-
-# if "remotely" in ut.settings["terminalSetupManagement"]:
-#     managed_essential_processes["RAS_remote_d"] = "launcher_remote"
-# else:
-#     managed_essential_processes["RAS_local_d"] = "oldLauncher"
 
 managed_processes = {
     **managed_essential_processes,

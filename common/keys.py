@@ -20,7 +20,12 @@ keys_by_Type[TxType.FACTORY_SETTINGS] = [
     "productionNumber"  ,
     "qualityInspector"  , 
     "SSIDreset"         ,
-    "hashed_machine_id"
+    "hashed_machine_id",
+    "setup_password",
+    "ordered_by",
+    "invoice_nr",
+    "RAS_hostname",
+    "bluetooth_device_name"
   ]
 
 keys_by_Type[TxType.ON_DEVICE_SETUP] = [
@@ -81,10 +86,7 @@ keys_by_Type.update({
       "displayClock",
       "acknowledged",
       "isRemoteOdooControlAvailable",
-      "internetReachable",
-      "statusProcessReadSSIDs",
-      "statusProcessConnectToSSID",
-      "statusProcessConnectToOdoo"
+      "internetReachable"
     ]
   })
 

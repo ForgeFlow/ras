@@ -8,12 +8,11 @@ import time
 from dbus.mainloop.glib import DBusGMainLoop
 from common.common import runShellCommand_and_returnOutput as rs
 #from common.launcher import launcher
-from common.connectivity import internetReachable
+from common.connectivity import internetReachable, isOdooPortOpen
 from multiprocessing import Process #, Manager
 from bluetooth import connect_To_Odoo
 
 from common.params import Params
-
 from common import constants as co
 
 params = Params(db=co.PARAMS)
@@ -42,22 +41,15 @@ UUID_SSIDS_CHARACTERISTIC               = '5468696e-6773-496e-546f-756368100005'
 UUID_CONNECT_TO_SSID_CHARACTERISTIC     = '5468696e-6773-496e-546f-756368100006'
 UUID_NOTIFY_CHARACTERISTIC              = '5468696e-6773-496e-546f-756368100007'
 UUID_CONNECT_TO_ODOO_CHARACTERISTIC     = '5468696e-6773-496e-546f-756368100008'
+UUID_CHECK_SETUP_PASSWORD_CHARACTERISTIC= '5468696e-6773-496e-546f-756368100009'
 
-DEVICE_NAME = 'ThingsInTouch: please pair'
+
+DEVICE_NAME = params.get("bluetooth_device_name")
 
 N_A             = (32).to_bytes(1, byteorder="big")
 TRUE            = (33).to_bytes(1, byteorder="big")
 FALSE           = (34).to_bytes(1, byteorder="big")
 # SEPARATOR       = (160).to_bytes(1, byteorder="big") # this is "\n"
-# READ_SSIDS      = (32).to_bytes(1, byteorder="big")
-# CONNECT_TO_SSID = (33).to_bytes(1, byteorder="big")
-# CONNECT_TO_ODOO = (34).to_bytes(1, byteorder="big")
-
-# def codifyAnswer(*args):
-#     answer = ''
-#     for b in args:
-#         answer += b + SEPARATOR
-#     return answer
 
 class InternetConnectedCharacteristic(Characteristic):
     """
@@ -140,17 +132,12 @@ class ConnectToSSIDCharacteristic(Characteristic):
         for i in range(0,len(value)):
             valueString+= str(value[i])
         print(f'TestCharacteristic was written : {valueString}')
-        print("#"*100)
-        print("#"*100)
-        print("#"*100)
         splittedString = valueString.split("\n")
         self.ssidName = splittedString[0]
         self.ssidPassword = splittedString[1]
         print(f'ssidName : {self.ssidName}; ssidPassword : {self.ssidPassword};')
-        #answer = (rs('nmcli dev wifi con '+self.ssidName+' password '+self.ssidPassword))
-        #name ='"'+self.ssidName+'"'
-        subprocess.Popen(["nmcli","dev","wifi", 'con', self.ssidName, 'password', self.ssidPassword])
-        #print(f'answer after nmcli connecting {answer}') 
+        self.connectToSSIDProcess = Process(target=connect_To_SSID.main, args=(self.ssidName, self.ssidPassword, ))
+        self.connectToSSIDProcess.start()
         print("#"*100)
         print("#"*100)
         print("#"*100)
@@ -193,8 +180,55 @@ class ConnectToOdooCharacteristic(Characteristic):
             print("#"*100)
             self.value= FALSE
             self.connectToOdooProcess = Process(target=connect_To_Odoo.main, args=(self.odooAddress,))
+            self.connectToOdooProcess.start()
         except Exception as e:
             print(f'Exception in Write Value - Connect To Odoo: {e}')
+            print("#"*100)
+            print("#"*100)
+            print("#"*100)            
+
+class CheckSetupPasswordCharacteristic(Characteristic):
+    """
+    check if the provided Setup Password is correct
+    (write) Setup Password
+
+    (read) returns if last given setup password was correct ("true") or not
+    """
+
+    def __init__(self, service):
+        self.bus = dbus.SystemBus()
+        self.uuid = UUID_CHECK_SETUP_PASSWORD_CHARACTERISTIC
+        self.index = self.uuid[-6:]
+        Characteristic.__init__(self, self.bus, self.index,self.uuid,        
+                ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
+                service)
+        self.answer = "false"
+        self.notifying = False
+
+    def ReadValue(self, options):
+        self.value = self.answer.encode()
+        self.answer = "false" # after each "read", the answer is reset to false (you have to check again)
+        print(f"Connect To Odoo Characteristic Read: {self.answer}")
+        return self.value
+
+    def WriteValue(self, value, options):
+        try:
+            valueString =""
+            for i in range(0,len(value)):
+                valueString+= str(value[i])
+            splittedString = valueString.split("\n")
+            self.setupPassword = splittedString[0]
+            print(f'Check Setup Password Characteristic was written : {self.setupPassword}')
+            print("#"*100)
+            print("#"*100)
+            print("#"*100)
+            storedPassword = params.get("setup_password")
+            if (storedPassword == self.setupPassword):
+                self.answer = "true"
+            else:
+                self.answer = "false"
+        except Exception as e:
+            print(f'Exception in Write Value - Check Setup Password: {e}')
             print("#"*100)
             print("#"*100)
             print("#"*100)            
@@ -229,10 +263,8 @@ class NotifyCharacteristic(Characteristic):
         Characteristic.__init__( self, self.bus, self.index, self.uuid, ['read', 'notify'], service)
         #self.value = codifyAnswer(N_A, N_A, N_A)
         self.notifying = False
-        params.put("statusProcessReadSSIDs", N_A)
-        params.put("statusProcessConnectToSSID", N_A)
         self.notification = 0
-        self.valueToNotify = [N_A,N_A,N_A]
+        self.valueToNotify = [N_A,N_A]
         self.period = 1000 # in ms
         GObject.timeout_add(self.period, self.periodical_tasks)
 
@@ -244,8 +276,6 @@ class NotifyCharacteristic(Characteristic):
         try:
             if not self.notifying: return
             for i, b in enumerate(self.valueToNotify):
-                # if isinstance(b, bytes):
-                #      self.valueTo
                 print(f'value {b} - type {type(b)}')
             arrayOfBytes = [dbus.Byte(ord(b)) for b in self.valueToNotify]
             print(f"sending notification: {self.notification} -  {arrayOfBytes}")
@@ -256,17 +286,22 @@ class NotifyCharacteristic(Characteristic):
 
     def periodical_tasks(self):
         try:
-            statusProcessReadSSIDs = params.get("statusProcessReadSSIDs")
-            statusProcessConnectToSSID = params.get("statusProcessConnectToSSID")
 
             if internetReachable():
                 internetByte = TRUE.decode()
             else:
                 internetByte = FALSE.decode()
 
-            self.valueToNotify = [internetByte,
-                statusProcessReadSSIDs,
-                statusProcessConnectToSSID]
+            if isOdooPortOpen():
+                odooPortByte = TRUE.decode()
+            else:
+                odooPortByte = FALSE.decode()
+
+
+            self.valueToNotify = [
+                internetByte,
+                odooPortByte
+                ]
             
             print(f'new value to notify: {self.valueToNotify}')
             if self.notifying:
@@ -275,24 +310,6 @@ class NotifyCharacteristic(Characteristic):
         except Exception as e:
             print(f'exception in NOTIFY PERIODICAL: {e}')
         
-
-        # if not self.notifying: return
-
-        # statusProcessReadSSIDs = params.get("statusProcessReadSSIDs")
-        # statusProcessConnectToSSID = params.get("statusProcessConnectToSSID")
-
-        # if internetReachable():
-        #     internetByte = TRUE
-        # else:
-        #     internetByte = FALSE
-
-        # answerString = codifyAnswer(internetByte, statusProcessReadSSIDs, statusProcessConnectToSSID)
-        # answerBytes = answerString.encode()
-        # arrayOfBytes = [dbus.Byte(b) for b in answerBytes]
-        # print(f"sending notification: {self.notification} -  {arrayOfBytes}")
-        # self.notification += 1
-        # self.PropertiesChanged( GATT_CHRC_IFACE, {'Value': arrayOfBytes}, [])
-        # return True
 
     def StartNotify(self):
         if self.notifying:
@@ -321,6 +338,7 @@ class GateSetupService(Service):
         self.add_characteristic(ConnectToSSIDCharacteristic(self))
         self.add_characteristic(NotifyCharacteristic(self))
         self.add_characteristic(ConnectToOdooCharacteristic(self))
+        self.add_characteristic(CheckSetupPasswordCharacteristic(self))
 
 class GateSetupApplication(Application):
     def __init__(self):
