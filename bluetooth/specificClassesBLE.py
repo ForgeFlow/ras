@@ -9,6 +9,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from common.common import runShellCommand_and_returnOutput as rs
 #from common.launcher import launcher
 from common.connectivity import internetReachable, isOdooPortOpen
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 from multiprocessing import Process #, Manager
 from bluetooth import connect_To_Odoo
 
@@ -87,7 +88,6 @@ class SSIDsCharacteristic(Characteristic):
                 service)
         self.message = "---"      
         self.value = self.message.encode()
-        params.put("statusProcessReadSSIDs", N_A)
         self.notifying = False
 
     def ReadValue(self, options):
@@ -120,7 +120,6 @@ class ConnectToSSIDCharacteristic(Characteristic):
                 ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
                 service)
         self.value = N_A
-        params.put("statusProcessConnectToSSID", N_A)
         self.notifying = False
 
     def ReadValue(self, options):
@@ -159,7 +158,6 @@ class ConnectToOdooCharacteristic(Characteristic):
                 ['read','write'], #['read', 'write', 'writable-auxiliaries', 'notify'],
                 service)
         self.value = N_A
-        params.put("statusProcessConnectToOdoo", N_A)
         self.notifying = False
 
     def ReadValue(self, options):
@@ -263,10 +261,8 @@ class NotifyCharacteristic(Characteristic):
         Characteristic.__init__( self, self.bus, self.index, self.uuid, ['read', 'notify'], service)
         #self.value = codifyAnswer(N_A, N_A, N_A)
         self.notifying = False
-        self.notification = 0
-        self.valueToNotify = [N_A,N_A]
-        self.period = 1000 # in ms
-        GObject.timeout_add(self.period, self.periodical_tasks)
+        self.timeout_int = False
+
 
     def ReadValue(self, options):
         print(f"TestCharacteristic Read: {self.value}")
@@ -278,11 +274,11 @@ class NotifyCharacteristic(Characteristic):
             for i, b in enumerate(self.valueToNotify):
                 print(f'value {b} - type {type(b)}')
             arrayOfBytes = [dbus.Byte(ord(b)) for b in self.valueToNotify]
-            print(f"sending notification: {self.notification} -  {arrayOfBytes}")
+            loggerDEBUG(f"sending notification: {self.notification} -  {arrayOfBytes}")
             self.notification += 1
             self.PropertiesChanged( GATT_CHRC_IFACE, {'Value': arrayOfBytes}, [])
         except Exception as e:
-            print(f'exception in notify value: {e}')
+            loggerERROR(f'exception in notify value: {e}')
 
     def periodical_tasks(self):
         try:
@@ -297,35 +293,46 @@ class NotifyCharacteristic(Characteristic):
             else:
                 odooPortByte = FALSE.decode()
 
+            # internetByte = FALSE.decode() #### REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE 
+            # odooPortByte = FALSE.decode() #### REMOVE REMOVE REMOVE REMOVE REMOVE REMOVE
 
             self.valueToNotify = [
                 internetByte,
                 odooPortByte
                 ]
             
-            print(f'new value to notify: {self.valueToNotify}')
+            #print(f'new value to notify: {self.valueToNotify}')
+
             if self.notifying:
                 self.notify_value()
-            return True
+                return True
+            else:
+                return False
         except Exception as e:
-            print(f'exception in NOTIFY PERIODICAL: {e}')
+            loggerERROR(f'exception in NOTIFY PERIODICAL: {e}')
         
 
     def StartNotify(self):
         if self.notifying:
-            print('Already notifying, nothing to do')
+            loggerDEBUG('Already notifying, nothing to do')
         else:
-            print('Begin Notifying +++++++++++++++++++++++++')
-            print('+'*100)
-            print('+'*100)
-            print('+'*100)
+            loggerDEBUG('Begin Notifying +++++++++++++++++++++++++')
+            loggerDEBUG('+'*100)
+            loggerDEBUG('+'*100)
+            loggerDEBUG('+'*100)
+            self.notification = 0
+            self.valueToNotify = [N_A, N_A]
+            self.period = 1000 # in ms
+            self.timeout_int = GObject.timeout_add(self.period, self.periodical_tasks)
             self.notifying = True
 
     def StopNotify(self):
         if self.notifying:
-            self.notifying = False
+            self.notifying = False  
+            if self.timeout_int:              
+                Gobject.source_remove(self.timeout_int)
         else:
-            print('Not notifying, nothing to do')
+            loggerDEBUG('Not notifying, nothing to do')
 
 class GateSetupService(Service):
     """

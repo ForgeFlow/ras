@@ -1,5 +1,12 @@
 import subprocess
+import socket
 
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
+from common.params import Params
+from common import constants as co
+
+
+params = Params(db=co.PARAMS)
 
 def isSuccesRunningSubprocess(command):
     try:
@@ -21,9 +28,13 @@ def internetReachable():
     return isPingable("1.1.1.1")
 
 def isOdooPortOpen():
-    odooHost = params.get("odoo_host")
-    odooPort =  params.get("odoo_port")
-    return isIpPortOpen((odooHost, odooPort))
+    try:
+        odooHost = params.get("odoo_host")
+        odooPort =  int(params.get("odoo_port"))
+        return isIpPortOpen((odooHost, odooPort))
+    except Exception as e:
+        loggerERROR(f"common.connectivity - exception in method isOdooPortOpen: {e}")
+        return False
 
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,7 +48,7 @@ def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex f
             #print("Utils - IP Port CLOSED ", ipPort)
             isOpen = False
     except Exception as e:
-        loggerERROR(f"Utils - exception in method isIpPortOpen: {e}")
+        loggerERROR(f"common.connectivity - exception in method isIpPortOpen: {e}")
         isOpen = False
     finally:
         s.close()

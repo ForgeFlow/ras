@@ -36,7 +36,7 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
     "display_d": "display.manager",
     "clock_d": "clock.manager",
     "reader_d": "reader.manager",
-    "odoo_routine_check_d": "odooRoutineCheck.manager",
+    #"odoo_routine_check_d": "odooRoutineCheck.manager",
     "bluetooth.d": "bluetooth.server",
     #"RAS_d": "oldLauncher"
 }

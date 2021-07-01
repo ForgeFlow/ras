@@ -59,7 +59,7 @@ def doRoutineCheck():
 def doAcknowledgementCheck():
     print("##############################################################")
     print("in Acknowledgement - in Acknowledgement - in Acknowledgement - in Acknowledgement - ")
-    params.put("acknowledged",True)
+    #params.put("acknowledged",True)
     return
 
 def routineCheck():

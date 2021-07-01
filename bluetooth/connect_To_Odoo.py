@@ -21,13 +21,13 @@ def main(odooAddress):
         text = f"CONNECTED\nWITH ODOO\n{odooAddress}"
         odooAdressSplitted = odooAddress.split(":")
         length = odooAdressSplitted.len()
-        if length = 1:
+        if length == 1:
             params.put("odoo_host", odooAdressSplitted[0])
             params.put("odoo_port", "443")
-        if length = 2:
+        if length == 2:
             params.put("odoo_host", odooAdressSplitted[0])
             params.put("odoo_port", odooAdressSplitted[1])
-        if length = 3:
+        if length == 3:
             params.put("odoo_host", odooAdressSplitted[0]+":"+odooAdressSplitted[1])
             params.put("odoo_port", odooAdressSplitted[2])      
         params.put("odooUrlTemplate", odooAddress)
