@@ -189,7 +189,8 @@ class i2c_rdwr_ioctl_data(Structure):
     __slots__ = [name for name,type in _fields_]
 
 def open_fd():
-    return os.open("/dev/i2c-1", os.O_RDWR) #I2C bus 1
+    fd = os.open("/dev/i2c-1", os.O_RDWR) #I2C bus 1    
+    return fd
 
 def close_fd():
     os.close(fd)
@@ -216,11 +217,11 @@ def get_i2c_msg_structure_for_writing(byte_seq):
 def readAckFrame():
     """ returns an int
     """
-    print(f"wait for ack at : {time.time()}")
+    #print(f"wait for ack at : {time.time()}")
 
     t = 0
     while 1:
-        print(f"PN532_I2C_ADDRESS {PN532_I2C_ADDRESS}")
+        #print(f"PN532_I2C_ADDRESS {PN532_I2C_ADDRESS}")
         number_of_bytes_in_response = len(PN532_ACK) + 1
         responses = transaction(
             get_i2c_msg_structure_for_reading(number_of_bytes_in_response) )
@@ -233,10 +234,10 @@ def readAckFrame():
         time.sleep(.001)    # sleep 1 ms
         t+=1
         if (t > PN532_ACK_WAIT_TIME):
-            print("Time out when waiting for ACK\n")
+            #print("Time out when waiting for ACK\n")
             return PN532_TIMEOUT
 
-    print(f"ready at : {time.time()}")
+    #print(f"ready at : {time.time()}")
 
     ackBuf = list(data[1:])
 
@@ -591,76 +592,105 @@ def mifareultralight_ReadPage(page: int):
     data = response[1:5]
     return True, data
 
-def loop():
-    #  Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
-        #  'uid' will be populated with the UID, and uidLength will indicate
-        #  if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
-    success, uid = readPassiveTargetID(PN532_MIFARE_ISO14443A_106KBPS)
+def inListPassiveTarget():
+    """
+        'InLists' a passive target. PN532 acting as reader/initiator,
+        peer acting as card/responder.
+        :returns -> bool: True if command succeeded, False otherwise
+                 -> inListedTag:byte
+    """
+    command = PN532_COMMAND_INLISTPASSIVETARGET
+    header = bytearray([
+        command,
+        1,
+        0,
+    ])
+    #print("inList passive target")
+
+    if (writeCommand(header)):
+        return False, 0
+
+    status, response = readResponse(command)
+    if (status < 0 or response[0] != 1):
+        return False, 0
+    
+    inListedTag = response[1]
+    return True, inListedTag
+
+def inDataExchange(send: bytearray, inListedTag):
+    """
+        Exchanges an APDU with the currently inlisted peer
+
+        :param  send:            Pointer to data to send
+        :param  response:        Pointer to response data
+        :param  responseLength:  Pointer to the response data length
+
+        returns:  -> (bool, bytearray)
+    """
+    command = PN532_COMMAND_INDATAEXCHANGE
+    header = bytearray([
+        command,
+        inListedTag
+    ])
+
+    if (writeCommand(header, send)):
+        return False, bytearray()
+    
+
+    status, response = readResponse(command)
+    if (status < 0):
+        return False, bytearray()
+    
+
+    if ((response[0] & 0x3f) != 0):
+        print("Status code indicates an error")
+        return False, bytearray()
+
+    response = response[1:]
+    return True, response
+
+def loop_hce():
+    success, inListedTag = inListPassiveTarget()
 
     if (success):
-        #  Display some basic information about the card
-        print("Found an ISO14443A card")
-        print("UID Length: {:d}".format(len(uid)))
-        print("UID Value: {}".format(binascii.hexlify(uid)))
+        print("Found a peer acting as card/responder")
+        selectApdu = bytearray([0x00,                                     # CLA 
+                                0xA4,                                     # INS 
+                                0x04,                                     # P1  
+                                0x00,                                     # P2  
+                                0x07,                                     # Length of AID  
+                                0xF0, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, # AID defined on Android App 
+                                0x00 # Le
+                                ])
+        success, response = inDataExchange(selectApdu, inListedTag)
 
-        if (len(uid) == 4):
-            #  We probably have a Mifare Classic card ...
-            print("Seems to be a Mifare Classic card (4 byte UID)")
-
-            #  Now we need to try to authenticate it for read/write access
-            #  Try with the factory default KeyA: 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF
-            print("Trying to authenticate block 4 with default KEYA value")
-            keya = bytearray([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
-
-            #  Start with block 4 (the first block of sector 1) since sector 0
-            #  contains the manufacturer data and it's probably better just
-            #  to leave it alone unless you know what you're doing
-            success = mifareclassic_AuthenticateBlock(uid, 4, 0, keya)
-
-            if (success):
-                print("Sector 1 (Blocks 4..7) has been authenticated")
-
-                #  If you want to write something to block 4 to test with, uncomment
-                #  the following line and this text should be read back in a minute
-                # data = bytearray([ 'a', 'd', 'a', 'f', 'r', 'u', 'i', 't', '.', 'c', 'o', 'm', 0, 0, 0, 0])
-                # success = nfc.mifareclassic_WriteDataBlock (4, data)
-
-                #  Try to read the contents of block 4
-                success, data = mifareclassic_ReadDataBlock(4)
+        if (success):
+            print("responseLength: {:d}", len(response))
+            print(binascii.hexlify(response))
+            while (success):
+                apdu = bytearray(b"Hello from Arduino")
+                success, back = inDataExchange(apdu, inListedTag)
 
                 if (success):
-                    #  Data seems to have been read ... spit it out
-                    print("Read Block 4: {}".format(binascii.hexlify(data)))
-                    return True
-
+                    print("responseLength: {:d}", len(back))
+                    print(binascii.hexlify(back))
                 else:
-                    print("Ooops ... unable to read the requested block.  Try another key?")
-            else:
-                print("Ooops ... authentication failed: Try another key?")
+                    print("Broken connection?")
+        else:
+            print("Failed sending SELECT AID")
+    else:
+        print("Didn't find any peer acting as card/responder")
 
-        elif (len(uid) == 7):
-            #  We probably have a Mifare Ultralight card ...
-            print("Seems to be a Mifare Ultralight tag (7 byte UID)")
-
-            #  Try to read the first general-purpose user page (#4)
-            print("Reading page 4")
-            success, data = mifareultralight_ReadPage(4)
-            if (success):
-                #  Data seems to have been read ... spit it out
-                print("Read Page 4: {}".format(binascii.hexlify(data)))
-                return True
-
-            else:
-                print("Ooops ... unable to read the requested page!?")
+        time.sleep(1)
 
     return False
 
 #############################################################################
 
 #begin
-
+print("-------Peer to Peer HCE--------")
 fd = open_fd()
-print(f"fd in main: {fd}")
+#print(f"fd in main: {fd}")
 
 #wakeup
 time.sleep(.05) # wait for all ready to manipulate pn532
@@ -681,12 +711,8 @@ else:
 #  configure board to read RFID tags
 SAMConfig()
 
-print("Waiting for an ISO14443A Card ...")
-
-found = False
-
-while not found:
-    found = loop()
+while True:
+    loop_hce()
 
 
 time.sleep(.05) # wait for all ready to manipulate pn532
