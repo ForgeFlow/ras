@@ -221,7 +221,6 @@ def readAckFrame():
 
     t = 0
     while 1:
-        time.sleep(0.05) # you need this pause, otherwise ioctl throws an error
         #print(f"PN532_I2C_ADDRESS {PN532_I2C_ADDRESS}")
         number_of_bytes_in_response = len(PN532_ACK) + 1
         responses = transaction(
@@ -235,7 +234,7 @@ def readAckFrame():
         time.sleep(.001)    # sleep 1 ms
         t+=1
         if (t > PN532_ACK_WAIT_TIME):
-            print("Time out when waiting for ACK\n")
+            #print("Time out when waiting for ACK\n")
             return PN532_TIMEOUT
 
     #print(f"ready at : {time.time()}")
@@ -699,23 +698,6 @@ time.sleep(.05) # wait for all ready to manipulate pn532
 transaction(
     get_i2c_msg_structure_for_writing(WAKEUP_SEQUENCE) )
 
-versiondata = getFirmwareVersion()
-if (not versiondata):
-    print("Didn't find PN53x board")
-    raise RuntimeError("Didn't find PN53x board")  # halt
-else:
-    #  Got ok data, print it out!
-    print("Found chip PN5 {:#x} Firmware ver. {:d}.{:d}".format(
-        (versiondata >> 24) & 0xFF, (versiondata >> 16) & 0xFF,
-        (versiondata >> 8) & 0xFF))
-
-#  configure board to read RFID tags
-SAMConfig()
-
-while True:
-    loop_hce()
-
-
-time.sleep(.05) # wait for all ready to manipulate pn532
+time.sleep(.05)
 
 close_fd()

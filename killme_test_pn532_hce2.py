@@ -221,7 +221,7 @@ def readAckFrame():
 
     t = 0
     while 1:
-        time.sleep(0.05) # you need this pause, otherwise ioctl throws an error
+        time.sleep(0.05)
         #print(f"PN532_I2C_ADDRESS {PN532_I2C_ADDRESS}")
         number_of_bytes_in_response = len(PN532_ACK) + 1
         responses = transaction(
@@ -309,10 +309,10 @@ def getResponseLength(timeout: int):
         return PN532_INVALID_FRAME
 
     length = data[4]
-    print('_getResponseLength length is {:d}'.format(length))
+    print('response length is {:d}'.format(length))
 
     # request for last respond msg again
-    print('_getResponseLength writing nack: {!r}'.format(PN532_NACK))
+    #print('_getResponseLength writing nack: {!r}'.format(PN532_NACK))
     transaction(
         get_i2c_msg_structure_for_writing(PN532_NACK))
 
@@ -326,6 +326,7 @@ def readResponse(command, timeout: int = 1000):
     buf = bytearray()
 
     if length < 0:
+        print(f"no response = length is negative: {length}")
         return length, buf
 
     # [RDY] 00 00 FF LEN LCS (TFI PD0 ... PDn) DCS 00
@@ -366,7 +367,11 @@ def readResponse(command, timeout: int = 1000):
 
     dsum = PN532_PN532TOHOST + cmd
     buf = data[8:-2]
-    print('readResponse response: {!r}\n'.format(buf))
+    print('response: {!r}\n'.format(buf))
+    buf_str = [str(b) for b in buf]
+    buf_int = [int(b) for b in buf_str]
+    buf_hex = [hex(i) for i in buf_int]
+    print(f"response hex: {buf_hex}")
     dsum += sum(buf)
 
     checksum = data[-2]
@@ -654,7 +659,7 @@ def loop_hce():
     success, inListedTag = inListPassiveTarget()
 
     if (success):
-        print("Found a peer acting as card/responder")
+        print(f"Found a peer acting as card/responder - inListedTag: {inListedTag}")
         selectApdu = bytearray([0x00,                                     # CLA 
                                 0xA4,                                     # INS 
                                 0x04,                                     # P1  
@@ -666,14 +671,14 @@ def loop_hce():
         success, response = inDataExchange(selectApdu, inListedTag)
 
         if (success):
-            print("responseLength: {:d}", len(response))
+            print("a1 - responseLength: {:d}", len(response))
             print(binascii.hexlify(response))
             while (success):
                 apdu = bytearray(b"Hello from Arduino")
                 success, back = inDataExchange(apdu, inListedTag)
 
                 if (success):
-                    print("responseLength: {:d}", len(back))
+                    print("a2 - responseLength: {:d}", len(back))
                     print(binascii.hexlify(back))
                 else:
                     print("Broken connection?")
