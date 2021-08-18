@@ -7,7 +7,7 @@ from reader.MFRC522 import MFRC522
 
 def main():
 
-    pub_reader = Publisher("5557")
+    new_card_publisher = Publisher("5557")
 
     reader = MFRC522()
 
@@ -17,9 +17,9 @@ def main():
         if card:
             loggerDEBUG(f"card read {card}")
 
-            message = f"{card}"
+            card_id_as_string = f"{card}"
 
-            pub_reader.publish("display", message)
+            new_card_publisher.publish("new_card", card_id_as_string)
 
         time.sleep(co.PERIOD_READER_MANAGER)
 

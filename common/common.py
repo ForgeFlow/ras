@@ -5,6 +5,7 @@ pPrint = PrettyPrinter(indent=1).pprint
 import subprocess
 import os
 import time
+import socket
 
 from hashlib import blake2b
 
@@ -77,3 +78,21 @@ def getHashedMachineId():
         ).hexdigest()
 
     return hashed_machine_id
+
+def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.settimeout(2)
+        canConnectResult = s.connect_ex(ipPort)
+        if canConnectResult == 0:
+            #print("Utils - IP Port OPEN ", ipPort)
+            isOpen = True
+        else:
+            #print("Utils - IP Port CLOSED ", ipPort)
+            isOpen = False
+    except Exception as e:
+        loggerERROR(f"Utils - exception in method isIpPortOpen: {e}")
+        isOpen = False
+    finally:
+        s.close()
+    return isOpen

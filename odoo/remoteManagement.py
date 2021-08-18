@@ -12,6 +12,7 @@ from common.constants import PARAMS
 from common.params import Params
 from common.keys import TxType
 
+
 params = Params(db=PARAMS)
 
 
@@ -25,13 +26,10 @@ def getPayload(settings_to_send):
     return payload
 
 def getRASxxx():
-    RAS_id_str ="2  "
+    RAS_id_str ="2.1"
     params = Params(db=PARAMS)
     try:
-        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
-            RAS_id = ut.settings["terminalIDinOdoo"]
-        else:
-            RAS_id = params.get("terminalIDinOdoo", encoding='utf-8')
+        RAS_id = params.get("terminalIDinOdoo", encoding='utf-8')
         if RAS_id:
             RAS_id_str = str(RAS_id)
             if len(RAS_id_str)==1:
@@ -40,40 +38,49 @@ def getRASxxx():
                 RAS_id_str = "0" + RAS_id_str
             elif len(RAS_id_str)>3:
                 RAS_id_str = RAS_id_str[-3:]
+        loggerDEBUG(f"RAS_id_str: {RAS_id_str} ")
     except Exception as e:
         loggerERROR(f"Exception in getRASxxx: {e}")
         
     return RAS_id_str
 
 def acknowledgeTerminalInOdoo():
-    terminal_ID_in_Odoo     = None
+    terminal_ID_in_Odoo     = False
     params = Params(db=PARAMS)
     try:
         requestURL  = params.get("odooUrlTemplate") + co.ROUTE_ACK_GATE
         headers     = {'Content-Type': 'application/json'}
         list_of_all_keys = params.get_list_of_all_keys()
+        list_on_ack_from_odoo = params.get_list_of_keys_with_type(TxType.ON_ACK_FROM_ODOO)
         payload     = getPayload(list_of_all_keys)
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
         loggerDEBUG(f"Acknowledge Terminal in Odoo - Status code of response: {response.status_code} ")
         loggerDEBUG("Printing Entire Post Response")
-        print(response.json())
+        cc.pPrint(response.json())
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)
             if error:
                 loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
             else:
-                for o in list_of_all_keys:
-                    ut.storeOptionInDeviceCustomization(o,answer.get(o, False))
-                terminal_ID_in_Odoo     = answer.get('id', False)
-                loggerINFO(f"terminal ID in Odoo: {answer.get('id', False)}")
+                for o in list_on_ack_from_odoo:
+                    value = answer.get(o, False)
+                    loggerDEBUG(f"key: {o}; value:{value} ") 
+                    if type(value) != bool : value = str(value)
+                    params.put(o,value)
+                terminal_ID_in_Odoo     = answer.get('terminalIDinOdoo', False)
+                loggerINFO(f"terminal ID in Odoo: {answer.get('terminalIDinOdoo', False)}")
+                if not terminal_ID_in_Odoo:
+                    terminal_ID_in_Odoo = "2.1"
+                params.put("terminalIDinOdoo", terminal_ID_in_Odoo)
+                RASxxx = "RAS-"+getRASxxx()
+                params.put("RASxxx", RASxxx)
                 if answer["tz"]:
-                    # ut.storeOptionInDeviceCustomization("tz_database_name", answer.get('tz', False))
-                    # ut.storeOptionInDeviceCustomization("howToDefineTime", "use tz database")
+                    loggerDEBUG(f"setting time zone to {answer['tz']}")
                     cc.setTimeZone()
-                copyDeviceCustomizationJson() # Is it necessary?
+                params.put("acknowledged", True)
         else:
             loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:
@@ -116,7 +123,8 @@ def isRemoteOdooControlAvailable():
                 version_things_module_in_Odoo     = answer['version']
                 loggerINFO(f"Version_things_module_in_Odoo: {version_things_module_in_Odoo}")
                 loggerINFO(f"Remote Odoo Control Available") 
-                ut.storeOptionInDeviceCustomization("version_things_module_in_Odoo",version_things_module_in_Odoo)
+                params.put("version_things_module_in_Odoo",version_things_module_in_Odoo)
+                params.put("odooConnectedAtLeastOnce",True)
                 return True
         else:
             loggerINFO(f"Remote Odoo Control not Available - Answer from Odoo did not contain an answer")

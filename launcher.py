@@ -38,6 +38,9 @@ managed_essential_processes = { # key(=process name) : (pythonmodule where the p
     "reader_d": "reader.manager",
     #"odoo_routine_check_d": "odooRoutineCheck.manager",
     "bluetooth_d": "bluetooth.server",
+    "odoo_d": "odoo.manager",
+    "state_d": "state.manager",
+    "buzzer_d": "buzzer.manager"
     #"RAS_d": "oldLauncher"
 }
 
@@ -92,25 +95,43 @@ def log_begin_manager_thread():
 def log_running_processes_list():
     running_alive = [p for p in running if running[p].is_alive()]
     running_dead = [p for p in running if p not in running_alive]
-    loggerINFO("alive processes: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
-    loggerINFO("dead processes: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
+    if running_dead:
+        loggerINFO("alive processes: " + cf.GREEN + ' ; '.join(running_alive) + cf.RESET)    
+        loggerINFO("dead processes: " + cf.RED + ' ; '.join(running_dead) + cf.RESET) 
 
 def manager_thread():
+    def get_thermal_status(counter):
+        def log_info_when_needed(counter):
+            try:
+                period_between_logs = int(params.get("periodCPUtemperatureLOGS")) * 60
+            except:
+                period_between_logs = 360
+
+            if counter*co.PERIOD_MAIN_THREAD > period_between_logs:
+                loggerINFO(f"thermal update {counter} - T {temperature}°C," + \
+                    f" CPU load 5 minutes avg {load_5min}%, mem used {memUsed}%")
+                counter = 0
+            return counter
+
+        topic, message = ras_subscriber.receive() # BLOCKING
+        #loggerDEBUG(f"received {topic} {message}")
+        loggerDEBUG(f"thermal status counter {counter}")
+        if topic == "thermal":
+            temperature, load_5min, memUsed = \
+                message.split()
+            counter = log_info_when_needed(counter)
+        return counter 
+
+
     ras_subscriber = Subscriber("5556")
     ras_subscriber.subscribe("thermal")
     log_begin_manager_thread()
     start_all_daemon_processes()
     start_all_managed_processes()
     #thermal = ThermalStatus() # instance of class ThermalStatus
+    counter = 0
     while 1:
-        # get thermal status
-        topic, message = ras_subscriber.receive() # BLOCKING
-        #loggerDEBUG(f"received {topic} {message}")
-        if topic == "thermal":
-            counter, temperature, load_5min, memUsed = \
-                message.split()     
-            loggerINFO(f"thermal update nr.{counter}: T {temperature}°C," + \
-                f" CPU load 5 minutes avg {load_5min}%, mem used {memUsed}%")
+        counter = get_thermal_status(counter) # BLOCKING
 
         if False: #thermal.isCritical()
             terminate_non_essential_managed_processes()
@@ -118,6 +139,7 @@ def manager_thread():
             start_all_managed_processes()
         log_running_processes_list()
         time.sleep(co.PERIOD_MAIN_THREAD)
+        counter += 1
 
 
 def main():

@@ -38,7 +38,8 @@ keys_by_Type[TxType.ON_DEVICE_SETUP] = [
   ]
 
 keys_by_Type[TxType.ON_ACK_FROM_ODOO] = [
-    "id",
+    "terminalIDinOdoo",
+    #"id",
     "RASxxx",
     "routefromDeviceToOdoo",
     "routefromOdooToDevice",
@@ -68,7 +69,7 @@ keys_by_Type.update({
       "timeToDisplayResultAfterClocking",
       "location"                        ,
       "shouldGetFirmwareUpdate"         , # True, False
-      "setRebootAt"                     , # time for next reboot (not periodically - einzelfall nur)
+      "setRebootAt"                     , # time for next reboot (not periodically, one time reboot)
       'shutdownTerminal'                ,
       "gitBranch"                       ,
       "gitCommit"                       ,
@@ -76,7 +77,9 @@ keys_by_Type.update({
       "updateOTAcommand"                ,
       "doFactoryReset"                  ,
       "updateAvailable"                 , # to be proofed in Odoo every day @03:00 + random
-      "lastConnectionOdooTerminal"
+      "lastConnectionOdooTerminal"      ,
+      "periodCPUtemperatureLOGS"        , # in minutes
+      "minimumTimeBetweenClockings"     , # in seconds
     ]
   })
 
@@ -86,7 +89,9 @@ keys_by_Type.update({
       "displayClock",
       "acknowledged",
       "isRemoteOdooControlAvailable",
-      "internetReachable"
+      "internetReachable",
+      "odooPortOpen",
+      "thermalMessageCounter"
     ]
   })
 

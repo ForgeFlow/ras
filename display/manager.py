@@ -16,7 +16,7 @@ params = Params(db=co.PARAMS)
 def main():
 
     display_subscriber = Subscriber("5557")
-    display_subscriber.subscribe("display")
+    display_subscriber.subscribe("new_card")
 
     oled = Oled()
     
@@ -24,16 +24,15 @@ def main():
         # get 
         topic, message = display_subscriber.receive() # BLOCKING
         #loggerDEBUG(f"received {topic} {message}")
-        if topic == "display":
+        if topic == "new_card":
             params.put("displayClock", "no")
             # counter, load = \
             #     message.split()
-            text = f"CARD WAS READ\n\n{message}"
-            loggerINFO(text)           
+            text = f"CARD WAS READ: {message}"
+            loggerDEBUG(text)           
             oled.three_lines_text(text)
 
         time.sleep(co.PERIOD_DISPLAY_MANAGER)
-        time.sleep(3)
         params.put("displayClock", "yes")
 
 if __name__ == "__main__":

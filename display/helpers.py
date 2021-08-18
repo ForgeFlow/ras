@@ -18,6 +18,7 @@ import common.constants as co
 import lib.Utils as ut
 
 import common.common as cc
+from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 
 params = Params(db=co.PARAMS)
 
@@ -387,16 +388,25 @@ def multiline_text_lu(
 
 
 def getInternetQualityMessage():
-    internetQualityMessage = "No Internet"
-    if ut.internetReachable():
-        if ut.isTypeOfConnection_Connected("eth0"):
-            internetQualityMessage = "Ethernet"
-        elif ut.isTypeOfConnection_Connected("wlan0"):
-            internetQualityMessage = "WiFi"
-        else:
-            internetQualityMessage = "Internet"          
-    return internetQualityMessage
+    try:
+        if params.get("internetReachable") == "1":
+            if ut.isTypeOfConnection_Connected("eth0"):
+                return "Ethernet"
+            elif ut.isTypeOfConnection_Connected("wlan0"):
+                return "WiFi"
+            else:
+                return "Internet" 
+    except Exception as e:
+        loggerDEBUG(f"Exception @ Get Internet Quality Message (display.helpers) {e}")
+    return "..."
 
+def getOdooReachabilityMessage():
+    try:
+        if params.get("odooPortOpen") == "1":
+            return params.get("RASxxx")+" <---> Odoo"
+    except Exception as e:
+        loggerDEBUG(f"Exception @ Odoo Reachability Message (display.helpers) {e}")
+    return "< ! >"     
 
 class Oled():
 
@@ -506,9 +516,10 @@ class Oled():
                 self.draw_text_not_centered(draw, [self.x_am_pm, 33], fontClockInfos,self.am_pm)
 
         self.displayClock = params.get("displayClock")
+        #loggerDEBUG(f"######################################### DISPLAY_TIME {self.displayClock}")
         if self.displayClock == "yes":
             self.internetQualityMessage = getInternetQualityMessage()
-            # self.odooReachabilityMessage = get....
+            self.odooReachabilityMessage = getOdooReachabilityMessage()
             update_time_related_variables()
             if self.somethingChanged():
                 self.device_display.command(self.device_display._const.INVERTDISPLAY)

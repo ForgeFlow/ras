@@ -305,12 +305,6 @@ class Params():
       result.append(key)
     return result
 
-  # def manager_start(self):
-  #   self._clear_keys_with_type(TxType.CLEAR_ON_MANAGER_START)
-
-  # def panda_disconnect(self):
-  #   self._clear_keys_with_type(TxType.CLEAR_ON_PANDA_DISCONNECT)
-
   def delete(self, key):
     with self.transaction(write=True) as txn:
       txn.delete(key)
@@ -347,7 +341,7 @@ class Params():
 
     if key not in keys:
       raise UnknownKeyName(key)
-
+    #print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
     write_db(self.db, key, dat)
 
 

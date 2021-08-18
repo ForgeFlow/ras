@@ -25,16 +25,20 @@ def isPingable(address):
     return isSuccesRunningSubprocess(command)
 
 def internetReachable():
-    return isPingable("1.1.1.1")
+    internet_reachable = isPingable("1.1.1.1")
+    params.put("internetReachable", internet_reachable)
+    return internet_reachable
 
 def isOdooPortOpen():
     try:
         odooHost = params.get("odoo_host")
         odooPort =  int(params.get("odoo_port"))
-        return isIpPortOpen((odooHost, odooPort))
+        odoo_port_open = isIpPortOpen((odooHost, odooPort))
     except Exception as e:
         loggerERROR(f"common.connectivity - exception in method isOdooPortOpen: {e}")
-        return False
+        odoo_port_open = False
+    params.put("odooPortOpen", odoo_port_open)
+    return odoo_port_open
 
 def isIpPortOpen(ipPort): # you can not ping ports, you have to use connect_ex for ports
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
