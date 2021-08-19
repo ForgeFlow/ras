@@ -20,8 +20,7 @@ def getAnswerFromOdooRoutineCheck():
         headers     = {'Content-Type': 'application/json'}
         incrementalLog = params.get("incrementalLog")
         payload     = {'question': co.QUESTION_ASK_FOR_ROUTINE_CHECK,
-                    'productName': productName,
-                    'incrementalLog': incrementalLog}
+                    'productName': productName}
         response    = requests.post(url=requestURL, json=payload, headers=headers)
         answer      = response.json().get("result", False)
         return  answer
@@ -38,32 +37,21 @@ def saveChangesToParams(answer):
             if answer.get(k,False)!=params.get(k):
                 params.put(k,answer.get(k, False))
 
-def doRoutineCheck():
+def routineCheck():
     answer = getAnswerFromOdooRoutineCheck()
 
     if answer:
         error = answer.get("error", False)
         if error:
-            loggerINFO(f"Routine Check not Available - error in answer from Odoo: {error}")
+            loggerDEBUG(f"Routine Check not Available - error in answer from Odoo: {error}")
         else:
-            params.put("incrementalLog", "")
+            loggerDEBUG(f"Routine Check done - no error") 
             params.put("isRemoteOdooControlAvailable", True)
             saveChangesToParams(answer)
             return True
     else:
-        loggerINFO(f"Routine Check not Available - No Answer from Odoo")        
+        loggerDEBUG(f"Routine Check not Available - No Answer from Odoo")        
 
     params.put("isRemoteOdooControlAvailable", False)
     return False
 
-def doAcknowledgementCheck():
-    print("##############################################################")
-    print("in Acknowledgement - in Acknowledgement - in Acknowledgement - in Acknowledgement - ")
-    #params.put("acknowledged",True)
-    return
-
-def routineCheck():
-    if int(params.get("acknowledged")):
-        doRoutineCheck()
-    else:
-        doAcknowledgementCheck()

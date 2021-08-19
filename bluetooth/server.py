@@ -43,7 +43,7 @@ def changeDeviceHostname(): # the bluetooth device listening reads the DeviceHos
 
 
 def server():
-    changeDeviceHostname()
+    #changeDeviceHostname()
     application     = GateSetupApplication()
     application.registerApplication()
 

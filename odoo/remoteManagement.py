@@ -7,7 +7,7 @@ import common.constants as co
 import common.common as cc
 import lib.Utils as ut
 import common.logger as lo
-from launcherHelper import copyDeviceCustomizationJson
+#from launcherHelper import copyDeviceCustomizationJson
 from common.constants import PARAMS
 from common.params import Params
 from common.keys import TxType
@@ -29,7 +29,7 @@ def getRASxxx():
     RAS_id_str ="2.1"
     params = Params(db=PARAMS)
     try:
-        RAS_id = params.get("terminalIDinOdoo", encoding='utf-8')
+        RAS_id = params.get("terminalIDinOdoo")
         if RAS_id:
             RAS_id_str = str(RAS_id)
             if len(RAS_id_str)==1:
@@ -96,7 +96,7 @@ def getTerminalIDinOdoo():
     hashed_machine_id = params.get("hashed_machine_id")
     if not hashed_machine_id:
         hashed_machine_id = cc.getHashedMachineId()
-        ut.storeOptionInDeviceCustomization("hashed_machine_id", hashed_machine_id)
+        params.put("hashed_machine_id", hashed_machine_id)
     acknowledgeTerminalInOdoo()
 
 def ensureFirstOdooConnection_RemoteManagement():

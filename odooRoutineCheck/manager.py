@@ -8,7 +8,10 @@ from common.params import Params
 params = Params(db=PARAMS)
 
 def main():
-    params.put("acknowledged",False)
+    
+    while params.get("acknowledged") == "0":
+        sleep(PERIOD_ODOO_ROUTINE_CHECK_MANAGER) # waiting_to_be_acknowledged
+
     while True:
         routineCheck()
         sleep(PERIOD_ODOO_ROUTINE_CHECK_MANAGER)

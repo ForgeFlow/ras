@@ -4,10 +4,11 @@ import time
 import os
 
 from common.constants import PARAMS
-from common.params import Params
+from common.params import Params, Log
 import re
 
 params = Params(db=PARAMS)
+log_db =  Log()
 
 logger = logging.getLogger('ras')
 
@@ -29,12 +30,14 @@ def escape_ansi(line):
 
 def appendToIncrementalLog(message):
     message = escape_ansi(message)
-    currentLog = params.get("incrementalLog")
-    if currentLog:
-        currentLog = currentLog + "\n" + message
-    else:
-        currentLog = message
-    params.put("incrementalLog", currentLog)
+    log_db.put(message)
+
+    # currentLog = params.get("incrementalLog")
+    # if currentLog:
+    #     currentLog = currentLog + "\n" + message
+    # else:
+    #     currentLog = message
+    # params.put("incrementalLog", currentLog)
 
 def loggerDEBUG(message):
     logger.debug(message)

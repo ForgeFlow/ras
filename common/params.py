@@ -30,7 +30,7 @@ import fcntl
 import tempfile
 import threading
 from enum import Enum, auto
-from common.constants import PARAMS
+import common.constants as co
 from common.keys import keys, TxType, keys_by_Type
 from factory_settings.params import factory_settings
 
@@ -268,7 +268,7 @@ def write_db(params_path, key, value):
     lock.release()
 
 class Params():
-  def __init__(self, db=PARAMS):
+  def __init__(self, db=co.PARAMS):
     self.db = db
     # create the database if it doesn't exist...
     if not os.path.exists(self.db + "/d"):
@@ -343,6 +343,92 @@ class Params():
       raise UnknownKeyName(key)
     #print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
     write_db(self.db, key, dat)
+
+
+class Log():
+  def __init__(self, db=co.LOG):
+    self.db = db
+    self.keys = {}
+    self.index = 0 # where the next entry comes
+    print(f"\n\n\n co.MAX_NUMBER_OF_LOG_ENTRIES {co.MAX_NUMBER_OF_LOG_ENTRIES} \n\n\n")
+    for i in range(co.MAX_NUMBER_OF_LOG_ENTRIES+1):
+      # print(f"i {i} - str(i) {str(i)}")
+      self.keys[str(i)]=[TxType.LOG]
+    # create the database if it doesn't exist...
+    if not os.path.exists(self.db + "/d"):
+      with self.transaction(write=True):
+        pass
+
+  def next_index(self):
+    next_index = self.index+1
+    if next_index>co.MAX_NUMBER_OF_LOG_ENTRIES:
+      next_index = 0
+    self.index = next_index
+
+  def clear_all(self):
+    shutil.rmtree(self.db, ignore_errors=True)
+    with self.transaction(write=True):
+      pass
+
+  def transaction(self, write=False):
+    if write:
+      return DBWriter(self.db)
+    else:
+      return DBReader(self.db)
+
+  def _clear_keys_with_type(self, tx_type):
+    with self.transaction(write=True) as txn:
+      for key in self.keys:
+        if tx_type in self.keys[key]:
+          txn.delete(key)
+  
+  def get_list_of_keys_with_type(self, tx_type):
+    result = []
+    for key in self.keys:
+      if tx_type in self.keys[key]:
+        result.append(key)
+    return result
+
+  def get_list_of_all_keys(self):
+    result=[]
+    for key in self.keys:
+      result.append(key)
+    return result
+
+  def delete(self, key):
+    with self.transaction(write=True) as txn:
+      txn.delete(key)
+
+  def get(self, key, block=False, encoding='utf-8'):
+    if key not in self.keys:
+      raise UnknownKeyName(key)
+
+    while 1:
+      ret = read_db(self.db, key)
+      if not block or ret is not None:
+        break
+      # is polling really the best we can do?
+      time.sleep(0.05)
+
+    if ret is not None and encoding is not None:
+      ret = ret.decode(encoding)
+    #print(f"key: {key} -- ret: {ret}")
+    return ret
+
+  def put(self, dat):
+    """
+    Warning: This function blocks until the param is written to disk!
+    In very rare cases this can take over a second, and your code will hang.
+
+    Use the put_nonblocking helper function in time sensitive code, but
+    in general try to avoid writing params as much as possible.
+    """
+    key = str(self.index)
+    if key not in self.keys:
+      raise UnknownKeyName(key)
+    print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
+    write_db(self.db, key, dat)
+    self.next_index()
 
 
 def put_nonblocking(key, val):

@@ -10,15 +10,7 @@ params = Params(db=co.PARAMS)
 def setOdooUrlTemplate():
     odooUrlTemplate    = None
     try:
-        if not os.path.isfile(co.PARAMS_DB_TRANSFERRED_FLAG):
-            if  ut.isOdooUsingHTTPS():
-                odooUrlTemplate = "https://%s" % ut.settings["odooParameters"]["odoo_host"][0]
-            else:
-                odooUrlTemplate = "http://%s" % ut.settings["odooParameters"]["odoo_host"][0]                
-            if ut.settings["odooParameters"]["odoo_port"][0]:
-                odooUrlTemplate += ":%s" % ut.settings["odooParameters"]["odoo_port"][0]
-        else:
-            odooUrlTemplate = params.get("odooUrlTemplate", encoding='utf-8')
+        odooUrlTemplate = params.get("odooUrlTemplate", encoding='utf-8')
         loggerINFO(f"odooUrlTemplate is {odooUrlTemplate}")
     except Exception as e:
         loggerERROR(f"Could not set Odoo URL Template - exception: {e}")

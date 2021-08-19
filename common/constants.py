@@ -46,5 +46,8 @@ QUESTION_ASK_FOR_RESET_SETTINGS = config("QUESTION_ASK_FOR_RESET_SETTINGS")
 
 PARAMS = WORKING_DIR + "/data/params"
 CLOCKINGS = WORKING_DIR + "/data/clockings"
+LOG = WORKING_DIR + "/data/log"
+
+MAX_NUMBER_OF_LOG_ENTRIES = 500
 
 #PARAMS_DB_TRANSFERRED_FLAG = WORKING_DIR + "/data/params_db_transferred_flag"
