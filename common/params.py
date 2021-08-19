@@ -33,7 +33,8 @@ from enum import Enum, auto
 import common.constants as co
 from common.keys import keys, TxType, keys_by_Type
 from factory_settings.params import factory_settings
-
+from pprint import PrettyPrinter
+pPrint = PrettyPrinter(indent=1).pprint
 
 def mkdirs_exists_ok(path):
   try:
@@ -294,9 +295,12 @@ class Params():
   
   def get_list_of_keys_with_type(self, tx_type):
     result = []
+    #print(f"\n\n\n tx_type {tx_type.value}")
     for key in keys:
-      if tx_type in keys[key]:
+      #print(f"key {key} - keys[key] {keys[key]}")
+      if tx_type.value in keys[key]:
         result.append(key)
+        #pPrint(result)
     return result
 
   def get_list_of_all_keys(self):
@@ -348,22 +352,32 @@ class Params():
 class Log():
   def __init__(self, db=co.LOG):
     self.db = db
-    self.keys = {}
-    self.index = 0 # where the next entry comes
-    print(f"\n\n\n co.MAX_NUMBER_OF_LOG_ENTRIES {co.MAX_NUMBER_OF_LOG_ENTRIES} \n\n\n")
+
+    self.keys = {} # every key (0,1,2,...) is a line of log 
     for i in range(co.MAX_NUMBER_OF_LOG_ENTRIES+1):
-      # print(f"i {i} - str(i) {str(i)}")
       self.keys[str(i)]=[TxType.LOG]
+    self.keys["index"] = [TxType.LOG]
+
     # create the database if it doesn't exist...
     if not os.path.exists(self.db + "/d"):
       with self.transaction(write=True):
         pass
 
+    if self.get("index") is not None:
+      self.set_index(int(self.get("index")))
+    else:
+      self.set_index(0) # where the next entry comes
+
   def next_index(self):
     next_index = self.index+1
     if next_index>co.MAX_NUMBER_OF_LOG_ENTRIES:
       next_index = 0
-    self.index = next_index
+    self.set_index(next_index)
+
+  def set_index(self, i):
+    self.index = i
+    write_db(self.db, "index", str(i))
+    print(f"set index: {i}")
 
   def clear_all(self):
     shutil.rmtree(self.db, ignore_errors=True)
@@ -423,12 +437,14 @@ class Log():
     Use the put_nonblocking helper function in time sensitive code, but
     in general try to avoid writing params as much as possible.
     """
-    key = str(self.index)
+    key = self.get("index", block=True)
+    self.index = int(key)
     if key not in self.keys:
       raise UnknownKeyName(key)
-    print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
+    #print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
     write_db(self.db, key, dat)
     self.next_index()
+
 
 
 def put_nonblocking(key, val):

@@ -59,6 +59,8 @@ def acknowledgeTerminalInOdoo():
         loggerDEBUG(f"Acknowledge Terminal in Odoo - Status code of response: {response.status_code} ")
         loggerDEBUG("Printing Entire Post Response")
         cc.pPrint(response.json())
+        loggerDEBUG("Printing list_on_ack_from_odoo")
+        cc.pPrint(list_on_ack_from_odoo)
         answer = response.json().get("result", None)
         if answer:
             error = answer.get("error", None)

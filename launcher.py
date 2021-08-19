@@ -108,14 +108,14 @@ def manager_thread():
                 period_between_logs = 360
 
             if counter*co.PERIOD_MAIN_THREAD > period_between_logs:
-                loggerINFO(f"thermal update {counter} - T {temperature}°C," + \
-                    f" CPU load 5 minutes avg {load_5min}%, mem used {memUsed}%")
+                loggerINFO(f"thermal update - T {temperature}°C," + \
+                    f" CPU load (5 minutes avg) {load_5min}%, mem used {memUsed}%")
                 counter = 0
             return counter
 
         topic, message = ras_subscriber.receive() # BLOCKING
         #loggerDEBUG(f"received {topic} {message}")
-        loggerDEBUG(f"thermal status counter {counter}")
+        #loggerDEBUG(f"thermal status counter {counter}")
         if topic == "thermal":
             temperature, load_5min, memUsed = \
                 message.split()
