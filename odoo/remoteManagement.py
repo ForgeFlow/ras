@@ -87,7 +87,7 @@ def acknowledgeTerminalInOdoo():
         loggerINFO(f"Request Exception : {e}")
         # TODO inform the user via Display and wait 1 second
     except Exception as e:
-        loggerERROR(f"Could not acknowledge Terminal in Odoo - Exception: {e}")
+        loggerDEBUG(f"Could not acknowledge Terminal in Odoo - Exception: {e}")
         # TODO inform the user via Display and wait 1 second
 
     return terminal_ID_in_Odoo

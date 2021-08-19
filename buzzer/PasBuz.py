@@ -16,7 +16,7 @@ class PasBuz:
         loggerDEBUG("PasBuz Class Initialized")
 
     def Play(self, msg):
-        loggerINFO(f"Playing PasBuz: {msg}")
+        loggerDEBUG(f"Playing PasBuz: {msg}")
         self.InitBuz()
         try:
             data = dic[msg]

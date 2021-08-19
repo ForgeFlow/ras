@@ -13,11 +13,11 @@ dic = {
     "check_in": ((v, hz, s * 2), (v, hz * 1.28, s * 2), (v, 5, s * 2)),
     "check_out": ((v, hz * 1.26, s), (v, hz, s), (v, 5, s)),
     "FALSE": (
-        (v, hz * 2, s / 2),
+        (v, hz * 1.5, s / 2),
         (v, 20, s),
-        (v, hz * 2, s / 2),
+        (v, hz * 1.5, s / 2),
         (v, 20, s),
-        (v, hz * 2, s / 2),
+        (v, hz * 1.5, s / 2),
         (v, 20, s),
     ),
     "comERR1": (

@@ -50,6 +50,7 @@ def main():
         # loggerDEBUG(text)      
         return enough_time
 
+    display_publisher   = Publisher("5559")
     buzzer_publisher    = Publisher("5558")
     odoo_subscriber     = Subscriber("5557")
     odoo_subscriber.subscribe("new_card")
@@ -65,11 +66,13 @@ def main():
             text = f":{card_id_as_string} - time: NOW_in_seconds {NOW_in_seconds}"
             if enough_time_between_clockings():
                 buzzer_publisher.publish("buzz", "card_registered")
+                display_publisher.publish("display_card_related_message", "card_registered")
                 text ="card REGISTERED: "+text
                 loggerINFO(text)
                 write_clocking(card_id_as_string, NOW_in_seconds)
             else:
                 buzzer_publisher.publish("buzz", "too_little_time_between_clockings")
+                display_publisher.publish("display_card_related_message", "too_little_time_between_clockings")
                 text ="card not registered (too_little_time_between_clockings) "+text
                 loggerDEBUG(text)
 
