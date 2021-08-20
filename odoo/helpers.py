@@ -33,9 +33,27 @@ def getAnswerFromOdooRoutineCheck():
 
 def saveChangesToParams(answer):
     for k in answer:
-        if k in keys_by_Type[TxType.ON_ROUTINE_CALLS]:
-            if answer.get(k,False)!=params.get(k):
-                params.put(k,answer.get(k, False))
+        ans = answer.get(k, None)
+        if ans is not None:
+            if ans is False: ans = "0"
+            if ans is True : ans = "1"
+            if k in keys_by_Type[TxType.ON_ROUTINE_CALLS]:
+                if ans != params.get(k):
+                    loggerDEBUG(f"from routine check - storing {k}: {ans}")
+                    params.put(k,ans)
+            elif k == "rfid_codes_to_names":
+                for code in ans:
+                    if code in params.keys:
+                        if ans[code] != params.get(code):
+                            loggerDEBUG(f"from routine check - storing {code}: {ans[code]}")
+                            params.put(code,ans[code])
+                    else:
+                        params.add_rfid_card_code_to_keys(code)
+                        loggerDEBUG(f"from routine check - CREATED and storing {code}: {ans[code]}")
+                        loggerDEBUG(f"params.keys {params.keys}")
+                        params.put(code,ans[code])                        
+            else:
+                loggerDEBUG(f"this key in answer from routine call is NOT STORED {k}: {ans}")
 
 def routineCheck():
     answer = getAnswerFromOdooRoutineCheck()

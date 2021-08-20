@@ -9,7 +9,7 @@ from messaging.messaging import SubscriberMultipart as Subscriber
 from messaging.messaging import PublisherMultipart as Publisher
 
 
-from common.params import Params, mkdirs_exists_ok
+from common.params import Params, mkdirs_exists_ok, read_db
 
 params = Params(db=co.PARAMS)
 
@@ -64,17 +64,22 @@ def main():
             NOW_in_seconds = int(time.time())
             card_id_as_string = f"{card}"                
             text = f":{card_id_as_string} - time: NOW_in_seconds {NOW_in_seconds}"
+            loggerDEBUG(f"card {card} - params.keys {params.keys}")
+            if card in os.listdir(co.PARAMS+'/d'):
+                full_name = read_db(co.PARAMS, card).decode('utf-8')
+                two_lines_name = full_name.replace(" ", "\n", 1)
+            else:
+                two_lines_name = "no\nName"
+
             if enough_time_between_clockings():
                 buzzer_publisher.publish("buzz", "card_registered")
-                display_publisher.publish("display_card_related_message", "card_registered")
-                text ="card REGISTERED: "+text
-                loggerINFO(text)
+                text ="REGISTERED\n" + two_lines_name                
+                display_publisher.publish("display_card_related_message", text)
                 write_clocking(card_id_as_string, NOW_in_seconds)
             else:
                 buzzer_publisher.publish("buzz", "too_little_time_between_clockings")
-                display_publisher.publish("display_card_related_message", "too_little_time_between_clockings")
-                text ="card not registered (too_little_time_between_clockings) "+text
-                loggerDEBUG(text)
+                text ="MIN "+str(co.DEFAULT_MINIMUM_TIME_BETWEEN_CLOCKINGS)+"s\n" + two_lines_name                
+                display_publisher.publish("display_card_related_message", text)
 
         #time.sleep(co.PERIOD_DISPLAY_MANAGER)
         time.sleep(0.01)

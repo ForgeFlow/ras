@@ -26,11 +26,11 @@ def main():
         #loggerDEBUG(f"received {topic} {message}")
         if topic == "display_card_related_message":
             params.put("displayClock", "no")
-            # counter, load = \
+            # , load = \
             #     message.split()
-            text = f"new message \n {message}"
+            text = f"new message on display: \n {message}"
             loggerDEBUG(text)           
-            oled.three_lines_text(text)
+            oled.three_lines_text(message)
 
         time.sleep(co.PERIOD_DISPLAY_MANAGER)
         params.put("displayClock", "yes")

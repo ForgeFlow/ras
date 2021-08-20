@@ -9,6 +9,7 @@ class TxType(Enum):
   ON_ROUTINE_CALLS            = auto()  # Updates come from Odoo - do not clear on start,
   FLAG                        = auto()  # used as flag in the firmware
   LOG                         = auto()  # key to store the logs
+  RFID_CARD_CODE              = auto()
 
 keys_by_Type = {}
 

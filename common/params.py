@@ -271,6 +271,7 @@ def write_db(params_path, key, value):
 class Params():
   def __init__(self, db=co.PARAMS):
     self.db = db
+    self.keys = keys
     # create the database if it doesn't exist...
     if not os.path.exists(self.db + "/d"):
       with self.transaction(write=True):
@@ -289,23 +290,23 @@ class Params():
 
   def _clear_keys_with_type(self, tx_type):
     with self.transaction(write=True) as txn:
-      for key in keys:
-        if tx_type in keys[key]:
+      for key in self.keys:
+        if tx_type in self.keys[key]:
           txn.delete(key)
   
   def get_list_of_keys_with_type(self, tx_type):
     result = []
     #print(f"\n\n\n tx_type {tx_type.value}")
-    for key in keys:
+    for key in self.keys:
       #print(f"key {key} - keys[key] {keys[key]}")
-      if tx_type.value in keys[key]:
+      if tx_type.value in self.keys[key]:
         result.append(key)
         #pPrint(result)
     return result
 
   def get_list_of_all_keys(self):
     result=[]
-    for key in keys:
+    for key in self.keys:
       result.append(key)
     return result
 
@@ -343,10 +344,14 @@ class Params():
       else:
         dat="0"
 
-    if key not in keys:
+    if key not in self.keys:
       raise UnknownKeyName(key)
     #print(f"put -- key {key}; value {dat}; type of value: {type(dat)}")
     write_db(self.db, key, dat)
+
+  def add_rfid_card_code_to_keys(self, rfid_card_code):
+    self.keys[rfid_card_code]= [TxType.RFID_CARD_CODE]
+
 
 
 class Log():
