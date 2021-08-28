@@ -4,13 +4,14 @@ import os
 
 from common.logger import loggerDEBUG, loggerINFO, loggerWARNING, loggerERROR, loggerCRITICAL
 import common.constants as co
-#import common.common as cc
+import common.common as cc
 
 from common.constants import PARAMS
 from common.params import Params
 from common.keys import TxType, keys_by_Type
 params = Params(db=PARAMS)
-
+keys_to_be_saved =  keys_by_Type[TxType.ON_ROUTINE_CALLS] + keys_by_Type[TxType.DISPLAY_MESSAGE]
+# cc.pPrint(keys_to_be_saved)
 productName = params.get('productName')
 
 def getAnswerFromOdooRoutineCheck():
@@ -37,7 +38,7 @@ def saveChangesToParams(answer):
         if ans is not None:
             if ans is False: ans = "0"
             if ans is True : ans = "1"
-            if k in keys_by_Type[TxType.ON_ROUTINE_CALLS]:
+            if k in keys_to_be_saved:
                 if ans != params.get(k):
                     loggerDEBUG(f"from routine check - storing {k}: {ans}")
                     params.put(k,ans)

@@ -9,9 +9,15 @@ class TxType(Enum):
   ON_ROUTINE_CALLS            = auto()  # Updates come from Odoo - do not clear on start,
   FLAG                        = auto()  # used as flag in the firmware
   LOG                         = auto()  # key to store the logs
-  RFID_CARD_CODE              = auto()
+  DISPLAY_MESSAGE             = auto()  # which message will be displayed
+  RFID_CARD_CODE              = auto() 
 
 keys_by_Type = {}
+
+keys_by_Type[TxType.DISPLAY_MESSAGE] = [
+    "card_registered",
+    "too_little_time_between_clockings"
+  ]
 
 keys_by_Type[TxType.FACTORY_SETTINGS] = [
     "firmwareAtShipment",

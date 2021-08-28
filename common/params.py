@@ -330,6 +330,25 @@ class Params():
     #print(f"key: {key} -- ret: {ret}")
     return ret
 
+  def get_filtered(self, key, block=False, encoding='utf-8'):
+    if key not in keys:
+      raise UnknownKeyName(key)
+
+    while 1:
+      ret = read_db(self.db, key)
+      if not block or ret is not None:
+        break
+      # is polling really the best we can do?
+      time.sleep(0.05)
+
+    if ret is not None and encoding is not None:
+      ret = ret.decode(encoding)
+
+    if ret is None:
+      ret = "not defined"
+
+    return ret
+
   def put(self, key, dat):
     """
     Warning: This function blocks until the param is written to disk!

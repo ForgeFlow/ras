@@ -57,34 +57,40 @@ def acknowledgeTerminalInOdoo():
         response    = requests.post(url=requestURL, json=payload, headers=headers)
 
         loggerDEBUG(f"Acknowledge Terminal in Odoo - Status code of response: {response.status_code} ")
-        loggerDEBUG("Printing Entire Post Response")
-        cc.pPrint(response.json())
-        loggerDEBUG("Printing list_on_ack_from_odoo")
-        cc.pPrint(list_on_ack_from_odoo)
-        answer = response.json().get("result", None)
-        if answer:
-            error = answer.get("error", None)
-            if error:
-                loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
-            else:
-                for o in list_on_ack_from_odoo:
-                    value = answer.get(o, False)
-                    loggerDEBUG(f"key: {o}; value:{value} ") 
-                    if type(value) != bool : value = str(value)
-                    params.put(o,value)
-                terminal_ID_in_Odoo     = answer.get('terminalIDinOdoo', False)
-                loggerINFO(f"terminal ID in Odoo: {answer.get('terminalIDinOdoo', False)}")
-                if not terminal_ID_in_Odoo:
-                    terminal_ID_in_Odoo = "2.1"
-                params.put("terminalIDinOdoo", terminal_ID_in_Odoo)
-                RASxxx = "RAS-"+getRASxxx()
-                params.put("RASxxx", RASxxx)
-                if answer["tz"]:
-                    loggerDEBUG(f"setting time zone to {answer['tz']}")
-                    cc.setTimeZone()
-                params.put("acknowledged", True)
+        if params.get("odooPortOpen") != "0" and response.status_code == 404:
+            loggerINFO(f"Route is not recognized by Odoo anymore, RAS has to be registered again")
+            loggerINFO(f"odooConnectedAtLeastOnce set to 0")
+            params.put("odooConnectedAtLeastOnce", "0")
+            params.put("RASxxx", "RASxxx")
         else:
-            loggerINFO(f"Answer from Odoo did not contain an answer")
+            loggerDEBUG("Printing Entire Post Response")
+            cc.pPrint(response.json())
+            loggerDEBUG("Printing list_on_ack_from_odoo")
+            cc.pPrint(list_on_ack_from_odoo)
+            answer = response.json().get("result", None)
+            if answer:
+                error = answer.get("error", None)
+                if error:
+                    loggerINFO(f"could not acknowledge the terminal in Odoo- error: {error}")
+                else:
+                    for o in list_on_ack_from_odoo:
+                        value = answer.get(o, False)
+                        loggerDEBUG(f"key: {o}; value:{value} ") 
+                        if type(value) != bool : value = str(value)
+                        params.put(o,value)
+                    terminal_ID_in_Odoo     = answer.get('terminalIDinOdoo', False)
+                    loggerINFO(f"terminal ID in Odoo: {answer.get('terminalIDinOdoo', False)}")
+                    if not terminal_ID_in_Odoo:
+                        terminal_ID_in_Odoo = "2.1"
+                    params.put("terminalIDinOdoo", terminal_ID_in_Odoo)
+                    RASxxx = "RAS-"+getRASxxx()
+                    params.put("RASxxx", RASxxx)
+                    if answer["tz"]:
+                        loggerDEBUG(f"setting time zone to {answer['tz']}")
+                        cc.setTimeZone()
+                    params.put("acknowledged", True)
+            else:
+                loggerINFO(f"Answer from Odoo did not contain an answer")
     except ConnectionRefusedError as e:
         loggerINFO(f"Request Exception : {e}")
         # TODO inform the user via Display and wait 1 second

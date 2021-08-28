@@ -17,7 +17,6 @@ if not os.path.exists(co.CLOCKINGS):
     mkdirs_exists_ok(co.CLOCKINGS)
 
 
-
 def main():
     def write_clocking(card_id_as_string, NOW_in_seconds):
         file_name_of_the_clocking = co.CLOCKINGS + "/" + card_id_as_string + "-" + str(NOW_in_seconds)
@@ -72,16 +71,16 @@ def main():
                 two_lines_name = "no\nName"
 
             if enough_time_between_clockings():
-                buzzer_publisher.publish("buzz", "card_registered")
-                text ="REGISTERED\n" + two_lines_name                
-                display_publisher.publish("display_card_related_message", text)
+                how_to_handle_the_clocking = "card_registered"
                 write_clocking(card_id_as_string, NOW_in_seconds)
             else:
-                buzzer_publisher.publish("buzz", "too_little_time_between_clockings")
-                text ="MIN "+str(co.DEFAULT_MINIMUM_TIME_BETWEEN_CLOCKINGS)+"s\n" + two_lines_name                
-                display_publisher.publish("display_card_related_message", text)
+                how_to_handle_the_clocking = "too_little_time_between_clockings"
 
-        #time.sleep(co.PERIOD_DISPLAY_MANAGER)
+            buzzer_publisher.publish("buzz", how_to_handle_the_clocking)
+            msg = params.get_filtered(how_to_handle_the_clocking)
+            text =msg + "\n" + two_lines_name              
+            display_publisher.publish("display_card_related_message", text)
+
         time.sleep(0.01)
 
 

@@ -15,7 +15,7 @@ params = Params(db=co.PARAMS)
 
 def main():
 
-    params.put("acknowledged", "0") # terminal is NOT acknowledged at the beginning
+    #params.put("acknowledged", "0") # terminal is NOT acknowledged at the beginning
 
     while True:
         if params.get("odooConnectedAtLeastOnce") == "0":
