@@ -27,9 +27,9 @@ def postToOdooRegisterClockings():
                       "/" + params.get("routefromDeviceToOdoo")
         headers     = {'Content-Type': 'application/json'}
         clockings   = getClockings()
-        loggerDEBUG(f"#####################--------------##############")
-        cc.pPrint(clockings)
-        loggerDEBUG(f"#####################--------------##############")
+        # loggerDEBUG(f"#####################--------------##############")
+        # cc.pPrint(clockings)
+        # loggerDEBUG(f"#####################--------------##############")
         payload     = {
                     'question'      : co.QUESTION_ASK_FOR_REGISTER_CLOCKINGS,
                     'productName'   : productName,
@@ -37,7 +37,7 @@ def postToOdooRegisterClockings():
                     }
         response    = requests.post(url=requestURL, json=payload, headers=headers)
         answer      = response.json().get("result", False)
-        loggerDEBUG(f"REGISTER CLOCKINGS answer: {answer}")
+        #loggerDEBUG(f"REGISTER CLOCKINGS answer: {answer}")
         return  answer
     except ConnectionRefusedError as e:
         loggerDEBUG(f"Register Clockings not Available - ConnectionRefusedError - Request Exception : {e}")

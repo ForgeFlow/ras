@@ -283,6 +283,11 @@ class sh1106(device):
 
             self.data(list(buf))
 
+    def display_off(self):
+        self.command(
+            self._const.DISPLAYOFF
+        )
+
 
 class canvas():
     """
@@ -468,6 +473,9 @@ class Oled():
             return True
         else:
             return False
+
+    def display_off(self):
+        self.device_display.command(self.device_display._const.DISPLAYOFF)
 
     def display_time(self):
 

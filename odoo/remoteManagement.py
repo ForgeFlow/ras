@@ -9,20 +9,31 @@ import lib.Utils as ut
 import common.logger as lo
 #from launcherHelper import copyDeviceCustomizationJson
 from common.constants import PARAMS
-from common.params import Params
+from common.params import Params, Log
 from common.keys import TxType
 
 
 params = Params(db=PARAMS)
+log_db =  Log()
 
+def prepare_incrementalLog():
+    last_index = int(log_db.get('index'))
+    inc_log = log_db.get_whole_log(last_index)
+    #cc.pPrint(inc_log)
+    return inc_log
 
 def getPayload(settings_to_send):
     payload = {}
+    inc_log = prepare_incrementalLog()
+    params.put('incrementalLog', inc_log)
+    last_log = int(log_db.get('index', 0))
+    params.put('lastLogMessage', str(last_log))
     for s in settings_to_send:
         try:
             payload[s] = params.get(s)
         except Exception as e:
             loggerERROR(f"Exception while trying to access setting {s}")
+    #cc.pPrint(payload)
     return payload
 
 def acknowledgeTerminalInOdoo():
@@ -33,6 +44,8 @@ def acknowledgeTerminalInOdoo():
         headers     = {'Content-Type': 'application/json'}
         list_of_all_keys = params.get_list_of_all_keys()
         list_on_ack_from_odoo = params.get_list_of_keys_with_type(TxType.ON_ACK_FROM_ODOO)
+        print("ww"*80)
+        cc.pPrint(list_on_ack_from_odoo)
         payload     = getPayload(list_of_all_keys)
 
         response    = requests.post(url=requestURL, json=payload, headers=headers)

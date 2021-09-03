@@ -50,7 +50,10 @@ keys_by_Type[TxType.ON_ACK_FROM_ODOO] = [
     "RASxxx",
     "routefromDeviceToOdoo",
     "routefromOdooToDevice",
-    "version_things_module_in_Odoo"
+    "version_things_module_in_Odoo",
+    "minimumTimeBetweenClockings"     , # in seconds
+    "period_odoo_routine_check"       , # in seconds
+    "timeToDisplayResultAfterClocking",
   ]
 
 keys_by_Type[TxType.ON_ACK_FROM_DEVICE] = [
@@ -87,6 +90,7 @@ keys_by_Type.update({
       "lastConnectionOdooTerminal"      ,
       "periodCPUtemperatureLOGS"        , # in minutes
       "minimumTimeBetweenClockings"     , # in seconds
+      "period_odoo_routine_check"       , # in seconds
     ]
   })
 
@@ -98,7 +102,8 @@ keys_by_Type.update({
       "isRemoteOdooControlAvailable",
       "internetReachable",
       "odooPortOpen",
-      "thermalMessageCounter"
+      "thermalMessageCounter",
+      'lastLogMessage'
     ]
   })
 
@@ -114,7 +119,12 @@ keys = {}
 for e in TxType:
   if e in keys_by_Type.keys():
     for k in keys_by_Type[e]:
-      # print(f"key: {k} and value: {e} - {e.value}")
-      keys[k]=[e.value]
+      print(f"key: {k} and value: {e} - {e.value}")
+      if keys.get(k, None) is None:
+        keys[k]=[e.value]
+      else:
+        existing = keys[k]
+        existing.append(e.value)
+        keys[k] = existing
 
 keys_routine_calls={}

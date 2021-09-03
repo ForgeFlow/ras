@@ -375,6 +375,7 @@ class Params():
 
 class Log():
   def __init__(self, db=co.LOG):
+    self.params = Params()
     self.db = db
 
     self.keys = {} # every key (0,1,2,...) is a line of log 
@@ -391,6 +392,44 @@ class Log():
       self.set_index(int(self.get("index")))
     else:
       self.set_index(0) # where the next entry comes
+
+  def previous_index(self, i):
+    previous_index = i-1
+    if previous_index <0:
+      previous_index = co.MAX_NUMBER_OF_LOG_ENTRIES
+    return previous_index
+  
+  def get_next_index(self, index):
+    next_index = index+1
+    if next_index>co.MAX_NUMBER_OF_LOG_ENTRIES:
+      next_index = 0
+    return next_index
+
+  def get_whole_log(self, begin):
+    end = self.previous_index(begin)
+    return self.get_inc_log(begin, end)
+
+  def sanitize_index(self,i):
+    i = int(i)
+    if i<0: i=0
+    if i>co.MAX_NUMBER_OF_LOG_ENTRIES: i = co.MAX_NUMBER_OF_LOG_ENTRIES
+    return i
+
+  def get_inc_log(self, begin, end):
+    begin = self.sanitize_index(begin)
+    end   = self.sanitize_index(end)
+    if begin == end: return ''
+    incremental_log =""
+    index = begin
+    entry = self.get(str(index))
+    incremental_log = entry + '\n' + incremental_log
+    index = self.get_next_index(index)
+    stop_mark = self.previous_index(end)
+    while index != stop_mark:
+      entry = self.get(str(index))
+      incremental_log = entry + '\n' + incremental_log
+      index = self.get_next_index(index)
+    return incremental_log    
 
   def next_index(self):
     next_index = self.index+1

@@ -16,8 +16,8 @@ params = Params(db=co.PARAMS)
 if not os.path.exists(co.CLOCKINGS):
     mkdirs_exists_ok(co.CLOCKINGS)
 
-
 def main():
+
     def write_clocking(card_id_as_string, NOW_in_seconds):
         file_name_of_the_clocking = co.CLOCKINGS + "/" + card_id_as_string + "-" + str(NOW_in_seconds)
         with open(file_name_of_the_clocking, 'w'): pass
@@ -26,7 +26,7 @@ def main():
 
         def get_minimum_time():
             n = params.get("minimumTimeBetweenClockings")
-            if n is None:
+            if n is None or n is "False": 
                 loggerDEBUG(f"No parameter stored for minimumTimeBetweenClockings")
                 min_time_between_clockings = co.DEFAULT_MINIMUM_TIME_BETWEEN_CLOCKINGS
             elif n:
